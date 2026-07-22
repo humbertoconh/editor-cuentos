@@ -759,6 +759,7 @@ window.nav = (binderEl, section) => {
   document.querySelectorAll('.bitem').forEach(i=>i.classList.remove('active'));
   if(binderEl) binderEl.classList.add('active');
   if(chapters[section]) {
+    saveCurrentChapter();
     showEditor(); loadChapter(section);
     document.getElementById('modePill').textContent='Escritura';
     document.getElementById('modePill').className='mode-pill pill-write';
@@ -809,11 +810,16 @@ function loadChapter(id) {
 
 function saveCurrentChapter() {
   if(!currentChapterId||!chapters[currentChapterId]) return;
+  clearTimeout(saveTimer);
   const ch=chapters[currentChapterId];
   ch.content=document.getElementById('mainEditor').innerHTML;
   const txt=document.getElementById('mainEditor').innerText||'';
   ch.words=txt.trim()?txt.trim().split(/\s+/).length:0;
   ch.title=document.getElementById('chapterTitle').value;
+  // Guardar inmediatamente en Firebase al cambiar de capítulo
+  if(currentProjectId) {
+    updateDoc(doc(db,'projects',currentProjectId,'chapters',currentChapterId),{content:ch.content,words:ch.words,title:ch.title}).catch(()=>{});
+  }
 }
 
 window.saveCurrentChTitle = () => {
