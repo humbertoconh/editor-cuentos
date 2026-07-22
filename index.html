@@ -1,1243 +1,980 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
 <title>Editor de cuentos ilustrados</title>
-<link rel="preconnect" href="https://fonts.googleapis.com" />
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Lora:ital,wght@0,400;0,500;1,400&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.31.0/dist/tabler-icons.min.css" />
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Lora:ital,wght@0,400;0,500;1,400&family=Inter:wght@400;500;600&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.31.0/dist/tabler-icons.min.css"/>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
-  --binder-bg:#1a1208;--binder-border:#7a5230;--binder-gold:#c9a96e;--binder-gold-dim:rgba(201,169,110,0.4);
-  --binder-text:#e8d8b8;--cork-bg:#e8d8c0;--cork-card:#fffdf6;
-  --surface:#ffffff;--surface-1:#f8f5f0;--surface-2:#f0ebe3;
-  --border:rgba(0,0,0,0.09);--border-strong:rgba(0,0,0,0.16);
-  --text:#1a1208;--text-2:#5a4a38;--text-muted:#9a8a78;
-  --accent:#185FA5;--accent-bg:#e6f1fb;--accent-border:#85b7eb;
-  --green:#3D6B5E;--green-dark:#2e5247;--green-bg:#e0ede9;
-  --gold:#c9a96e;--gold-bg:#faf3e6;
-  --success-bg:#eaf3de;--success:#3b6d11;
-  --danger:#a32d2d;--danger-bg:#fcebeb;
-  --radius:6px;
+  --binder-bg:#1a1208;--binder-border:#7a5230;--gold:#c9a96e;--gold-dim:rgba(201,169,110,0.4);
+  --binder-text:#e8d8b8;--cork:#e8d8c0;
+  --s0:#ffffff;--s1:#f8f5f0;--s2:#f0ebe3;
+  --bd:rgba(0,0,0,0.09);--bd2:rgba(0,0,0,0.16);
+  --tx:#1a1208;--tx2:#5a4a38;--txm:#9a8a78;
+  --ac:#185FA5;--ac-bg:#e6f1fb;--ac-bd:#85b7eb;
+  --gr:#3D6B5E;--gr-dark:#2e5247;--gr-bg:#e0ede9;
+  --ok:#3b6d11;--ok-bg:#eaf3de;
+  --r:6px;
 }
-html,body{height:100%;overflow:hidden;font-family:'Inter',sans-serif;background:var(--surface-1);color:var(--text)}
+html,body{height:100%;overflow:hidden;font-family:'Inter',sans-serif;background:var(--s1);color:var(--tx)}
 
-/* ── APP SHELL ── */
-.app{display:flex;height:100vh;overflow:hidden;position:relative}
+/* ── LAYOUT ── */
+.app{display:flex;height:100vh;overflow:hidden}
 
 /* ── BINDER ── */
-.binder{width:230px;min-width:230px;background:var(--binder-bg);display:flex;flex-direction:column;border-right:3px solid var(--binder-border);flex-shrink:0;position:relative;transition:width 0.2s}
-.binder.collapsed{width:0;min-width:0;border:none;overflow:hidden}
-.binder-spine{position:absolute;left:0;top:0;bottom:0;width:7px;background:repeating-linear-gradient(180deg,var(--binder-border) 0,#5c3a1e 2px,#2e1a0a 4px,var(--binder-border) 6px);opacity:0.5;pointer-events:none}
-.binder-header{padding:16px 12px 12px 22px;border-bottom:1px solid rgba(139,94,60,0.3);cursor:default;flex-shrink:0}
-.binder-project{font-family:'Playfair Display',serif;font-size:14px;color:var(--binder-gold);letter-spacing:0.04em;font-weight:600;outline:none;background:transparent;border:none;color:var(--binder-gold);width:100%}
-.binder-project:focus{border-bottom:1px solid var(--binder-gold-dim)}
-.binder-sub{font-size:11px;color:var(--binder-gold-dim);margin-top:3px}
+.binder{width:230px;min-width:230px;background:var(--binder-bg);display:flex;flex-direction:column;border-right:3px solid var(--binder-border);flex-shrink:0;position:relative}
+.binder-spine{position:absolute;left:0;top:0;bottom:0;width:7px;background:repeating-linear-gradient(180deg,var(--binder-border) 0,#5c3a1e 2px,#2e1a0a 4px,var(--binder-border) 6px);opacity:.5;pointer-events:none}
+.binder-head{padding:16px 12px 12px 22px;border-bottom:1px solid rgba(139,94,60,.3)}
+.binder-project{font-family:'Playfair Display',serif;font-size:14px;color:var(--gold);letter-spacing:.04em;font-weight:600;background:transparent;border:none;outline:none;width:100%}
+.binder-sub{font-size:11px;color:var(--gold-dim);margin-top:3px}
 .binder-body{flex:1;overflow-y:auto;padding:6px 0}
 .binder-body::-webkit-scrollbar{width:3px}
-.binder-body::-webkit-scrollbar-thumb{background:rgba(201,169,110,0.15);border-radius:2px}
-.binder-section-label{padding:10px 10px 4px 22px;font-size:10px;color:var(--binder-gold-dim);text-transform:uppercase;letter-spacing:0.1em;font-weight:600}
-.binder-item{padding:7px 8px 7px 22px;display:flex;align-items:center;gap:7px;cursor:pointer;border-left:3px solid transparent;transition:background 0.1s;user-select:none}
-.binder-item:hover{background:rgba(201,169,110,0.07)}
-.binder-item.active{background:rgba(201,169,110,0.13);border-left-color:var(--binder-gold)}
-.binder-item .bi{font-size:13px;color:var(--binder-gold);opacity:0.8;flex-shrink:0}
-.binder-item .bl{font-size:13px;color:var(--binder-text);flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.binder-item .bb{font-size:10px;background:rgba(201,169,110,0.15);color:var(--binder-gold);padding:1px 5px;border-radius:8px;flex-shrink:0}
-.binder-item.sub{padding-left:34px}
-.binder-item.sub .bl{font-size:12px}
-.binder-divider{height:1px;background:rgba(139,94,60,0.2);margin:6px 12px 6px 22px}
-.binder-add-btn{margin:4px 10px 4px 22px;padding:5px 8px;background:rgba(201,169,110,0.07);border:1px dashed rgba(201,169,110,0.25);border-radius:var(--radius);cursor:pointer;display:flex;align-items:center;gap:5px;color:rgba(201,169,110,0.5);font-size:11px;font-family:'Inter',sans-serif;transition:all 0.12s;text-align:left}
-.binder-add-btn:hover{background:rgba(201,169,110,0.14);color:var(--binder-gold)}
-.compile-btn{margin:8px 10px;padding:9px;background:var(--green);color:#fff;border:none;border-radius:var(--radius);cursor:pointer;font-size:13px;font-weight:500;display:flex;align-items:center;justify-content:center;gap:6px;font-family:'Inter',sans-serif;transition:background 0.12s;flex-shrink:0}
-.compile-btn:hover{background:var(--green-dark)}
+.binder-body::-webkit-scrollbar-thumb{background:rgba(201,169,110,.15);border-radius:2px}
+.bsec{padding:10px 10px 4px 22px;font-size:10px;color:var(--gold-dim);text-transform:uppercase;letter-spacing:.1em;font-weight:600}
+.bitem{padding:7px 8px 7px 22px;display:flex;align-items:center;gap:7px;cursor:pointer;border-left:3px solid transparent;transition:background .1s;user-select:none}
+.bitem:hover{background:rgba(201,169,110,.07)}
+.bitem.active{background:rgba(201,169,110,.13);border-left-color:var(--gold)}
+.bitem i{font-size:13px;color:var(--gold);opacity:.8;flex-shrink:0}
+.bitem .bl{font-size:13px;color:var(--binder-text);flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bitem .bb{font-size:10px;background:rgba(201,169,110,.15);color:var(--gold);padding:1px 5px;border-radius:8px;flex-shrink:0}
+.bitem.sub{padding-left:34px}
+.bitem.sub .bl{font-size:12px}
+.bdiv{height:1px;background:rgba(139,94,60,.2);margin:6px 12px 6px 22px}
+.badd{margin:4px 10px 4px 22px;padding:5px 8px;background:rgba(201,169,110,.07);border:1px dashed rgba(201,169,110,.25);border-radius:var(--r);cursor:pointer;display:flex;align-items:center;gap:5px;color:rgba(201,169,110,.5);font-size:11px;font-family:'Inter',sans-serif;transition:all .12s;text-align:left;width:calc(100% - 32px)}
+.badd:hover{background:rgba(201,169,110,.14);color:var(--gold)}
+.compile-btn{margin:8px 10px;padding:9px;background:var(--gr);color:#fff;border:none;border-radius:var(--r);cursor:pointer;font-size:13px;font-weight:500;display:flex;align-items:center;justify-content:center;gap:6px;font-family:'Inter',sans-serif;transition:background .12s;flex-shrink:0}
+.compile-btn:hover{background:var(--gr-dark)}
 
-/* ── MIDDLE PANEL ── */
-.middle-panel{width:215px;min-width:190px;flex-shrink:0;background:var(--surface-1);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden;transition:width 0.2s}
-.middle-panel.collapsed{width:0;min-width:0;overflow:hidden}
-.ptabs{display:flex;border-bottom:1px solid var(--border);background:var(--surface);flex-shrink:0}
-.ptab{flex:1;padding:9px 4px;font-size:11px;color:var(--text-muted);cursor:pointer;text-align:center;border-bottom:2px solid transparent;transition:all 0.12s;user-select:none}
-.ptab.active{color:var(--accent);border-bottom-color:var(--accent)}
-.ptab:hover:not(.active){background:var(--surface-1)}
+/* ── MIDDLE ── */
+.mid{width:215px;min-width:190px;flex-shrink:0;background:var(--s1);border-right:1px solid var(--bd);display:flex;flex-direction:column;overflow:hidden}
+.ptabs{display:flex;border-bottom:1px solid var(--bd);background:var(--s0);flex-shrink:0}
+.ptab{flex:1;padding:9px 4px;font-size:11px;color:var(--txm);cursor:pointer;text-align:center;border-bottom:2px solid transparent;transition:all .12s;user-select:none}
+.ptab.active{color:var(--ac);border-bottom-color:var(--ac)}
+.ptab:hover:not(.active){background:var(--s1)}
+.cork{flex:1;overflow-y:auto;padding:12px;background:var(--cork);display:flex;flex-direction:column;gap:10px}
+.cork::-webkit-scrollbar{width:3px}
+.cork::-webkit-scrollbar-thumb{background:rgba(139,94,60,.2);border-radius:2px}
+.ccard{background:#fffdf6;border-radius:3px;padding:11px 11px 9px;cursor:pointer;border-top:4px solid var(--gold);box-shadow:0 2px 6px rgba(0,0,0,.1);transition:transform .12s,box-shadow .12s;position:relative}
+.ccard:hover{transform:translateY(-2px);box-shadow:0 5px 12px rgba(0,0,0,.15)}
+.ccard.active{border-top-color:var(--gr)}
+.cpin{position:absolute;top:-7px;left:50%;transform:translateX(-50%);width:11px;height:11px;border-radius:50%;background:#c0392b;box-shadow:0 1px 3px rgba(0,0,0,.3)}
+.ccard .ct{font-family:'Playfair Display',serif;font-size:13px;font-weight:600;color:#2a1a0a;margin-bottom:4px}
+.ccard .cs{font-size:11px;color:#7a6a58;line-height:1.5}
+.ccard .cst{display:inline-block;font-size:10px;padding:2px 7px;border-radius:8px;margin-top:6px}
+.st-b{background:#fde8cc;color:#7a4a18}
+.st-r{background:var(--gr-bg);color:var(--gr)}
+.st-f{background:var(--ac-bg);color:var(--ac)}
+.outline{flex:1;overflow-y:auto;display:none}
+.oitem{padding:8px 10px 8px 12px;display:flex;align-items:center;gap:6px;cursor:pointer;font-size:12px;color:var(--tx);border-bottom:1px solid var(--bd);transition:background .1s}
+.oitem:hover{background:var(--s2)}
+.oitem.active{background:var(--ac-bg);color:var(--ac)}
+.oitem i{font-size:12px;color:var(--txm)}
+.oitem.active i{color:var(--ac)}
+.oitem .ow{margin-left:auto;font-size:10px;color:var(--txm)}
+.oitem .os{font-size:10px;padding:1px 5px;border-radius:6px;margin-left:4px}
+.scriv{flex:1;overflow-y:auto;display:none;padding:10px;background:var(--s1)}
+.ssec{background:var(--s0);border-radius:var(--r);border:1px solid var(--bd);margin-bottom:8px;overflow:hidden}
+.ssec-title{padding:8px 12px;background:var(--s2);border-bottom:1px solid var(--bd);font-family:'Playfair Display',serif;font-size:13px;font-weight:600;color:var(--tx2);cursor:pointer}
+.ssec-title:hover{background:var(--ac-bg);color:var(--ac)}
+.ssec-body{padding:12px;font-family:'Lora',serif;font-size:13px;line-height:1.8;color:var(--tx)}
 
-/* CORKBOARD */
-.corkboard{flex:1;overflow-y:auto;padding:12px;background:var(--cork-bg);display:flex;flex-direction:column;gap:10px}
-.corkboard::-webkit-scrollbar{width:3px}
-.corkboard::-webkit-scrollbar-thumb{background:rgba(139,94,60,0.2);border-radius:2px}
-.cork-card{background:var(--cork-card);border-radius:3px;padding:11px 11px 9px;cursor:pointer;border-top:4px solid var(--binder-gold);box-shadow:0 2px 6px rgba(0,0,0,0.1);transition:transform 0.12s,box-shadow 0.12s;position:relative}
-.cork-card:hover{transform:translateY(-2px);box-shadow:0 5px 12px rgba(0,0,0,0.15)}
-.cork-card.active{border-top-color:var(--green)}
-.cork-pin{position:absolute;top:-7px;left:50%;transform:translateX(-50%);width:11px;height:11px;border-radius:50%;background:#c0392b;box-shadow:0 1px 3px rgba(0,0,0,0.3)}
-.cork-card .ct{font-family:'Playfair Display',serif;font-size:13px;font-weight:600;color:#2a1a0a;margin-bottom:4px}
-.cork-card .cs{font-size:11px;color:#7a6a58;line-height:1.5}
-.cork-card .cst{display:inline-block;font-size:10px;padding:2px 7px;border-radius:8px;margin-top:6px}
-.st-borrador{background:#fde8cc;color:#7a4a18}
-.st-revision{background:var(--green-bg);color:var(--green)}
-.st-final{background:var(--accent-bg);color:var(--accent)}
-
-/* OUTLINER */
-.outliner{flex:1;overflow-y:auto;display:none}
-.ol-item{padding:8px 10px 8px 12px;display:flex;align-items:center;gap:6px;cursor:pointer;font-size:12px;color:var(--text);border-bottom:1px solid var(--border);transition:background 0.1s}
-.ol-item:hover{background:var(--surface-2)}
-.ol-item.active{background:var(--accent-bg);color:var(--accent)}
-.ol-item .oi{font-size:12px;color:var(--text-muted)}
-.ol-item.active .oi{color:var(--accent)}
-.ol-item .ow{margin-left:auto;font-size:10px;color:var(--text-muted);white-space:nowrap}
-.ol-item .os{font-size:10px;padding:1px 5px;border-radius:6px;margin-left:4px}
-
-/* SCRIVENINGS */
-.scrivenings-view{flex:1;overflow-y:auto;display:none;padding:12px;background:var(--surface-1)}
-.scrivenings-section{background:var(--surface);border-radius:var(--radius);border:1px solid var(--border);margin-bottom:10px;overflow:hidden}
-.scrivenings-section-title{padding:8px 12px;background:var(--surface-2);border-bottom:1px solid var(--border);font-family:'Playfair Display',serif;font-size:13px;font-weight:600;color:var(--text-2)}
-.scrivenings-section-body{padding:12px;font-family:'Lora',serif;font-size:14px;line-height:1.8;color:var(--text);min-height:60px}
-
-/* ── EDITOR ── */
-.editor-area{flex:1;display:flex;flex-direction:column;overflow:hidden;background:var(--surface)}
-.editor-toolbar{padding:6px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:3px;background:var(--surface-1);flex-wrap:wrap;flex-shrink:0}
+/* ── MAIN AREA ── */
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden;background:var(--s0)}
+.toolbar{padding:6px 14px;border-bottom:1px solid var(--bd);display:flex;align-items:center;gap:3px;background:var(--s1);flex-wrap:wrap;flex-shrink:0}
 .tg{display:flex;gap:1px}
-.tg+.tg{margin-left:5px;padding-left:5px;border-left:1px solid var(--border-strong)}
-.tbtn{padding:5px 8px;border:none;background:transparent;border-radius:4px;cursor:pointer;color:var(--text-2);font-size:12px;font-family:'Inter',sans-serif;display:flex;align-items:center;gap:3px;transition:background 0.1s,color 0.1s;white-space:nowrap}
-.tbtn:hover{background:var(--surface-2);color:var(--text)}
-.tbtn.on{background:var(--accent-bg);color:var(--accent)}
+.tg+.tg{margin-left:5px;padding-left:5px;border-left:1px solid var(--bd2)}
+.tbtn{padding:5px 8px;border:none;background:transparent;border-radius:4px;cursor:pointer;color:var(--tx2);font-size:12px;font-family:'Inter',sans-serif;display:flex;align-items:center;gap:3px;transition:background .1s,color .1s;white-space:nowrap}
+.tbtn:hover{background:var(--s2);color:var(--tx)}
+.tbtn.on{background:var(--ac-bg);color:var(--ac)}
 .tbtn i{font-size:15px}
-.editor-title-bar{padding:14px 24px 0;background:var(--surface);flex-shrink:0}
-.chapter-title{width:100%;font-family:'Playfair Display',serif;font-size:24px;font-weight:600;color:var(--text);border:none;background:transparent;outline:none;padding-bottom:10px;border-bottom:2px solid var(--accent-border)}
-.editor-split{flex:1;display:flex;overflow:hidden}
-.editor-scroll{flex:1;overflow-y:auto;padding:20px 24px;background:var(--surface)}
+
+/* ── PANEL DE CONTENIDO (contiene todo lo que cambia) ── */
+.content-area{flex:1;display:flex;overflow:hidden;position:relative}
+
+/* ── EDITOR VIEW ── */
+.editor-view{flex:1;display:flex;flex-direction:column;overflow:hidden}
+.editor-title-bar{padding:14px 24px 0;background:var(--s0);flex-shrink:0}
+.chapter-title{width:100%;font-family:'Playfair Display',serif;font-size:24px;font-weight:600;color:var(--tx);border:none;background:transparent;outline:none;padding-bottom:10px;border-bottom:2px solid var(--ac-bd)}
+.editor-body{flex:1;display:flex;overflow:hidden}
+.editor-scroll{flex:1;overflow-y:auto;padding:20px 24px;background:var(--s0)}
 .editor-scroll::-webkit-scrollbar{width:5px}
-.editor-scroll::-webkit-scrollbar-thumb{background:var(--border-strong);border-radius:3px}
+.editor-scroll::-webkit-scrollbar-thumb{background:var(--bd2);border-radius:3px}
 .editor-content{max-width:640px;margin:0 auto}
-.text-editor{width:100%;min-height:220px;font-family:'Lora',serif;font-size:17px;line-height:1.85;color:var(--text);border:none;background:transparent;resize:none;outline:none}
-.text-editor p{margin-bottom:0.3em}
-.text-editor h2{font-family:'Playfair Display',serif;font-size:21px;margin:1em 0 0.4em;color:var(--text)}
-.text-editor h3{font-family:'Playfair Display',serif;font-size:17px;margin:0.8em 0 0.3em}
-.text-editor blockquote{border-left:3px solid var(--gold);padding-left:16px;color:var(--text-2);font-style:italic;margin:1em 0}
-.text-editor ul,.text-editor ol{padding-left:24px;margin:0.5em 0}
-.text-editor hr{border:none;border-top:1px solid var(--border-strong);margin:24px 0}
-
-/* SPLIT EDITOR */
-.split-divider{width:4px;background:var(--border);cursor:col-resize;flex-shrink:0}
-.split-divider:hover{background:var(--accent-border)}
-.editor-scroll-b{flex:1;overflow-y:auto;padding:20px 24px;background:var(--surface-1);display:none}
-.editor-scroll-b::-webkit-scrollbar{width:5px}
-.editor-scroll-b::-webkit-scrollbar-thumb{background:var(--border-strong);border-radius:3px}
-
-/* IMAGES */
-.img-placeholder{width:100%;background:var(--surface-1);border:1.5px dashed var(--border-strong);border-radius:8px;padding:24px 16px;text-align:center;cursor:pointer;margin:18px 0;transition:all 0.12s}
-.img-placeholder:hover{border-color:var(--accent-border);background:var(--accent-bg)}
-.img-placeholder i{font-size:28px;color:var(--text-muted);display:block;margin-bottom:6px}
-.img-placeholder span{font-size:13px;color:var(--text-muted)}
-.img-wrapper{margin:18px 0;position:relative}
-.img-wrapper img{width:100%;border-radius:8px;display:block}
-.img-actions{position:absolute;top:8px;right:8px;display:none;gap:4px}
-.img-wrapper:hover .img-actions{display:flex}
-.img-act-btn{width:28px;height:28px;background:rgba(0,0,0,0.6);border:none;border-radius:4px;cursor:pointer;color:#fff;display:flex;align-items:center;justify-content:center;font-size:13px;transition:background 0.1s}
-.img-act-btn:hover{background:rgba(0,0,0,0.85)}
-.img-caption{width:100%;font-family:'Lora',serif;font-style:italic;font-size:13px;color:var(--text-2);border:none;background:transparent;text-align:center;padding:6px 0;outline:none;border-bottom:1px solid transparent;transition:border-color 0.12s}
-.img-caption:focus{border-bottom-color:var(--border-strong)}
+.texted{width:100%;min-height:220px;font-family:'Lora',serif;font-size:17px;line-height:1.85;color:var(--tx);border:none;background:transparent;resize:none;outline:none}
+.texted p{margin-bottom:.3em}
+.texted h2{font-family:'Playfair Display',serif;font-size:21px;margin:1em 0 .4em}
+.texted h3{font-family:'Playfair Display',serif;font-size:17px;margin:.8em 0 .3em}
+.texted blockquote{border-left:3px solid var(--gold);padding-left:16px;color:var(--tx2);font-style:italic;margin:1em 0}
+.texted ul,.texted ol{padding-left:24px;margin:.5em 0}
+.texted hr{border:none;border-top:1px solid var(--bd2);margin:24px 0}
+.split-div{width:4px;background:var(--bd);cursor:col-resize;flex-shrink:0}
+.split-div:hover{background:var(--ac-bd)}
+.editor-scroll-b{flex:1;overflow-y:auto;padding:20px 24px;background:var(--s1);display:none}
+.img-ph{width:100%;background:var(--s1);border:1.5px dashed var(--bd2);border-radius:8px;padding:24px 16px;text-align:center;cursor:pointer;margin:18px 0;transition:all .12s}
+.img-ph:hover{border-color:var(--ac-bd);background:var(--ac-bg)}
+.img-ph i{font-size:28px;color:var(--txm);display:block;margin-bottom:6px}
+.img-ph span{font-size:13px;color:var(--txm)}
+.img-wrap{margin:18px 0;position:relative}
+.img-wrap img{width:100%;border-radius:8px;display:block}
+.img-acts{position:absolute;top:8px;right:8px;display:none;gap:4px}
+.img-wrap:hover .img-acts{display:flex}
+.img-act-btn{width:28px;height:28px;background:rgba(0,0,0,.6);border:none;border-radius:4px;cursor:pointer;color:#fff;display:flex;align-items:center;justify-content:center;font-size:13px}
+.img-act-btn:hover{background:rgba(0,0,0,.85)}
+.img-cap{width:100%;font-family:'Lora',serif;font-style:italic;font-size:13px;color:var(--tx2);border:none;background:transparent;text-align:center;padding:6px 0;outline:none;border-bottom:1px solid transparent;transition:border-color .12s}
+.img-cap:focus{border-bottom-color:var(--bd2)}
 input[type="file"]{display:none}
 
-/* STATUS BAR */
-.status-bar{padding:5px 18px;background:var(--surface-1);border-top:1px solid var(--border);display:flex;align-items:center;gap:12px;font-size:11px;color:var(--text-muted);flex-shrink:0}
-.mode-pill{background:var(--success-bg);color:var(--success);padding:2px 8px;border-radius:10px;font-size:10px;font-weight:500}
+/* ── ALT VIEW (personajes, refs, brainstorm) ── */
+.alt-view{flex:1;overflow-y:auto;padding:24px;background:var(--s0);display:none;flex-direction:column;gap:16px}
+.alt-view.visible{display:flex}
+.av-title{font-family:'Playfair Display',serif;font-size:22px;font-weight:600;color:var(--tx);padding-bottom:10px;border-bottom:2px solid var(--ac-bd)}
+.av-sub{font-size:12px;color:var(--txm);margin-top:-8px}
+
+/* Personaje card */
+.pj-card{background:var(--s1);border:1px solid var(--bd);border-radius:8px;overflow:hidden}
+.pj-head{padding:10px 14px;background:var(--s2);border-bottom:1px solid var(--bd);display:flex;align-items:center;gap:8px}
+.pj-av{width:34px;height:34px;border-radius:50%;background:var(--gold);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;color:var(--binder-bg);flex-shrink:0}
+.pj-name{font-size:13px;font-weight:500;color:var(--tx);flex:1}
+.pj-body{padding:14px;display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.pj-campo label{display:block;font-size:10px;color:var(--txm);margin-bottom:3px;text-transform:uppercase;letter-spacing:.05em}
+.pj-campo input,.pj-campo textarea{width:100%;border:1px solid var(--bd2);border-radius:4px;padding:5px 7px;font-size:12px;font-family:'Inter',sans-serif;color:var(--tx);background:var(--s0);outline:none;transition:border-color .12s}
+.pj-campo textarea{resize:vertical;min-height:52px;line-height:1.5}
+.pj-campo input:focus,.pj-campo textarea:focus{border-color:var(--ac-bd)}
+.pj-campo.full{grid-column:1/-1}
+.add-pj-btn{padding:12px;border:1.5px dashed var(--bd2);border-radius:8px;background:transparent;cursor:pointer;font-size:13px;color:var(--txm);font-family:'Inter',sans-serif;display:flex;align-items:center;justify-content:center;gap:6px;transition:all .12s}
+.add-pj-btn:hover{border-color:var(--ac-bd);color:var(--ac);background:var(--ac-bg)}
+
+/* Ref card */
+.ref-card{background:var(--s1);border:1px solid var(--bd);border-radius:8px;padding:14px}
+.ref-title{font-size:13px;font-weight:500;color:var(--tx);margin-bottom:8px;display:flex;align-items:center;gap:6px}
+.ref-card textarea{width:100%;resize:none;min-height:80px;border:1px solid var(--bd2);border-radius:4px;padding:7px 9px;font-size:12px;font-family:'Lora',serif;color:var(--tx);background:var(--s0);outline:none;line-height:1.65}
+.ref-card textarea:focus{border-color:var(--ac-bd)}
+
+/* Brainstorm */
+.storm-bg{background:var(--cork);padding:16px;border-radius:8px;min-height:260px;display:grid;grid-template-columns:repeat(auto-fill,minmax(155px,1fr));gap:12px;align-content:start}
+.storm-card{background:#fffdf6;border-radius:3px;padding:10px;border-top:3px solid var(--gold);box-shadow:0 2px 6px rgba(0,0,0,.1);position:relative}
+.storm-card textarea{width:100%;border:none;background:transparent;resize:none;font-size:12px;font-family:'Lora',serif;color:#2a1a0a;line-height:1.6;outline:none;min-height:72px}
+.storm-pin{position:absolute;top:-6px;left:50%;transform:translateX(-50%);width:10px;height:10px;border-radius:50%;background:#c0392b;box-shadow:0 1px 3px rgba(0,0,0,.3)}
+.add-storm{background:rgba(201,169,110,.1);border:1.5px dashed rgba(201,169,110,.4);border-radius:6px;display:flex;align-items:center;justify-content:center;gap:6px;color:rgba(201,169,110,.7);font-size:12px;font-family:'Inter',sans-serif;cursor:pointer;padding:20px;transition:all .12s;min-height:96px}
+.add-storm:hover{background:rgba(201,169,110,.18);color:var(--gold)}
+
+/* ── STATUS BAR ── */
+.status-bar{padding:5px 18px;background:var(--s1);border-top:1px solid var(--bd);display:flex;align-items:center;gap:12px;font-size:11px;color:var(--txm);flex-shrink:0}
+.mode-pill{padding:2px 8px;border-radius:10px;font-size:10px;font-weight:500}
+.pill-write{background:var(--ok-bg);color:var(--ok)}
+.pill-ref{background:var(--ac-bg);color:var(--ac)}
 .saved-ok{display:flex;align-items:center;gap:3px;margin-left:auto}
-.saved-ok i{font-size:12px;color:var(--success)}
+.saved-ok i{font-size:12px;color:var(--ok)}
 
-/* ── NOTES PANEL ── */
-.notes-panel{width:235px;min-width:210px;flex-shrink:0;background:var(--surface-1);border-left:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden;transition:width 0.2s}
-.notes-panel.collapsed{width:0;min-width:0;overflow:hidden}
-.notes-header{padding:12px 13px;border-bottom:1px solid var(--border);background:var(--surface);display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
-.notes-header-title{font-size:13px;font-weight:500;color:var(--text)}
-.ntabs{display:flex;gap:3px;padding:7px 9px;border-bottom:1px solid var(--border);background:var(--surface);flex-shrink:0;flex-wrap:wrap}
-.ntab{padding:3px 8px;font-size:11px;border-radius:var(--radius);cursor:pointer;color:var(--text-muted);border:1px solid transparent;transition:all 0.1s;font-family:'Inter',sans-serif;user-select:none}
-.ntab.active{background:var(--accent-bg);color:var(--accent);border-color:var(--accent-border)}
-.ntab:hover:not(.active){background:var(--surface-2)}
-.notes-scroll{flex:1;overflow-y:auto;padding:10px}
-.notes-scroll::-webkit-scrollbar{width:3px}
-.notes-scroll::-webkit-scrollbar-thumb{background:var(--border-strong);border-radius:2px}
-.meta-row{display:flex;align-items:center;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--border)}
-.meta-label{font-size:11px;color:var(--text-muted)}
-.meta-select{font-size:11px;background:var(--surface);border:1px solid var(--border-strong);border-radius:4px;padding:2px 4px;color:var(--text);font-family:'Inter',sans-serif;cursor:pointer}
-.meta-val{font-size:12px;color:var(--text);font-weight:500}
-.ntextarea{width:100%;resize:none;font-size:12px;line-height:1.65;color:var(--text);background:var(--surface);border:1px solid var(--border-strong);border-radius:var(--radius);padding:7px 9px;outline:none;font-family:'Inter',sans-serif;margin:7px 0;transition:border-color 0.12s}
-.ntextarea:focus{border-color:var(--accent-border)}
-.section-label{font-size:11px;color:var(--text-muted);margin:10px 0 5px}
-.snap-item{padding:8px 9px;background:var(--surface);border-radius:var(--radius);border:1px solid var(--border);margin-bottom:6px;cursor:pointer;transition:border-color 0.12s}
-.snap-item:hover{border-color:var(--border-strong)}
-.snap-date{font-size:10px;color:var(--text-muted)}
-.snap-label{font-size:12px;color:var(--text);margin-top:2px;font-weight:500}
-.progress-wrap{margin-top:10px;padding:9px;background:var(--surface);border-radius:var(--radius);border:1px solid var(--border)}
-.progress-header{font-size:11px;color:var(--text-muted);margin-bottom:6px;display:flex;justify-content:space-between}
-.progress-track{background:var(--surface-2);border-radius:6px;height:6px;overflow:hidden}
-.progress-fill{height:100%;background:var(--accent);border-radius:6px;transition:width 0.3s}
-.wc-footer{padding:8px 12px;background:var(--surface);border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;flex-shrink:0}
-.wc-label{font-size:11px;color:var(--text-muted)}
-.wc-val{font-size:12px;color:var(--text);font-weight:500}
-
-/* ── OBJETIVO DE PALABRAS ── */
-.objetivo-wrap{margin-top:10px;padding:9px;background:var(--gold-bg);border-radius:var(--radius);border:1px solid rgba(201,169,110,0.3)}
-.objetivo-header{font-size:11px;color:var(--text-2);margin-bottom:6px;display:flex;justify-content:space-between;align-items:center}
-.objetivo-track{background:rgba(201,169,110,0.2);border-radius:6px;height:6px;overflow:hidden}
-.objetivo-fill{height:100%;background:var(--gold);border-radius:6px;transition:width 0.3s}
-.objetivo-row{display:flex;gap:6px;margin-top:8px}
-.objetivo-input{flex:1;padding:4px 6px;border:1px solid rgba(201,169,110,0.4);border-radius:4px;font-size:11px;background:var(--surface);font-family:'Inter',sans-serif;color:var(--text)}
-.objetivo-btn{padding:4px 8px;background:var(--gold);color:var(--binder-bg);border:none;border-radius:4px;font-size:11px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif}
-
-/* ── PERSONAJE FICHA ── */
-.personaje-ficha{background:var(--surface);border-radius:var(--radius);border:1px solid var(--border);overflow:hidden;margin-bottom:8px}
-.personaje-ficha-header{padding:8px 10px;background:var(--surface-2);border-bottom:1px solid var(--border);display:flex;align-items:center;gap:6px;cursor:pointer}
-.personaje-ficha-title{font-size:12px;font-weight:500;color:var(--text);flex:1}
-.personaje-ficha-body{padding:8px 10px;display:none}
-.personaje-campo{margin-bottom:6px}
-.personaje-campo label{display:block;font-size:10px;color:var(--text-muted);margin-bottom:2px}
-.personaje-campo input,.personaje-campo textarea{width:100%;border:1px solid var(--border-strong);border-radius:4px;padding:4px 6px;font-size:12px;font-family:'Inter',sans-serif;color:var(--text);background:var(--surface);outline:none}
-.personaje-campo textarea{resize:none;min-height:44px;line-height:1.5}
-.personaje-campo input:focus,.personaje-campo textarea:focus{border-color:var(--accent-border)}
-
-/* ── MODAL COMPILAR ── */
-.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.45);display:none;align-items:center;justify-content:center;z-index:100}
-.modal-overlay.open{display:flex}
-.modal{background:var(--surface);border-radius:10px;padding:24px;width:400px;max-width:90vw;border:1px solid var(--border)}
-.modal-title{font-family:'Playfair Display',serif;font-size:18px;font-weight:600;color:var(--text);margin-bottom:4px}
-.modal-sub{font-size:12px;color:var(--text-muted);margin-bottom:18px}
-.modal-section{margin-bottom:14px}
-.modal-section-label{font-size:11px;color:var(--text-muted);margin-bottom:6px;text-transform:uppercase;letter-spacing:0.06em}
-.format-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px}
-.format-btn{padding:8px 10px;border:1px solid var(--border-strong);border-radius:var(--radius);cursor:pointer;font-size:12px;font-family:'Inter',sans-serif;background:var(--surface);color:var(--text);display:flex;align-items:center;gap:6px;transition:all 0.12s}
-.format-btn:hover{border-color:var(--accent-border);background:var(--accent-bg);color:var(--accent)}
-.format-btn i{font-size:15px}
-.modal-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:18px}
-.modal-btn-cancel{padding:7px 14px;border:1px solid var(--border-strong);border-radius:var(--radius);background:transparent;cursor:pointer;font-size:13px;font-family:'Inter',sans-serif;color:var(--text)}
-.modal-btn-ok{padding:7px 14px;border:none;border-radius:var(--radius);background:var(--green);color:#fff;cursor:pointer;font-size:13px;font-family:'Inter',sans-serif;font-weight:500}
+/* ── INSPECTOR ── */
+.inspector{width:235px;min-width:210px;flex-shrink:0;background:var(--s1);border-left:1px solid var(--bd);display:flex;flex-direction:column;overflow:hidden}
+.insp-head{padding:12px 13px;border-bottom:1px solid var(--bd);background:var(--s0);display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.insp-head-title{font-size:13px;font-weight:500;color:var(--tx)}
+.ntabs{display:flex;gap:3px;padding:7px 9px;border-bottom:1px solid var(--bd);background:var(--s0);flex-shrink:0;flex-wrap:wrap}
+.ntab{padding:3px 8px;font-size:11px;border-radius:var(--r);cursor:pointer;color:var(--txm);border:1px solid transparent;transition:all .1s;font-family:'Inter',sans-serif;user-select:none}
+.ntab.active{background:var(--ac-bg);color:var(--ac);border-color:var(--ac-bd)}
+.ntab:hover:not(.active){background:var(--s2)}
+.insp-scroll{flex:1;overflow-y:auto;padding:10px}
+.insp-scroll::-webkit-scrollbar{width:3px}
+.insp-scroll::-webkit-scrollbar-thumb{background:var(--bd2);border-radius:2px}
+.mrow{display:flex;align-items:center;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--bd)}
+.mrow:last-child{border:none}
+.mlabel{font-size:11px;color:var(--txm)}
+.msel{font-size:11px;background:var(--s0);border:1px solid var(--bd2);border-radius:4px;padding:2px 4px;color:var(--tx);font-family:'Inter',sans-serif;cursor:pointer}
+.mval{font-size:12px;color:var(--tx);font-weight:500}
+.ntarea{width:100%;resize:none;font-size:12px;line-height:1.65;color:var(--tx);background:var(--s0);border:1px solid var(--bd2);border-radius:var(--r);padding:7px 9px;outline:none;font-family:'Inter',sans-serif;margin:7px 0;transition:border-color .12s}
+.ntarea:focus{border-color:var(--ac-bd)}
+.slabel{font-size:11px;color:var(--txm);margin:10px 0 4px}
+.snap-item{padding:8px 9px;background:var(--s0);border-radius:var(--r);border:1px solid var(--bd);margin-bottom:6px;cursor:pointer;transition:border-color .12s}
+.snap-item:hover{border-color:var(--bd2)}
+.snap-date{font-size:10px;color:var(--txm)}
+.snap-lbl{font-size:12px;color:var(--tx);margin-top:2px;font-weight:500}
+.prog-wrap{margin-top:10px;padding:9px;background:var(--s0);border-radius:var(--r);border:1px solid var(--bd)}
+.prog-head{font-size:11px;color:var(--txm);margin-bottom:6px;display:flex;justify-content:space-between}
+.prog-track{background:var(--s2);border-radius:6px;height:6px;overflow:hidden}
+.prog-fill{height:100%;background:var(--ac);border-radius:6px;transition:width .3s}
+.obj-wrap{margin-top:8px;padding:9px;background:#faf3e6;border-radius:var(--r);border:1px solid rgba(201,169,110,.3)}
+.obj-head{font-size:11px;color:var(--tx2);margin-bottom:6px;display:flex;justify-content:space-between}
+.obj-track{background:rgba(201,169,110,.2);border-radius:6px;height:6px;overflow:hidden}
+.obj-fill{height:100%;background:var(--gold);border-radius:6px;transition:width .3s}
+.obj-row{display:flex;gap:6px;margin-top:8px}
+.obj-input{flex:1;padding:4px 6px;border:1px solid rgba(201,169,110,.4);border-radius:4px;font-size:11px;background:var(--s0);font-family:'Inter',sans-serif;color:var(--tx);outline:none}
+.obj-btn{padding:4px 8px;background:var(--gold);color:var(--binder-bg);border:none;border-radius:4px;font-size:11px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif}
+.insp-footer{padding:8px 12px;background:var(--s0);border-top:1px solid var(--bd);display:flex;justify-content:space-between;align-items:center;flex-shrink:0}
+.insp-footer-label{font-size:11px;color:var(--txm)}
+.insp-footer-val{font-size:12px;color:var(--tx);font-weight:500}
 
 /* ── MODO COMPOSICIÓN ── */
-.compose-mode{position:fixed;inset:0;background:#1a1a18;z-index:200;display:none;flex-direction:column;align-items:center;overflow-y:auto}
-.compose-mode.open{display:flex}
+.compose{position:fixed;inset:0;background:#1a1a18;z-index:200;display:none;flex-direction:column;align-items:center;overflow-y:auto}
+.compose.open{display:flex}
 .compose-inner{width:100%;max-width:680px;padding:60px 40px;flex:1}
-.compose-title{font-family:'Playfair Display',serif;font-size:28px;font-weight:600;color:#e8e0d0;border:none;background:transparent;outline:none;width:100%;margin-bottom:24px;padding-bottom:12px;border-bottom:1px solid rgba(255,255,255,0.1)}
-.compose-editor{font-family:'Lora',serif;font-size:18px;line-height:2;color:#d0c8b8;min-height:400px;outline:none;width:100%}
-.compose-editor p{margin-bottom:0.3em}
-.compose-bar{position:fixed;bottom:0;left:0;right:0;padding:10px 24px;background:rgba(26,26,24,0.9);display:flex;align-items:center;gap:16px;font-size:12px;color:rgba(200,190,170,0.5);border-top:1px solid rgba(255,255,255,0.07)}
-.compose-bar .wc{color:rgba(200,190,170,0.7)}
-.compose-exit{margin-left:auto;padding:5px 12px;border:1px solid rgba(255,255,255,0.15);border-radius:var(--radius);background:transparent;color:rgba(200,190,170,0.6);cursor:pointer;font-size:12px;font-family:'Inter',sans-serif}
-.compose-exit:hover{color:#e8e0d0;border-color:rgba(255,255,255,0.3)}
+.compose-title{font-family:'Playfair Display',serif;font-size:28px;font-weight:600;color:#e8e0d0;border:none;background:transparent;outline:none;width:100%;margin-bottom:24px;padding-bottom:12px;border-bottom:1px solid rgba(255,255,255,.1)}
+.compose-ed{font-family:'Lora',serif;font-size:18px;line-height:2;color:#d0c8b8;min-height:400px;outline:none;width:100%}
+.compose-ed p{margin-bottom:.3em}
+.compose-bar{position:fixed;bottom:0;left:0;right:0;padding:10px 24px;background:rgba(26,26,24,.92);display:flex;align-items:center;gap:16px;font-size:12px;color:rgba(200,190,170,.5);border-top:1px solid rgba(255,255,255,.07)}
+.compose-bar .wc{color:rgba(200,190,170,.7)}
+.compose-exit{margin-left:auto;padding:5px 12px;border:1px solid rgba(255,255,255,.15);border-radius:var(--r);background:transparent;color:rgba(200,190,170,.6);cursor:pointer;font-size:12px;font-family:'Inter',sans-serif}
+.compose-exit:hover{color:#e8e0d0;border-color:rgba(255,255,255,.3)}
+
+/* ── MODAL ── */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.45);display:none;align-items:center;justify-content:center;z-index:100}
+.modal-overlay.open{display:flex}
+.modal{background:var(--s0);border-radius:10px;padding:24px;width:400px;max-width:90vw;border:1px solid var(--bd)}
+.modal-title{font-family:'Playfair Display',serif;font-size:18px;font-weight:600;color:var(--tx);margin-bottom:4px}
+.modal-sub{font-size:12px;color:var(--txm);margin-bottom:18px}
+.fmt-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:8px}
+.fmt-btn{padding:9px 10px;border:1px solid var(--bd2);border-radius:var(--r);cursor:pointer;font-size:12px;font-family:'Inter',sans-serif;background:var(--s0);color:var(--tx);display:flex;align-items:center;gap:6px;transition:all .12s}
+.fmt-btn:hover{border-color:var(--ac-bd);background:var(--ac-bg);color:var(--ac)}
+.fmt-btn i{font-size:15px}
+.modal-foot{display:flex;justify-content:flex-end;margin-top:18px}
+.mbtn-cancel{padding:7px 14px;border:1px solid var(--bd2);border-radius:var(--r);background:transparent;cursor:pointer;font-size:13px;font-family:'Inter',sans-serif;color:var(--tx)}
+
+/* ── NOTEPAD ── */
+.notepad{position:fixed;bottom:50px;right:250px;width:280px;background:var(--s0);border:1px solid var(--bd2);border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,.12);z-index:90;display:none;flex-direction:column;overflow:hidden}
+.notepad.open{display:flex}
+.notepad-head{padding:9px 12px;background:var(--s2);border-bottom:1px solid var(--bd);display:flex;align-items:center;justify-content:space-between}
+.notepad-title{font-size:12px;font-weight:500;color:var(--tx)}
+.notepad-close{background:none;border:none;cursor:pointer;color:var(--txm);font-size:15px;padding:0}
+.notepad-area{width:100%;height:160px;resize:none;border:none;outline:none;font-size:13px;font-family:'Lora',serif;line-height:1.65;color:var(--tx);background:transparent;padding:10px}
 
 /* ── TOAST ── */
-.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(50px);background:#1a1208;color:#e8d8b8;padding:8px 16px;border-radius:20px;font-size:12px;font-family:'Inter',sans-serif;pointer-events:none;opacity:0;transition:opacity 0.2s,transform 0.2s;z-index:500;white-space:nowrap}
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(50px);background:#1a1208;color:#e8d8b8;padding:8px 16px;border-radius:20px;font-size:12px;font-family:'Inter',sans-serif;pointer-events:none;opacity:0;transition:opacity .2s,transform .2s;z-index:500;white-space:nowrap}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
-
-/* ── NOTEPAD GLOBAL ── */
-.notepad-panel{position:fixed;bottom:50px;right:250px;width:280px;background:var(--surface);border:1px solid var(--border-strong);border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,0.12);z-index:90;display:none;flex-direction:column;overflow:hidden}
-.notepad-panel.open{display:flex}
-.notepad-header{padding:9px 12px;background:var(--surface-2);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;cursor:move}
-.notepad-title{font-size:12px;font-weight:500;color:var(--text)}
-.notepad-close{background:none;border:none;cursor:pointer;color:var(--text-muted);font-size:15px;padding:0}
-.notepad-body{padding:10px}
-.notepad-area{width:100%;height:160px;resize:none;border:none;outline:none;font-size:13px;font-family:'Lora',serif;line-height:1.65;color:var(--text);background:transparent}
 </style>
 </head>
 <body>
+<div class="app">
 
-<!-- ═══ APP ═══ -->
-<div class="app" id="app">
-
-  <!-- ══ BINDER ══ -->
-  <div class="binder" id="binder">
-    <div class="binder-spine"></div>
-    <div class="binder-header">
-      <div class="binder-project" id="projectName" contenteditable="true" spellcheck="false">Mi proyecto</div>
-      <div class="binder-sub">Cuentos ilustrados</div>
-    </div>
-    <div class="binder-body" id="binderBody">
-      <div class="binder-section-label">Manuscrito</div>
-      <div class="binder-item active" onclick="selectBinder(this,'El bosque encantado','root')">
-        <i class="ti ti-book bi"></i><span class="bl">El bosque encantado</span>
-      </div>
-      <div class="binder-item sub" onclick="selectBinder(this,'Cap. 1 — La llegada','cap1')">
-        <i class="ti ti-file-text bi" style="font-size:12px"></i>
-        <span class="bl">Cap. 1 — La llegada</span><span class="bb" id="badge-cap1">320</span>
-      </div>
-      <div class="binder-item sub" onclick="selectBinder(this,'Cap. 2 — La criatura','cap2')">
-        <i class="ti ti-file-text bi" style="font-size:12px"></i>
-        <span class="bl">Cap. 2 — La criatura</span><span class="bb" id="badge-cap2">215</span>
-      </div>
-      <div class="binder-item sub" onclick="selectBinder(this,'Cap. 3 — El regreso','cap3')">
-        <i class="ti ti-file-text bi" style="font-size:12px"></i>
-        <span class="bl">Cap. 3 — El regreso</span><span class="bb" id="badge-cap3">0</span>
-      </div>
-      <button class="binder-add-btn" onclick="addChapter()"><i class="ti ti-plus" style="font-size:12px"></i> Añadir capítulo</button>
-      <div class="binder-divider"></div>
-      <div class="binder-section-label">Personajes</div>
-      <div class="binder-item" onclick="selectBinder(this,'Personajes','personajes')">
-        <i class="ti ti-users bi"></i><span class="bl">Fichas de personajes</span>
-      </div>
-      <div class="binder-item sub" onclick="selectBinder(this,'Lía','lia')">
-        <i class="ti ti-user bi" style="font-size:12px"></i><span class="bl">Lía — protagonista</span>
-      </div>
-      <div class="binder-item sub" onclick="selectBinder(this,'El guardián','guardian')">
-        <i class="ti ti-ghost bi" style="font-size:12px"></i><span class="bl">El guardián</span>
-      </div>
-      <button class="binder-add-btn" onclick="addPersonaje()"><i class="ti ti-plus" style="font-size:12px"></i> Añadir personaje</button>
-      <div class="binder-divider"></div>
-      <div class="binder-section-label">Investigación</div>
-      <div class="binder-item" onclick="selectBinder(this,'Referencias visuales','refs')">
-        <i class="ti ti-palette bi"></i><span class="bl">Referencias visuales</span>
-      </div>
-      <div class="binder-item" onclick="selectBinder(this,'Notas de estilo','estilo')">
-        <i class="ti ti-notes bi"></i><span class="bl">Notas de estilo</span>
-      </div>
-      <div class="binder-item" onclick="selectBinder(this,'Brainstorming','brainstorm')">
-        <i class="ti ti-bulb bi"></i><span class="bl">Brainstorming</span>
-      </div>
-      <button class="binder-add-btn" onclick="addRef()"><i class="ti ti-plus" style="font-size:12px"></i> Añadir referencia</button>
-    </div>
-    <button class="compile-btn" onclick="openModal('compilar')">
-      <i class="ti ti-package-export"></i> Compilar proyecto
-    </button>
+<!-- ══ BINDER ══ -->
+<div class="binder">
+  <div class="binder-spine"></div>
+  <div class="binder-head">
+    <div class="binder-project" contenteditable="true" spellcheck="false">Mi proyecto</div>
+    <div class="binder-sub">Cuentos ilustrados</div>
   </div>
+  <div class="binder-body">
+    <div class="bsec">Manuscrito</div>
+    <div class="bitem active" id="b-root" onclick="nav(this,'root')"><i class="ti ti-book"></i><span class="bl">El bosque encantado</span></div>
+    <div class="bitem sub" id="b-cap1" onclick="nav(this,'cap1')"><i class="ti ti-file-text" style="font-size:12px"></i><span class="bl">Cap. 1 — La llegada</span><span class="bb" id="bb-cap1">47</span></div>
+    <div class="bitem sub" id="b-cap2" onclick="nav(this,'cap2')"><i class="ti ti-file-text" style="font-size:12px"></i><span class="bl">Cap. 2 — La criatura</span><span class="bb" id="bb-cap2">23</span></div>
+    <div class="bitem sub" id="b-cap3" onclick="nav(this,'cap3')"><i class="ti ti-file-text" style="font-size:12px"></i><span class="bl">Cap. 3 — El regreso</span><span class="bb" id="bb-cap3">0</span></div>
+    <button class="badd" onclick="addChapter()"><i class="ti ti-plus" style="font-size:12px"></i> Añadir capítulo</button>
+    <div class="bdiv"></div>
+    <div class="bsec">Personajes</div>
+    <div class="bitem" id="b-personajes" onclick="nav(this,'personajes')"><i class="ti ti-users"></i><span class="bl">Fichas de personajes</span></div>
+    <div class="bitem sub" id="b-lia" onclick="nav(this,'lia')"><i class="ti ti-user" style="font-size:12px"></i><span class="bl">Lía — protagonista</span></div>
+    <div class="bitem sub" id="b-guardian" onclick="nav(this,'guardian')"><i class="ti ti-ghost" style="font-size:12px"></i><span class="bl">El guardián</span></div>
+    <button class="badd" onclick="addPersonaje()"><i class="ti ti-plus" style="font-size:12px"></i> Añadir personaje</button>
+    <div class="bdiv"></div>
+    <div class="bsec">Investigación</div>
+    <div class="bitem" id="b-refs" onclick="nav(this,'refs')"><i class="ti ti-palette"></i><span class="bl">Referencias visuales</span></div>
+    <div class="bitem" id="b-estilo" onclick="nav(this,'estilo')"><i class="ti ti-notes"></i><span class="bl">Notas de estilo</span></div>
+    <div class="bitem" id="b-brainstorm" onclick="nav(this,'brainstorm')"><i class="ti ti-bulb"></i><span class="bl">Brainstorming</span></div>
+    <button class="badd" onclick="addRef()"><i class="ti ti-plus" style="font-size:12px"></i> Añadir referencia</button>
+  </div>
+  <button class="compile-btn" onclick="openModal()"><i class="ti ti-package-export"></i> Compilar proyecto</button>
+</div>
 
-  <!-- ══ MIDDLE PANEL ══ -->
-  <div class="middle-panel" id="middlePanel">
-    <div class="ptabs">
-      <div class="ptab active" onclick="switchMiddle('cork',this)">Corcho</div>
-      <div class="ptab" onclick="switchMiddle('outline',this)">Esquema</div>
-      <div class="ptab" onclick="switchMiddle('scrivenings',this)">Todo</div>
+<!-- ══ MIDDLE ══ -->
+<div class="mid">
+  <div class="ptabs">
+    <div class="ptab active" onclick="switchMid('cork',this)">Corcho</div>
+    <div class="ptab" onclick="switchMid('outline',this)">Esquema</div>
+    <div class="ptab" onclick="switchMid('scriv',this)">Todo</div>
+  </div>
+  <div class="cork" id="cork">
+    <div class="ccard active" id="cc-cap1" onclick="nav(document.getElementById('b-cap1'),'cap1')">
+      <div class="cpin"></div><div class="ct">La llegada</div>
+      <div class="cs">Lía llega al bosque con su linterna. Algo la llama desde adentro.</div>
+      <div class="cst st-r">En revisión</div>
     </div>
-    <div class="corkboard" id="corkboard">
-      <div class="cork-card active" onclick="activateCard(this,'Cap. 1 — La llegada','cap1')">
-        <div class="cork-pin"></div>
-        <div class="ct">La llegada</div>
-        <div class="cs">Lía llega al borde del bosque con su linterna. Algo la llama desde adentro.</div>
-        <div class="cst st-revision">En revisión</div>
-      </div>
-      <div class="cork-card" onclick="activateCard(this,'Cap. 2 — La criatura','cap2')">
-        <div class="cork-pin" style="background:#3D6B5E"></div>
-        <div class="ct">La criatura</div>
-        <div class="cs">Descubre al guardián: un ser hecho de musgo y luciérnagas.</div>
-        <div class="cst st-borrador">Borrador</div>
-      </div>
-      <div class="cork-card" onclick="activateCard(this,'Cap. 3 — El regreso','cap3')">
-        <div class="cork-pin" style="background:#9a9a9a"></div>
-        <div class="ct">El regreso</div>
-        <div class="cs">Sin escribir aún.</div>
-        <div class="cst st-borrador">Borrador</div>
-      </div>
+    <div class="ccard" id="cc-cap2" onclick="nav(document.getElementById('b-cap2'),'cap2')">
+      <div class="cpin" style="background:#3D6B5E"></div><div class="ct">La criatura</div>
+      <div class="cs">Descubre al guardián: un ser hecho de musgo y luciérnagas.</div>
+      <div class="cst st-b">Borrador</div>
     </div>
-    <div class="outliner" id="outliner">
-      <div class="ol-item active" onclick="activateCard(null,'Cap. 1 — La llegada','cap1')">
-        <i class="ti ti-file-text oi"></i><span>La llegada</span>
-        <span class="os st-revision">Revisión</span><span class="ow">320p</span>
-      </div>
-      <div class="ol-item" onclick="activateCard(null,'Cap. 2 — La criatura','cap2')">
-        <i class="ti ti-file-text oi"></i><span>La criatura</span>
-        <span class="os st-borrador">Borrador</span><span class="ow">215p</span>
-      </div>
-      <div class="ol-item" onclick="activateCard(null,'Cap. 3 — El regreso','cap3')">
-        <i class="ti ti-file-text oi"></i><span>El regreso</span>
-        <span class="os st-borrador">Borrador</span><span class="ow">0p</span>
-      </div>
+    <div class="ccard" id="cc-cap3" onclick="nav(document.getElementById('b-cap3'),'cap3')">
+      <div class="cpin" style="background:#9a9a9a"></div><div class="ct">El regreso</div>
+      <div class="cs">Sin escribir aún.</div>
+      <div class="cst st-b">Borrador</div>
     </div>
-    <div class="scrivenings-view" id="scriveningsView">
-      <div class="scrivenings-section">
-        <div class="scrivenings-section-title">Cap. 1 — La llegada</div>
-        <div class="scrivenings-section-body">Lía nunca había visto el bosque de noche. Su linterna parpadeaba como un corazón nervioso mientras los árboles cerraban el cielo sobre su cabeza.<br><br>—Aquí hay algo —susurró, aunque nadie la escuchaba.</div>
-      </div>
-      <div class="scrivenings-section">
-        <div class="scrivenings-section-title">Cap. 2 — La criatura</div>
-        <div class="scrivenings-section-body" style="color:var(--text-muted);font-style:italic">Sin contenido aún.</div>
-      </div>
-      <div class="scrivenings-section">
-        <div class="scrivenings-section-title">Cap. 3 — El regreso</div>
-        <div class="scrivenings-section-body" style="color:var(--text-muted);font-style:italic">Sin contenido aún.</div>
-      </div>
+  </div>
+  <div class="outline" id="outline">
+    <div class="oitem active" onclick="nav(document.getElementById('b-cap1'),'cap1')"><i class="ti ti-file-text"></i><span>La llegada</span><span class="os st-r">Rev.</span><span class="ow">47p</span></div>
+    <div class="oitem" onclick="nav(document.getElementById('b-cap2'),'cap2')"><i class="ti ti-file-text"></i><span>La criatura</span><span class="os st-b">Bor.</span><span class="ow">23p</span></div>
+    <div class="oitem" onclick="nav(document.getElementById('b-cap3'),'cap3')"><i class="ti ti-file-text"></i><span>El regreso</span><span class="os st-b">Bor.</span><span class="ow">0p</span></div>
+  </div>
+  <div class="scriv" id="scriv"></div>
+</div>
+
+<!-- ══ MAIN ══ -->
+<div class="main">
+  <div class="toolbar">
+    <div class="tg">
+      <button class="tbtn" onclick="fmt('bold')"><i class="ti ti-bold"></i></button>
+      <button class="tbtn" onclick="fmt('italic')"><i class="ti ti-italic"></i></button>
+      <button class="tbtn" onclick="fmt('underline')"><i class="ti ti-underline"></i></button>
+      <button class="tbtn" onclick="fmt('strikeThrough')"><i class="ti ti-strikethrough"></i></button>
+    </div>
+    <div class="tg">
+      <button class="tbtn" onclick="fmt('h2')"><i class="ti ti-h-1"></i></button>
+      <button class="tbtn" onclick="fmt('h3')"><i class="ti ti-h-2"></i></button>
+      <button class="tbtn" onclick="fmt('quote')"><i class="ti ti-quote"></i></button>
+      <button class="tbtn" onclick="fmt('ul')"><i class="ti ti-list"></i></button>
+    </div>
+    <div class="tg">
+      <button class="tbtn" onclick="triggerImg()"><i class="ti ti-photo"></i><span style="font-size:11px">Imagen</span></button>
+      <button class="tbtn" onclick="addSep()"><i class="ti ti-minus"></i></button>
+    </div>
+    <div class="tg">
+      <button class="tbtn" id="splitBtn" onclick="toggleSplit()"><i class="ti ti-layout-columns"></i></button>
+      <button class="tbtn" onclick="saveSnap()"><i class="ti ti-camera"></i><span style="font-size:11px">Snap</span></button>
+      <button class="tbtn" onclick="openCompose()"><i class="ti ti-arrows-maximize"></i><span style="font-size:11px">Foco</span></button>
+    </div>
+    <div class="tg">
+      <button class="tbtn" onclick="toggleNotepad()"><i class="ti ti-notebook"></i></button>
     </div>
   </div>
 
-  <!-- ══ EDITOR ══ -->
-  <div class="editor-area">
-    <div class="editor-toolbar">
-      <div class="tg">
-        <button class="tbtn" onclick="fmt('bold')" title="Negrita"><i class="ti ti-bold"></i></button>
-        <button class="tbtn" onclick="fmt('italic')" title="Cursiva"><i class="ti ti-italic"></i></button>
-        <button class="tbtn" onclick="fmt('underline')" title="Subrayado"><i class="ti ti-underline"></i></button>
-        <button class="tbtn" onclick="fmt('strikeThrough')" title="Tachado"><i class="ti ti-strikethrough"></i></button>
+  <div class="content-area">
+
+    <!-- EDITOR VIEW -->
+    <div class="editor-view" id="editorView">
+      <div class="editor-title-bar">
+        <input type="text" class="chapter-title" id="chapterTitle" value="Cap. 1 — La llegada"/>
       </div>
-      <div class="tg">
-        <button class="tbtn" onclick="fmt('h2')" title="Título"><i class="ti ti-h-1"></i></button>
-        <button class="tbtn" onclick="fmt('h3')" title="Subtítulo"><i class="ti ti-h-2"></i></button>
-        <button class="tbtn" onclick="fmt('quote')" title="Cita"><i class="ti ti-quote"></i></button>
-        <button class="tbtn" onclick="fmt('ul')" title="Lista"><i class="ti ti-list"></i></button>
-      </div>
-      <div class="tg">
-        <button class="tbtn" onclick="triggerImg()" title="Imagen"><i class="ti ti-photo"></i> <span style="font-size:11px">Imagen</span></button>
-        <button class="tbtn" onclick="addSep()" title="Separador"><i class="ti ti-minus"></i></button>
-      </div>
-      <div class="tg">
-        <button class="tbtn" onclick="toggleSplit()" id="splitBtn" title="Doble pantalla"><i class="ti ti-layout-columns"></i></button>
-        <button class="tbtn" onclick="saveSnapshot()" title="Snapshot"><i class="ti ti-camera"></i> <span style="font-size:11px">Snap</span></button>
-        <button class="tbtn" onclick="openCompose()" title="Modo composición"><i class="ti ti-arrows-maximize"></i> <span style="font-size:11px">Foco</span></button>
-      </div>
-      <div class="tg">
-        <button class="tbtn" onclick="toggleBinder()" title="Ocultar binder"><i class="ti ti-layout-sidebar"></i></button>
-        <button class="tbtn" onclick="toggleNotes()" title="Ocultar notas"><i class="ti ti-layout-sidebar-right"></i></button>
-        <button class="tbtn" onclick="toggleNotepad()" title="Libreta del proyecto"><i class="ti ti-notebook"></i></button>
+      <div class="editor-body">
+        <div class="editor-scroll" id="scrollA">
+          <div class="editor-content">
+            <div class="img-wrap" id="imgDemo">
+              <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='640' height='200' viewBox='0 0 640 200'%3E%3Crect width='640' height='200' fill='%23c0d8b8'/%3E%3Cellipse cx='100' cy='50' rx='75' ry='115' fill='%23386b44'/%3E%3Cellipse cx='220' cy='35' rx='85' ry='125' fill='%234a7c54'/%3E%3Cellipse cx='440' cy='45' rx='88' ry='118' fill='%23386b44'/%3E%3Cellipse cx='560' cy='55' rx='75' ry='110' fill='%234a7c54'/%3E%3Ccircle cx='320' cy='85' r='22' fill='%23f9e04a' opacity='.95'/%3E%3Ccircle cx='320' cy='85' r='14' fill='%23fdf3a0'/%3E%3Crect x='312' y='107' width='16' height='60' fill='%23b8763a'/%3E%3C/svg%3E" alt="El bosque de noche"/>
+              <div class="img-acts"><button class="img-act-btn" onclick="removeImg('imgDemo')"><i class="ti ti-trash" style="font-size:12px"></i></button></div>
+              <input class="img-cap" type="text" value="El bosque brillaba bajo la luna, como si los árboles respiraran luz."/>
+            </div>
+            <div id="mainEditor" contenteditable="true" class="texted" oninput="onInput()" spellcheck="true">
+              <p>Lía nunca había visto el bosque de noche. Su linterna parpadeaba como un corazón nervioso mientras los árboles cerraban el cielo sobre su cabeza.</p>
+              <p><br></p>
+              <p>—Aquí hay algo —susurró, aunque nadie la escuchaba.</p>
+              <p><br></p>
+              <p>Y entonces lo oyó: un sonido suave, como hojas que aprenden a hablar.</p>
+            </div>
+            <div class="img-ph" id="imgPh" onclick="triggerImg()">
+              <i class="ti ti-photo-plus"></i><span>Insertar ilustración aquí</span>
+            </div>
+            <input type="file" id="imgInput" accept="image/*" onchange="handleImg(event)"/>
+          </div>
+        </div>
+        <div class="split-div" id="splitDiv" style="display:none"></div>
+        <div class="editor-scroll-b" id="scrollB">
+          <div style="padding:16px;font-family:'Lora',serif;font-size:15px;line-height:1.8;color:var(--tx2)">
+            <p style="font-family:'Playfair Display',serif;font-size:16px;font-weight:600;color:var(--tx);margin-bottom:12px">Cap. 2 — La criatura</p>
+            <p>El guardián emergió entre los helechos. Era alto como tres hombres juntos, hecho de musgo y luciérnagas que parpadeaban en lugar de latidos.</p>
+          </div>
+        </div>
       </div>
     </div>
 
-    <div class="editor-title-bar" id="editorTitleBar">
-      <input type="text" class="chapter-title" id="chapterTitle" value="Cap. 1 — La llegada" />
-    </div>
-
-    
-    <!-- ══ VISTAS ALTERNATIVAS ══ -->
-    <!-- Personajes -->
+    <!-- ALT: PERSONAJES -->
     <div class="alt-view" id="view-personajes">
-      <div>
-        <div class="alt-view-header">Fichas de personajes</div>
-        <div class="alt-view-sub">Boceto detallado de cada personaje del proyecto</div>
-      </div>
-      <div id="personajes-container">
-        <div class="personaje-card">
-          <div class="personaje-card-header">
-            <div class="personaje-avatar">LÍ</div>
-            <span class="personaje-card-title">Lía — protagonista</span>
-            <i class="ti ti-chevron-down" style="font-size:14px;color:var(--text-muted)"></i>
-          </div>
-          <div class="personaje-card-body">
-            <div class="personaje-campo"><label>Nombre completo</label><input type="text" value="Lía Martínez" /></div>
-            <div class="personaje-campo"><label>Edad</label><input type="text" value="9 años" /></div>
-            <div class="personaje-campo"><label>Descripción física</label><textarea>Pelo rizado oscuro, ojos grandes color avellana. Siempre lleva su linterna amarilla.</textarea></div>
-            <div class="personaje-campo"><label>Profesión / rol</label><input type="text" value="Protagonista, exploradora" /></div>
-            <div class="personaje-campo"><label>Deseo principal</label><input type="text" value="Descubrir los secretos del bosque" /></div>
-            <div class="personaje-campo"><label>Mayor miedo</label><input type="text" value="La oscuridad sin su linterna" /></div>
-            <div class="personaje-campo full"><label>Notas del personaje</label><textarea>Su linterna es el símbolo central del relato. Representa valentía.</textarea></div>
+      <div class="av-title">Fichas de personajes</div>
+      <div class="av-sub">Boceto detallado de cada personaje del proyecto</div>
+      <div id="pj-container">
+        <div class="pj-card">
+          <div class="pj-head"><div class="pj-av">LÍ</div><span class="pj-name">Lía — protagonista</span></div>
+          <div class="pj-body">
+            <div class="pj-campo"><label>Nombre completo</label><input type="text" value="Lía Martínez"/></div>
+            <div class="pj-campo"><label>Edad</label><input type="text" value="9 años"/></div>
+            <div class="pj-campo"><label>Descripción física</label><textarea>Pelo rizado oscuro, ojos grandes color avellana. Siempre lleva su linterna amarilla.</textarea></div>
+            <div class="pj-campo"><label>Profesión / rol</label><input type="text" value="Protagonista, exploradora"/></div>
+            <div class="pj-campo"><label>Deseo principal</label><input type="text" value="Descubrir los secretos del bosque"/></div>
+            <div class="pj-campo"><label>Mayor miedo</label><input type="text" value="La oscuridad sin su linterna"/></div>
+            <div class="pj-campo full"><label>Notas</label><textarea>Su linterna es el símbolo central del relato. Representa valentía.</textarea></div>
           </div>
         </div>
-        <div class="personaje-card" style="margin-top:12px">
-          <div class="personaje-card-header">
-            <div class="personaje-avatar" style="background:var(--green);color:#fff">GU</div>
-            <span class="personaje-card-title">El guardián del bosque</span>
-            <i class="ti ti-chevron-down" style="font-size:14px;color:var(--text-muted)"></i>
-          </div>
-          <div class="personaje-card-body">
-            <div class="personaje-campo"><label>Nombre completo</label><input type="text" value="El guardián (sin nombre)" /></div>
-            <div class="personaje-campo"><label>Naturaleza</label><input type="text" value="Ser del bosque, hecho de musgo" /></div>
-            <div class="personaje-campo"><label>Descripción física</label><textarea>Alto como tres hombres. Cuerpo de musgo y raíces. Luciérnagas como ojos.</textarea></div>
-            <div class="personaje-campo"><label>Rol en la historia</label><input type="text" value="Antagonista / guía" /></div>
-            <div class="personaje-campo"><label>Deseo principal</label><input type="text" value="Proteger el bosque de intrusos" /></div>
-            <div class="personaje-campo"><label>Mayor miedo</label><input type="text" value="Que el bosque desaparezca" /></div>
-            <div class="personaje-campo full"><label>Notas del personaje</label><textarea>¿Podría hablar en forma de poemas? Explorar esta idea en cap. 2.</textarea></div>
+        <div class="pj-card" style="margin-top:12px">
+          <div class="pj-head"><div class="pj-av" style="background:var(--gr);color:#fff">GU</div><span class="pj-name">El guardián del bosque</span></div>
+          <div class="pj-body">
+            <div class="pj-campo"><label>Nombre completo</label><input type="text" value="El guardián (sin nombre)"/></div>
+            <div class="pj-campo"><label>Naturaleza</label><input type="text" value="Ser del bosque, hecho de musgo"/></div>
+            <div class="pj-campo"><label>Descripción física</label><textarea>Alto como tres hombres. Cuerpo de musgo y raíces. Luciérnagas como ojos.</textarea></div>
+            <div class="pj-campo"><label>Rol en la historia</label><input type="text" value="Antagonista / guía espiritual"/></div>
+            <div class="pj-campo"><label>Deseo principal</label><input type="text" value="Proteger el bosque de intrusos"/></div>
+            <div class="pj-campo"><label>Mayor miedo</label><input type="text" value="Que el bosque desaparezca"/></div>
+            <div class="pj-campo full"><label>Notas</label><textarea>¿Podría hablar en forma de poemas? ¿Conocía a la abuela de Lía?</textarea></div>
           </div>
         </div>
       </div>
-      <button class="add-personaje-btn" onclick="addPersonajeCard()">
-        <i class="ti ti-plus" style="font-size:16px"></i> Añadir personaje
-      </button>
+      <button class="add-pj-btn" onclick="addPjCard()"><i class="ti ti-plus"></i> Añadir personaje</button>
     </div>
 
-    <!-- Lía individual -->
+    <!-- ALT: LÍA -->
     <div class="alt-view" id="view-lia">
-      <div class="alt-view-header">Lía — protagonista</div>
-      <div class="personaje-card-body" style="display:grid;grid-template-columns:1fr 1fr;gap:10px;background:var(--surface-1);border-radius:8px;padding:16px;border:1px solid var(--border)">
-        <div class="personaje-campo"><label>Nombre completo</label><input type="text" value="Lía Martínez" /></div>
-        <div class="personaje-campo"><label>Edad</label><input type="text" value="9 años" /></div>
-        <div class="personaje-campo"><label>Descripción física</label><textarea>Pelo rizado oscuro, ojos grandes color avellana. Siempre lleva su linterna amarilla.</textarea></div>
-        <div class="personaje-campo"><label>Deseo principal</label><textarea>Descubrir los secretos del bosque y ser valiente.</textarea></div>
-        <div class="personaje-campo"><label>Mayor miedo</label><input type="text" value="La oscuridad sin su linterna" /></div>
-        <div class="personaje-campo"><label>Perfume favorito</label><input type="text" value="Tierra mojada después de la lluvia" /></div>
-        <div class="personaje-campo full"><label>Historia personal</label><textarea style="min-height:80px">Lía creció escuchando historias del bosque que su abuela le contaba antes de dormir.</textarea></div>
+      <div class="av-title">Lía — protagonista</div>
+      <div class="pj-card">
+        <div class="pj-body">
+          <div class="pj-campo"><label>Nombre completo</label><input type="text" value="Lía Martínez"/></div>
+          <div class="pj-campo"><label>Edad</label><input type="text" value="9 años"/></div>
+          <div class="pj-campo"><label>Descripción física</label><textarea>Pelo rizado oscuro, ojos grandes color avellana. Siempre lleva su linterna amarilla.</textarea></div>
+          <div class="pj-campo"><label>Deseo principal</label><textarea>Descubrir los secretos del bosque y ser valiente.</textarea></div>
+          <div class="pj-campo"><label>Mayor miedo</label><input type="text" value="La oscuridad sin su linterna"/></div>
+          <div class="pj-campo"><label>Primer amor</label><input type="text" value="La naturaleza y los libros de aventuras"/></div>
+          <div class="pj-campo full"><label>Historia personal</label><textarea style="min-height:80px">Lía creció escuchando historias del bosque que su abuela le contaba antes de dormir. Cuando la abuela murió, Lía sintió que el bosque la llamaba.</textarea></div>
+        </div>
       </div>
     </div>
 
-    <!-- Guardián individual -->
+    <!-- ALT: GUARDIÁN -->
     <div class="alt-view" id="view-guardian">
-      <div class="alt-view-header">El guardián del bosque</div>
-      <div class="personaje-card-body" style="display:grid;grid-template-columns:1fr 1fr;gap:10px;background:var(--surface-1);border-radius:8px;padding:16px;border:1px solid var(--border)">
-        <div class="personaje-campo full"><label>Descripción física</label><textarea>Alto como tres hombres juntos. Hecho de musgo, raíces y luciérnagas parpadeantes.</textarea></div>
-        <div class="personaje-campo"><label>Rol en la historia</label><input type="text" value="Antagonista / guía espiritual" /></div>
-        <div class="personaje-campo"><label>Forma de hablar</label><input type="text" value="En forma de poemas y acertijos" /></div>
-        <div class="personaje-campo full"><label>Notas</label><textarea style="min-height:80px">¿Podría revelar al final que conocía a la abuela de Lía? Explorar esta conexión.</textarea></div>
+      <div class="av-title">El guardián del bosque</div>
+      <div class="pj-card">
+        <div class="pj-body">
+          <div class="pj-campo full"><label>Descripción física</label><textarea>Alto como tres hombres juntos. Hecho de musgo, raíces y luciérnagas parpadeantes que hacen las veces de ojos.</textarea></div>
+          <div class="pj-campo"><label>Rol en la historia</label><input type="text" value="Antagonista / guía espiritual"/></div>
+          <div class="pj-campo"><label>Forma de hablar</label><input type="text" value="En poemas y acertijos"/></div>
+          <div class="pj-campo full"><label>Notas de desarrollo</label><textarea style="min-height:80px">¿Revelar al final que conocía a la abuela de Lía? Podría ser el guardián que ella invocó antes de morir para proteger a su nieta.</textarea></div>
+        </div>
       </div>
     </div>
 
-    <!-- Referencias visuales -->
+    <!-- ALT: REFERENCIAS VISUALES -->
     <div class="alt-view" id="view-refs">
-      <div class="alt-view-header">Referencias visuales</div>
+      <div class="av-title">Referencias visuales</div>
       <div class="ref-card">
-        <div class="ref-card-title"><i class="ti ti-palette" style="font-size:15px;color:var(--gold)"></i> Paleta de color</div>
+        <div class="ref-title"><i class="ti ti-palette" style="font-size:15px;color:var(--gold)"></i> Paleta de color</div>
         <textarea>Verdes oscuros profundos: #386b44, #1e4a2a
 Amarillo cálido de linterna: #f9e04a, #f5c842
 Marrones tierra: #8B5E3C, #5c3a1e
 Fondo nocturno: #1a1208</textarea>
       </div>
       <div class="ref-card">
-        <div class="ref-card-title"><i class="ti ti-typography" style="font-size:15px;color:var(--gold)"></i> Estilo de ilustración</div>
+        <div class="ref-title"><i class="ti ti-brush" style="font-size:15px;color:var(--gold)"></i> Estilo de ilustración</div>
         <textarea>Inspiración: ilustradores nórdicos años 70 (Tove Jansson, John Bauer).
 Líneas limpias, sombras suaves, atmósfera onírica.
 Formato: doble página para escenas clave, viñeta para momentos de acción.</textarea>
       </div>
-      <div class="ref-card">
-        <div class="ref-card-title"><i class="ti ti-notes" style="font-size:15px;color:var(--gold)"></i> Notas de estilo narrativo</div>
-        <textarea>Narrador en 3ª persona cercana (PDV de Lía).
-Frases cortas en momentos de tensión. Más líricas en descripciones del bosque.
-Cada capítulo termina con una imagen visual potente.</textarea>
-      </div>
     </div>
 
-    <!-- Notas de estilo -->
+    <!-- ALT: NOTAS DE ESTILO -->
     <div class="alt-view" id="view-estilo">
-      <div class="alt-view-header">Notas de estilo</div>
+      <div class="av-title">Notas de estilo</div>
       <div class="ref-card">
-        <div class="ref-card-title"><i class="ti ti-pencil" style="font-size:15px;color:var(--gold)"></i> Voz narrativa</div>
-        <textarea style="min-height:100px">3ª persona cercana al PDV de Lía. Nunca acceso a pensamientos de otros personajes.
-El lector sabe solo lo que Lía sabe.</textarea>
+        <div class="ref-title"><i class="ti ti-pencil" style="font-size:15px;color:var(--gold)"></i> Voz narrativa</div>
+        <textarea style="min-height:100px">3ª persona cercana al PDV de Lía. El lector sabe solo lo que Lía sabe.
+Frases cortas en momentos de tensión. Más líricas en descripciones del bosque.</textarea>
       </div>
       <div class="ref-card">
-        <div class="ref-card-title"><i class="ti ti-vocabulary" style="font-size:15px;color:var(--gold)"></i> Vocabulario</div>
-        <textarea style="min-height:80px">Accesible para lectores de 7-10 años. Evitar palabras muy técnicas.
+        <div class="ref-title"><i class="ti ti-vocabulary" style="font-size:15px;color:var(--gold)"></i> Vocabulario</div>
+        <textarea>Accesible para lectores de 7-10 años. Evitar tecnicismos.
 Permitidas: metáforas sencillas y comparaciones con la naturaleza.</textarea>
       </div>
     </div>
 
-    <!-- Brainstorming -->
+    <!-- ALT: BRAINSTORMING -->
     <div class="alt-view" id="view-brainstorm">
-      <div class="alt-view-header">Brainstorming</div>
-      <div class="alt-view-sub">Panel de ideas — arrastra y organiza</div>
-      <div class="brainstorm-grid" id="brainstormGrid" style="background:#e8d8c0;padding:16px;border-radius:8px;min-height:300px">
-        <div class="brainstorm-card"><div class="brainstorm-pin"></div><textarea>¿Y si el bosque es el recuerdo de la abuela de Lía?</textarea></div>
-        <div class="brainstorm-card"><div class="brainstorm-pin" style="background:#3D6B5E"></div><textarea>La linterna se apaga en el momento más peligroso.</textarea></div>
-        <div class="brainstorm-card"><div class="brainstorm-pin" style="background:#185FA5"></div><textarea>El guardián habla en acertijos que Lía debe resolver.</textarea></div>
-        <div class="brainstorm-card"><div class="brainstorm-pin" style="background:#8B5E3C"></div><textarea>Hay otros niños atrapados en el bosque.</textarea></div>
-        <div class="brainstorm-card add-brainstorm-btn" onclick="addBrainstormCard()" style="min-height:80px;flex-direction:row">
-          <i class="ti ti-plus"></i> Nueva idea
-        </div>
+      <div class="av-title">Brainstorming</div>
+      <div class="storm-bg" id="stormGrid">
+        <div class="storm-card"><div class="storm-pin"></div><textarea>¿Y si el bosque es el recuerdo de la abuela de Lía?</textarea></div>
+        <div class="storm-card"><div class="storm-pin" style="background:#3D6B5E"></div><textarea>La linterna se apaga en el momento más peligroso.</textarea></div>
+        <div class="storm-card"><div class="storm-pin" style="background:#185FA5"></div><textarea>El guardián habla en acertijos que Lía debe resolver.</textarea></div>
+        <div class="storm-card"><div class="storm-pin" style="background:#8B5E3C"></div><textarea>Hay otros niños perdidos en el bosque.</textarea></div>
+        <div class="add-storm" onclick="addStorm()"><i class="ti ti-plus" style="font-size:16px"></i> Nueva idea</div>
       </div>
     </div>
 
-    <div class="editor-split" id="editorSplit">
-      <div class="editor-scroll" id="editorScrollA">
-        <div class="editor-content" id="editorContent">
-          <div class="img-wrapper" id="imgDemo">
-            <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='640' height='200' viewBox='0 0 640 200'%3E%3Crect width='640' height='200' fill='%23c0d8b8'/%3E%3Cellipse cx='100' cy='50' rx='75' ry='115' fill='%23386b44'/%3E%3Cellipse cx='220' cy='35' rx='85' ry='125' fill='%234a7c54'/%3E%3Cellipse cx='440' cy='45' rx='88' ry='118' fill='%23386b44'/%3E%3Cellipse cx='560' cy='55' rx='75' ry='110' fill='%234a7c54'/%3E%3Ccircle cx='320' cy='85' r='22' fill='%23f9e04a' opacity='0.95'/%3E%3Ccircle cx='320' cy='85' r='14' fill='%23fdf3a0'/%3E%3Cellipse cx='320' cy='100' rx='40' ry='28' fill='%23f5c842' opacity='0.22'/%3E%3Crect x='312' y='107' width='16' height='60' fill='%23b8763a'/%3E%3C/svg%3E" alt="El bosque de noche" />
-            <div class="img-actions">
-              <button class="img-act-btn" onclick="removeImg('imgDemo')" title="Quitar"><i class="ti ti-trash" style="font-size:12px"></i></button>
-            </div>
-            <input class="img-caption" type="text" value="El bosque brillaba bajo la luna, como si los árboles respiraran luz." />
-          </div>
-          <div id="mainEditor" contenteditable="true" class="text-editor" oninput="onEditorInput()" spellcheck="true">
-            <p>Lía nunca había visto el bosque de noche. Su linterna parpadeaba como un corazón nervioso mientras los árboles cerraban el cielo sobre su cabeza.</p>
-            <p><br></p>
-            <p>—Aquí hay algo —susurró, aunque nadie la escuchaba.</p>
-            <p><br></p>
-            <p>Y entonces lo oyó: un sonido suave, como hojas que aprenden a hablar.</p>
-          </div>
-          <div class="img-placeholder" id="imgPlaceholder" onclick="triggerImg()">
-            <i class="ti ti-photo-plus" aria-hidden="true"></i>
-            <span>Haz clic aquí para insertar una ilustración</span>
-          </div>
-          <input type="file" id="imgInput" accept="image/*" onchange="handleImg(event)" />
-        </div>
-      </div>
-      <div class="split-divider" id="splitDivider" style="display:none"></div>
-      <div class="editor-scroll-b" id="editorScrollB">
-        <div style="padding:16px;font-family:'Lora',serif;font-size:15px;line-height:1.8;color:var(--text-2)">
-          <p style="font-family:'Playfair Display',serif;font-size:16px;font-weight:600;color:var(--text);margin-bottom:12px">Cap. 2 — La criatura</p>
-          <p>El guardián emergió entre los helechos. Era alto como tres hombres juntos, hecho de musgo y luciérnagas que parpadeaban en lugar de latidos.</p>
-        </div>
-      </div>
-    </div>
+  </div><!-- /content-area -->
 
-    <div class="status-bar">
-      <span class="mode-pill" id="modePill">Escritura</span>
-      <span id="sbWords">Palabras: <strong>47</strong></span>
-      <span id="sbSesion">Sesión: <strong>0</strong></span>
-      <span id="sbChapter">Cap. 1 de 3</span>
-      <span class="saved-ok" id="savedOk">Guardado <i class="ti ti-check"></i></span>
-    </div>
-  </div>
-
-  <!-- ══ NOTES PANEL ══ -->
-  <div class="notes-panel" id="notesPanel">
-    <div class="notes-header">
-      <span class="notes-header-title">Inspector</span>
-      <i class="ti ti-x" style="font-size:14px;color:var(--text-muted);cursor:pointer" onclick="toggleNotes()"></i>
-    </div>
-    <div class="ntabs">
-      <div class="ntab active" onclick="switchNote('meta',this)">Info</div>
-      <div class="ntab" onclick="switchNote('sinopsis',this)">Sinopsis</div>
-      <div class="ntab" onclick="switchNote('notas',this)">Notas</div>
-      <div class="ntab" onclick="switchNote('snaps',this)">Snaps</div>
-      <div class="ntab" onclick="switchNote('objetivo',this)">Objetivo</div>
-    </div>
-    <div class="notes-scroll">
-
-      <!-- INFO -->
-      <div id="tab-meta">
-        <div class="meta-row"><span class="meta-label">Estado</span>
-          <select class="meta-select"><option>Borrador</option><option selected>En revisión</option><option>Final</option></select>
-        </div>
-        <div class="meta-row"><span class="meta-label">Etiqueta</span>
-          <select class="meta-select"><option selected>Misterio</option><option>Acción</option><option>Emoción</option><option>Comedia</option></select>
-        </div>
-        <div class="meta-row"><span class="meta-label">PDV</span>
-          <select class="meta-select"><option>1.ª persona</option><option selected>3.ª persona</option><option>2.ª persona</option></select>
-        </div>
-        <div class="meta-row"><span class="meta-label">Palabras</span>
-          <span class="meta-val"><span id="wc2">47</span> / 400</span>
-        </div>
-        <div class="meta-row" style="border:none"><span class="meta-label">Imágenes</span>
-          <span class="meta-val" id="imgCount">1</span>
-        </div>
-        <div class="meta-row" style="border:none;margin-top:4px">
-          <label style="font-size:11px;color:var(--text-muted);display:flex;align-items:center;gap:5px;cursor:pointer">
-            <input type="checkbox" checked style="cursor:pointer"> Incluir en compilación
-          </label>
-        </div>
-        <div class="progress-wrap">
-          <div class="progress-header"><span>Progreso capítulo</span><span id="pctLabel">12%</span></div>
-          <div class="progress-track"><div class="progress-fill" id="progressFill" style="width:12%"></div></div>
-        </div>
-      </div>
-
-      <!-- SINOPSIS -->
-      <div id="tab-sinopsis" style="display:none">
-        <div class="section-label">Sinopsis de la escena</div>
-        <textarea class="ntextarea" style="min-height:100px">Lía llega al bosque con su linterna. Oye algo en la oscuridad que la llama. Primer contacto con el mundo mágico.</textarea>
-        <div class="section-label">Palabras clave</div>
-        <input type="text" class="ntextarea" style="min-height:auto;padding:5px 8px" value="bosque, linterna, misterio, noche" />
-      </div>
-
-      <!-- NOTAS -->
-      <div id="tab-notas" style="display:none">
-        <div class="section-label">Notas del autor</div>
-        <textarea class="ntextarea" style="min-height:100px">La linterna = símbolo del coraje de Lía. Revisar ritmo del diálogo en la p.3.</textarea>
-        <div class="section-label">Referencias visuales</div>
-        <textarea class="ntextarea" style="min-height:70px">Paleta: verdes oscuros + amarillo cálido. Inspiración: ilustradores nórdicos años 70.</textarea>
-        <div class="section-label">Pendientes</div>
-        <textarea class="ntextarea" style="min-height:80px">☐ Revisar diálogos&#10;☐ Añadir ilustración criatura&#10;☐ Corrección final</textarea>
-      </div>
-
-      <!-- SNAPSHOTS -->
-      <div id="tab-snaps" style="display:none">
-        <div class="section-label">Versiones guardadas</div>
-        <div class="snap-item"><div class="snap-date">Hoy, 10:42</div><div class="snap-label">Versión inicial</div></div>
-        <div id="snapsContainer"></div>
-        <div style="font-size:11px;color:var(--text-muted);margin-top:8px;text-align:center;line-height:1.5">Botón "Snap" en la barra para guardar la versión actual</div>
-      </div>
-
-      <!-- OBJETIVO -->
-      <div id="tab-objetivo" style="display:none">
-        <div class="section-label">Objetivo del proyecto</div>
-        <div class="objetivo-wrap">
-          <div class="objetivo-header"><span>Meta total</span><span id="objPct">0%</span></div>
-          <div class="objetivo-track"><div class="objetivo-fill" id="objFill" style="width:0%"></div></div>
-          <div class="objetivo-row">
-            <input class="objetivo-input" type="number" id="objTarget" placeholder="Palabras objetivo" value="5000" min="1" onchange="updateObjetivo()"/>
-            <button class="objetivo-btn" onclick="updateObjetivo()">OK</button>
-          </div>
-        </div>
-        <div class="section-label" style="margin-top:12px">Objetivo de sesión</div>
-        <div class="objetivo-wrap">
-          <div class="objetivo-header"><span>Esta sesión</span><span id="sesionPct">0%</span></div>
-          <div class="objetivo-track"><div class="objetivo-fill" id="sesionFill" style="width:0%"></div></div>
-          <div class="objetivo-row">
-            <input class="objetivo-input" type="number" id="sesionTarget" placeholder="Palabras/sesión" value="500" min="1" onchange="updateSesion()"/>
-            <button class="objetivo-btn" onclick="updateSesion()">OK</button>
-          </div>
-        </div>
-        <div class="section-label" style="margin-top:12px">Fecha límite</div>
-        <input type="date" class="ntextarea" style="min-height:auto;padding:5px 8px" />
-      </div>
-
-    </div>
-    <div class="wc-footer">
-      <span class="wc-label">Total proyecto</span>
-      <span class="wc-val"><span id="totalWC">535</span> palabras</span>
-    </div>
+  <div class="status-bar">
+    <span class="mode-pill pill-write" id="modePill">Escritura</span>
+    <span id="sbWords">Palabras: <strong>47</strong></span>
+    <span id="sbSesion">Sesión: <strong>+0</strong></span>
+    <span class="saved-ok" id="savedOk">Guardado <i class="ti ti-check"></i></span>
   </div>
 </div>
 
-<!-- ══ MODO COMPOSICIÓN ══ -->
-<div class="compose-mode" id="composeMode">
-  <div class="compose-inner">
-    <input type="text" class="compose-title" id="composeTitleInput" value="Cap. 1 — La llegada" />
-    <div id="composeEditor" contenteditable="true" class="compose-editor" oninput="onComposeInput()" spellcheck="true">
-      <p>Lía nunca había visto el bosque de noche. Su linterna parpadeaba como un corazón nervioso mientras los árboles cerraban el cielo sobre su cabeza.</p>
-      <p><br></p>
-      <p>—Aquí hay algo —susurró, aunque nadie la escuchaba.</p>
-      <p><br></p>
-      <p>Y entonces lo oyó: un sonido suave, como hojas que aprenden a hablar.</p>
+<!-- ══ INSPECTOR ══ -->
+<div class="inspector">
+  <div class="insp-head">
+    <span class="insp-head-title">Inspector</span>
+    <i class="ti ti-x" style="font-size:14px;color:var(--txm);cursor:pointer" onclick="this.closest('.inspector').style.display='none'"></i>
+  </div>
+  <div class="ntabs">
+    <div class="ntab active" onclick="switchNote('meta',this)">Info</div>
+    <div class="ntab" onclick="switchNote('sinopsis',this)">Sinopsis</div>
+    <div class="ntab" onclick="switchNote('notas',this)">Notas</div>
+    <div class="ntab" onclick="switchNote('snaps',this)">Snaps</div>
+    <div class="ntab" onclick="switchNote('obj',this)">Objetivo</div>
+  </div>
+  <div class="insp-scroll">
+    <div id="tab-meta">
+      <div class="mrow"><span class="mlabel">Estado</span><select class="msel"><option>Borrador</option><option selected>En revisión</option><option>Final</option></select></div>
+      <div class="mrow"><span class="mlabel">Etiqueta</span><select class="msel"><option selected>Misterio</option><option>Acción</option><option>Emoción</option><option>Comedia</option></select></div>
+      <div class="mrow"><span class="mlabel">PDV</span><select class="msel"><option>1.ª persona</option><option selected>3.ª persona</option><option>2.ª persona</option></select></div>
+      <div class="mrow"><span class="mlabel">Palabras</span><span class="mval"><span id="wc2">47</span> / 400</span></div>
+      <div class="mrow"><span class="mlabel">Imágenes</span><span class="mval" id="imgCount">1</span></div>
+      <div class="mrow" style="border:none"><label style="font-size:11px;color:var(--txm);display:flex;align-items:center;gap:5px;cursor:pointer"><input type="checkbox" checked> Incluir en compilación</label></div>
+      <div class="prog-wrap">
+        <div class="prog-head"><span>Progreso capítulo</span><span id="pctLabel">12%</span></div>
+        <div class="prog-track"><div class="prog-fill" id="progFill" style="width:12%"></div></div>
+      </div>
+    </div>
+    <div id="tab-sinopsis" style="display:none">
+      <div class="slabel">Sinopsis de la escena</div>
+      <textarea class="ntarea" style="min-height:100px">Lía llega al bosque con su linterna. Oye algo en la oscuridad que la llama.</textarea>
+      <div class="slabel">Palabras clave</div>
+      <input type="text" class="ntarea" style="padding:5px 8px;min-height:auto" value="bosque, linterna, misterio, noche"/>
+    </div>
+    <div id="tab-notas" style="display:none">
+      <div class="slabel">Notas del autor</div>
+      <textarea class="ntarea" style="min-height:100px">La linterna = símbolo del coraje de Lía.</textarea>
+      <div class="slabel">Pendientes</div>
+      <textarea class="ntarea" style="min-height:80px">☐ Revisar diálogos&#10;☐ Ilustración de la criatura&#10;☐ Corrección final</textarea>
+    </div>
+    <div id="tab-snaps" style="display:none">
+      <div class="slabel">Versiones guardadas</div>
+      <div class="snap-item"><div class="snap-date">Hoy, 10:42</div><div class="snap-lbl">Versión inicial</div></div>
+      <div id="snapsContainer"></div>
+      <div style="font-size:11px;color:var(--txm);margin-top:8px;text-align:center;line-height:1.5">Usa "Snap" en la barra para guardar la versión actual</div>
+    </div>
+    <div id="tab-obj" style="display:none">
+      <div class="slabel">Objetivo del proyecto</div>
+      <div class="obj-wrap">
+        <div class="obj-head"><span>Meta total</span><span id="objPct">1%</span></div>
+        <div class="obj-track"><div class="obj-fill" id="objFill" style="width:1%"></div></div>
+        <div class="obj-row"><input class="obj-input" type="number" id="objTarget" value="5000" min="1"/><button class="obj-btn" onclick="updateObj()">OK</button></div>
+      </div>
+      <div class="slabel" style="margin-top:12px">Objetivo de sesión</div>
+      <div class="obj-wrap">
+        <div class="obj-head"><span>Esta sesión</span><span id="sesPct">0%</span></div>
+        <div class="obj-track"><div class="obj-fill" id="sesFill" style="width:0%"></div></div>
+        <div class="obj-row"><input class="obj-input" type="number" id="sesTarget" value="500" min="1"/><button class="obj-btn" onclick="updateSes()">OK</button></div>
+      </div>
+      <div class="slabel" style="margin-top:12px">Fecha límite</div>
+      <input type="date" class="ntarea" style="padding:5px 8px;min-height:auto"/>
     </div>
   </div>
+  <div class="insp-footer">
+    <span class="insp-footer-label">Total proyecto</span>
+    <span class="insp-footer-val"><span id="totalWC">70</span> palabras</span>
+  </div>
+</div>
+
+</div><!-- /app -->
+
+<!-- ══ MODO COMPOSICIÓN ══ -->
+<div class="compose" id="compose">
+  <div class="compose-inner">
+    <input type="text" class="compose-title" id="composeTitle" value="Cap. 1 — La llegada"/>
+    <div id="composeEd" contenteditable="true" class="compose-ed" oninput="onComposeInput()" spellcheck="true"></div>
+  </div>
   <div class="compose-bar">
-    <span class="wc">Palabras: <strong id="composeWC">47</strong></span>
-    <span class="wc">Sesión: <strong id="composeSesWC">0</strong></span>
-    <span style="color:rgba(200,190,170,0.4)">Esc para salir · Ctrl+S para snapshot</span>
+    <span class="wc">Palabras: <strong id="composeWC">0</strong></span>
+    <span style="color:rgba(200,190,170,.4)">Esc para salir · Ctrl+S para snapshot</span>
     <button class="compose-exit" onclick="closeCompose()"><i class="ti ti-arrows-minimize" style="font-size:13px"></i> Salir del foco</button>
   </div>
 </div>
 
 <!-- ══ MODAL COMPILAR ══ -->
-<div class="modal-overlay" id="modal-compilar">
+<div class="modal-overlay" id="modal">
   <div class="modal">
     <div class="modal-title">Compilar proyecto</div>
-    <div class="modal-sub">Exporta tu manuscrito en el formato que necesites</div>
-    <div class="modal-section">
-      <div class="modal-section-label">Formato de salida</div>
-      <div class="format-grid">
-        <button class="format-btn" onclick="compilar('txt')"><i class="ti ti-file-text"></i> Texto plano (.txt)</button>
-        <button class="format-btn" onclick="compilar('html')"><i class="ti ti-file-code"></i> Web (.html)</button>
-        <button class="format-btn" onclick="compilar('md')"><i class="ti ti-markdown"></i> Markdown (.md)</button>
-        <button class="format-btn" onclick="compilar('json')"><i class="ti ti-file-export"></i> JSON (backup)</button>
-      </div>
+    <div class="modal-sub">Exporta tu manuscrito al formato que necesites</div>
+    <div style="font-size:11px;color:var(--txm);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px">Formato de salida</div>
+    <div class="fmt-grid">
+      <button class="fmt-btn" onclick="compilar('txt')"><i class="ti ti-file-text"></i> Texto plano (.txt)</button>
+      <button class="fmt-btn" onclick="compilar('md')"><i class="ti ti-markdown"></i> Markdown (.md)</button>
+      <button class="fmt-btn" onclick="compilar('html')"><i class="ti ti-file-code"></i> Web (.html)</button>
+      <button class="fmt-btn" onclick="compilar('json')"><i class="ti ti-file-export"></i> Backup (.json)</button>
     </div>
-    <div class="modal-section">
-      <div class="modal-section-label">Incluir en la compilación</div>
-      <label style="display:flex;align-items:center;gap:6px;font-size:12px;color:var(--text);cursor:pointer;margin-bottom:5px"><input type="checkbox" checked> Capítulos marcados "incluir"</label>
-      <label style="display:flex;align-items:center;gap:6px;font-size:12px;color:var(--text);cursor:pointer"><input type="checkbox"> Notas del autor</label>
-    </div>
-    <div class="modal-actions">
-      <button class="modal-btn-cancel" onclick="closeModal('compilar')">Cancelar</button>
-    </div>
+    <div class="modal-foot"><button class="mbtn-cancel" onclick="closeModal()">Cancelar</button></div>
   </div>
 </div>
 
-<!-- ══ LIBRETA GLOBAL ══ -->
-<div class="notepad-panel" id="notepadPanel">
-  <div class="notepad-header">
+<!-- ══ LIBRETA ══ -->
+<div class="notepad" id="notepad">
+  <div class="notepad-head">
     <span class="notepad-title"><i class="ti ti-notebook" style="font-size:13px;margin-right:4px"></i>Libreta del proyecto</span>
     <button class="notepad-close" onclick="toggleNotepad()"><i class="ti ti-x"></i></button>
   </div>
-  <div class="notepad-body">
-    <textarea class="notepad-area" placeholder="Ideas, pensamientos, notas sueltas del proyecto…">Idea para el cap. 4: Lía vuelve al bosque con su madre.
-La criatura podría hablar en forma de poemas.</textarea>
-  </div>
+  <textarea class="notepad-area" placeholder="Ideas, notas sueltas del proyecto…">Idea cap. 4: Lía vuelve al bosque con su madre.
+El guardián podría hablar en poemas.</textarea>
 </div>
 
 <div class="toast" id="toast"></div>
 
 <script>
-/* ══════════════════════════════════════════
-   SISTEMA DE VISTAS — qué muestra el editor
-══════════════════════════════════════════ */
-
-// Mapa: section-id → qué vista mostrar
-const sectionViews = {
-  root:        { type: 'chapter', id: 'cap1' },
-  cap1:        { type: 'chapter', id: 'cap1' },
-  cap2:        { type: 'chapter', id: 'cap2' },
-  cap3:        { type: 'chapter', id: 'cap3' },
-  personajes:  { type: 'alt', viewId: 'view-personajes' },
-  lia:         { type: 'alt', viewId: 'view-lia' },
-  guardian:    { type: 'alt', viewId: 'view-guardian' },
-  refs:        { type: 'alt', viewId: 'view-refs' },
-  estilo:      { type: 'alt', viewId: 'view-estilo' },
-  brainstorm:  { type: 'alt', viewId: 'view-brainstorm' },
-};
-
-function showEditorView(type, extra) {
-  // Ocultar todo
-  document.getElementById('editorSplit').style.display = 'none';
-  document.getElementById('editorTitleBar').style.display = 'none';
-  document.querySelectorAll('.alt-view').forEach(v => v.classList.remove('active'));
-
-  if (type === 'chapter') {
-    document.getElementById('editorTitleBar').style.display = 'block';
-    document.getElementById('editorSplit').style.display = 'flex';
-    document.getElementById('modePill').textContent = 'Escritura';
-  } else if (type === 'alt') {
-    const view = document.getElementById(extra.viewId);
-    if (view) view.classList.add('active');
-    document.getElementById('modePill').textContent = 'Referencia';
-  }
-}
-
-
-/* ══════════════════════════════════════════
-   ESTADO GLOBAL
-══════════════════════════════════════════ */
-let snapCount = 0;
-let isSplit = false;
-let autoSaveT = null;
-let sesionStartWords = 0;
-
-// Base de datos de capítulos — cada uno tiene su propio contenido
+/* ════════════════════════════════════════
+   DATOS POR CAPÍTULO
+════════════════════════════════════════ */
 const chapters = {
-  cap1: {
-    title: 'Cap. 1 — La llegada',
-    content: `<p>Lía nunca había visto el bosque de noche. Su linterna parpadeaba como un corazón nervioso mientras los árboles cerraban el cielo sobre su cabeza.</p><p><br></p><p>—Aquí hay algo —susurró, aunque nadie la escuchaba.</p><p><br></p><p>Y entonces lo oyó: un sonido suave, como hojas que aprenden a hablar.</p>`,
-    words: 47, status: 'revision', label: 'Misterio', pdv: '3a', incluir: true,
-    sinopsis: 'Lía llega al bosque con su linterna. Oye algo en la oscuridad.',
-    notas: 'La linterna = símbolo del coraje de Lía. Revisar ritmo del diálogo.',
-    snaps: [], objetivo: 400
-  },
-  cap2: {
-    title: 'Cap. 2 — La criatura',
-    content: `<p>El guardián emergió entre los helechos. Era alto como tres hombres juntos, hecho de musgo y luciérnagas que parpadeaban en lugar de latidos.</p>`,
-    words: 28, status: 'borrador', label: 'Misterio', pdv: '3a', incluir: true,
-    sinopsis: 'Lía descubre al guardián del bosque.',
-    notas: '', snaps: [], objetivo: 400
-  },
-  cap3: {
-    title: 'Cap. 3 — El regreso',
-    content: ``,
-    words: 0, status: 'borrador', label: 'Emoción', pdv: '3a', incluir: true,
-    sinopsis: '', notas: '', snaps: [], objetivo: 400
-  }
+  cap1: { title:'Cap. 1 — La llegada', content:'', words:47, sesStart:47 },
+  cap2: { title:'Cap. 2 — La criatura', content:'<p>El guardián emergió entre los helechos. Era alto como tres hombres juntos, hecho de musgo y luciérnagas que parpadeaban en lugar de latidos.</p>', words:23, sesStart:23 },
+  cap3: { title:'Cap. 3 — El regreso', content:'', words:0, sesStart:0 },
+};
+let currentChId = 'cap1';
+let isSplit = false;
+let snapCount = 0;
+let imgCount = 1;
+let saveTimer = null;
+
+// Qué vista muestra cada sección del binder
+const sectionMap = {
+  root:'cap1', cap1:'cap1', cap2:'cap2', cap3:'cap3',
+  personajes:'view-personajes', lia:'view-lia', guardian:'view-guardian',
+  refs:'view-refs', estilo:'view-estilo', brainstorm:'view-brainstorm',
 };
 
-let currentChapterId = 'cap1';
-let imgCount = 1;
-
-/* ══════════════════════════════════════════
+/* ════════════════════════════════════════
    TOAST
-══════════════════════════════════════════ */
-function showToast(m) {
-  const t = document.getElementById('toast');
-  t.textContent = m;
-  t.classList.add('show');
-  setTimeout(() => t.classList.remove('show'), 2200);
+════════════════════════════════════════ */
+function toast(m){const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2200)}
+
+/* ════════════════════════════════════════
+   GUARDAR CAPÍTULO ACTUAL
+════════════════════════════════════════ */
+function saveCurrentCh(){
+  const ch=chapters[currentChId];
+  if(!ch)return;
+  ch.content=document.getElementById('mainEditor').innerHTML;
+  const txt=document.getElementById('mainEditor').innerText||'';
+  ch.words=txt.trim()?txt.trim().split(/\s+/).length:0;
+  ch.title=document.getElementById('chapterTitle').value;
 }
 
-/* ══════════════════════════════════════════
-   GUARDAR CAPÍTULO ACTUAL ANTES DE CAMBIAR
-══════════════════════════════════════════ */
-function saveCurrentChapter() {
-  if (!currentChapterId) return;
-  const ch = chapters[currentChapterId];
-  if (!ch) return;
-  ch.content = document.getElementById('mainEditor').innerHTML;
-  ch.title = document.getElementById('chapterTitle').value;
-  const text = document.getElementById('mainEditor').innerText || '';
-  ch.words = text.trim() ? text.trim().split(/\s+/).length : 0;
-  // Guardar sinopsis y notas
-  const sinEl = document.querySelector('#tab-sinopsis textarea');
-  if (sinEl) ch.sinopsis = sinEl.value;
-  const notEl = document.querySelector('#tab-notas textarea');
-  if (notEl) ch.notas = notEl.value;
+/* ════════════════════════════════════════
+   CARGAR CAPÍTULO EN EL EDITOR
+════════════════════════════════════════ */
+function loadChapter(id){
+  saveCurrentCh();
+  currentChId=id;
+  const ch=chapters[id];
+  document.getElementById('mainEditor').innerHTML=ch.content||'';
+  document.getElementById('chapterTitle').value=ch.title;
+  document.getElementById('composeTitle').value=ch.title;
+  const w=ch.words||0;
+  updateWC(w);
+  // Marcar corcho
+  document.querySelectorAll('.ccard').forEach(c=>c.classList.remove('active'));
+  const cc=document.getElementById('cc-'+id);
+  if(cc)cc.classList.add('active');
+  // Marcar outline
+  document.querySelectorAll('.oitem').forEach(o=>o.classList.remove('active'));
 }
 
-/* ══════════════════════════════════════════
-   CARGAR UN CAPÍTULO EN EL EDITOR
-══════════════════════════════════════════ */
-function loadChapter(id) {
-  saveCurrentChapter();
-  currentChapterId = id;
-  const ch = chapters[id];
-  if (!ch) return;
+/* ════════════════════════════════════════
+   NAVEGACIÓN POR EL BINDER
+════════════════════════════════════════ */
+function nav(binderEl, section){
+  // Marcar activo en binder
+  document.querySelectorAll('.bitem').forEach(i=>i.classList.remove('active'));
+  if(binderEl)binderEl.classList.add('active');
 
-  // Título
-  document.getElementById('chapterTitle').value = ch.title;
-  document.getElementById('composeTitleInput').value = ch.title;
+  const target=sectionMap[section];
+  if(!target)return;
 
-  // Contenido del editor
-  const editor = document.getElementById('mainEditor');
-  editor.innerHTML = ch.content || '';
-
-  // Inspector — info
-  const statusSel = document.querySelector('#tab-meta select:nth-of-type(1)');
-  if (statusSel) {
-    statusSel.value = ch.status === 'revision' ? 'En revisión' : ch.status === 'final' ? 'Final' : 'Borrador';
-  }
-
-  // Sinopsis
-  const sinEl = document.querySelector('#tab-sinopsis textarea');
-  if (sinEl) sinEl.value = ch.sinopsis || '';
-
-  // Notas
-  const notEl = document.querySelector('#tab-notas textarea');
-  if (notEl) notEl.value = ch.notas || '';
-
-  // Contar palabras
-  const text = editor.innerText || '';
-  const words = text.trim() ? text.trim().split(/\s+/).length : 0;
-  updateWordCountUI(words);
-
-  // Reset sesion start
-  sesionStartWords = words;
-
-  // Actualizar scrivenings
-  updateScrivenings();
-
-  showToast('Cargado: ' + ch.title);
-}
-
-/* ══════════════════════════════════════════
-   BINDER
-══════════════════════════════════════════ */
-function selectBinder(el, title, section) {
-  document.querySelectorAll('.binder-item').forEach(i => i.classList.remove('active'));
-  el.classList.add('active');
-
-  const view = sectionViews[section];
-  if (!view) return;
-
-  if (view.type === 'chapter') {
-    showEditorView('chapter');
-    loadChapter(view.id);
-  } else if (view.type === 'alt') {
-    saveCurrentChapter();
-    showEditorView('alt', view);
-    document.getElementById('chapterTitle').value = title;
+  if(target.startsWith('cap')){
+    // Es un capítulo → mostrar editor, ocultar alt-views
+    showEditor();
+    loadChapter(target);
+    document.getElementById('modePill').textContent='Escritura';
+    document.getElementById('modePill').className='mode-pill pill-write';
+  } else {
+    // Es una vista alternativa → ocultar editor, mostrar esa vista
+    saveCurrentCh();
+    showAlt(target);
+    document.getElementById('modePill').textContent='Referencia';
+    document.getElementById('modePill').className='mode-pill pill-ref';
   }
 }
 
-function addChapter() {
-  const ids = Object.keys(chapters).filter(k => k.startsWith('cap'));
-  const n = ids.length + 1;
-  const newId = 'cap' + n;
-  const title = `Cap. ${n} — Nuevo capítulo`;
-
-  chapters[newId] = {
-    title, content: '', words: 0, status: 'borrador',
-    label: 'Sin etiqueta', pdv: '3a', incluir: true,
-    sinopsis: '', notas: '', snaps: [], objetivo: 400
-  };
-
-  const body = document.getElementById('binderBody');
-  const btn = body.querySelector('.binder-add-btn');
-  const item = document.createElement('div');
-  item.className = 'binder-item sub';
-  item.id = 'binder-' + newId;
-  item.innerHTML = `<i class="ti ti-file-text bi" style="font-size:12px"></i><span class="bl">${title}</span><span class="bb" id="badge-${newId}">0</span>`;
-  item.onclick = () => selectBinder(item, title, newId);
-  body.insertBefore(item, btn);
-
-  addCorkCard(title, newId);
-  registerChapterInViews(newId);
-  loadChapter(newId);
-  showEditorView('chapter');
-
-  // Seleccionar en binder
-  document.querySelectorAll('.binder-item').forEach(i => i.classList.remove('active'));
-  item.classList.add('active');
-
-  showToast('Capítulo añadido');
+function showEditor(){
+  document.getElementById('editorView').style.display='flex';
+  document.querySelectorAll('.alt-view').forEach(v=>v.classList.remove('visible'));
 }
 
-function addPersonaje() { showToast('Personaje añadido'); }
-function addRef() { showToast('Referencia añadida'); }
+function showAlt(viewId){
+  document.getElementById('editorView').style.display='none';
+  document.querySelectorAll('.alt-view').forEach(v=>v.classList.remove('visible'));
+  const v=document.getElementById(viewId);
+  if(v)v.classList.add('visible');
+}
 
-/* ══════════════════════════════════════════
-   PANEL CENTRAL
-══════════════════════════════════════════ */
-function switchMiddle(mode, tabEl) {
-  document.querySelectorAll('.ptab').forEach(t => t.classList.remove('active'));
+/* ════════════════════════════════════════
+   PANEL CENTRAL (CORCHO / ESQUEMA / TODO)
+════════════════════════════════════════ */
+function switchMid(mode,tabEl){
+  document.querySelectorAll('.ptab').forEach(t=>t.classList.remove('active'));
   tabEl.classList.add('active');
-  document.getElementById('corkboard').style.display = mode === 'cork' ? 'flex' : 'none';
-  document.getElementById('outliner').style.display = mode === 'outline' ? 'block' : 'none';
-  document.getElementById('scriveningsView').style.display = mode === 'scrivenings' ? 'block' : 'none';
-  if (mode === 'scrivenings') updateScrivenings();
+  document.getElementById('cork').style.display=mode==='cork'?'flex':'none';
+  document.getElementById('outline').style.display=mode==='outline'?'block':'none';
+  document.getElementById('scriv').style.display=mode==='scriv'?'block':'none';
+  if(mode==='scriv')buildScriv();
 }
 
-function activateCard(card, title, section) {
-  if (card) {
-    document.querySelectorAll('.cork-card').forEach(c => c.classList.remove('active'));
-    card.classList.add('active');
-  }
-  document.querySelectorAll('.ol-item').forEach(i => i.classList.remove('active'));
-  if (chapters[section]) {
-    loadChapter(section);
-    // Marcar en binder
-    const binderItem = document.getElementById('binder-' + section) ||
-      document.querySelector(`.binder-item[data-id="${section}"]`);
-    if (binderItem) {
-      document.querySelectorAll('.binder-item').forEach(i => i.classList.remove('active'));
-      binderItem.classList.add('active');
-    }
-  }
+function buildScriv(){
+  saveCurrentCh();
+  const el=document.getElementById('scriv');
+  el.innerHTML='';
+  Object.entries(chapters).forEach(([id,ch])=>{
+    const sec=document.createElement('div');sec.className='ssec';
+    const bodyHtml=ch.content||'<span style="color:var(--txm);font-style:italic">Sin contenido aún.</span>';
+    sec.innerHTML=`<div class="ssec-title" onclick="nav(document.getElementById('b-${id}'),'${id}')">${ch.title}</div><div class="ssec-body">${bodyHtml}</div>`;
+    el.appendChild(sec);
+  });
 }
 
-function addCorkCard(title, id) {
-  const cork = document.getElementById('corkboard');
-  const card = document.createElement('div');
-  card.className = 'cork-card';
-  card.id = 'cork-' + id;
-  card.innerHTML = `<div class="cork-pin" style="background:#9a9a9a"></div><div class="ct">${title.replace(/Cap\. \d+ — /, '')}</div><div class="cs">Sin escribir aún.</div><div class="cst st-borrador">Borrador</div>`;
-  card.onclick = () => activateCard(card, title, id);
+/* ════════════════════════════════════════
+   AÑADIR CAPÍTULO
+════════════════════════════════════════ */
+function addChapter(){
+  const ids=Object.keys(chapters);
+  const n=ids.length+1;
+  const id='cap'+n;
+  const title=`Cap. ${n} — Nuevo capítulo`;
+  chapters[id]={title,content:'',words:0,sesStart:0};
+  sectionMap[id]=id;
+
+  // Binder
+  const body=document.getElementById('binder').querySelector('.binder-body');
+  const btn=body.querySelector('.badd');
+  const item=document.createElement('div');
+  item.className='bitem sub';item.id='b-'+id;
+  item.innerHTML=`<i class="ti ti-file-text" style="font-size:12px"></i><span class="bl">${title}</span><span class="bb" id="bb-${id}">0</span>`;
+  item.onclick=()=>nav(item,id);
+  body.insertBefore(item,btn);
+
+  // Corcho
+  const cork=document.getElementById('cork');
+  const card=document.createElement('div');
+  card.className='ccard';card.id='cc-'+id;
+  card.innerHTML=`<div class="cpin" style="background:#9a9a9a"></div><div class="ct">${title.replace(/Cap\. \d+ — /,'')}</div><div class="cs">Sin escribir aún.</div><div class="cst st-b">Borrador</div>`;
+  card.onclick=()=>nav(item,id);
   cork.appendChild(card);
+
+  nav(item,id);
+  toast('Capítulo añadido');
 }
 
-function updateScrivenings() {
-  saveCurrentChapter();
-  const view = document.getElementById('scriveningsView');
-  view.innerHTML = '';
-  Object.entries(chapters).forEach(([id, ch]) => {
-    const sec = document.createElement('div');
-    sec.className = 'scrivenings-section';
-    const bodyText = ch.content
-      ? `<div style="font-family:'Lora',serif;font-size:14px;line-height:1.8;color:var(--text)">${ch.content}</div>`
-      : `<div style="color:var(--text-muted);font-style:italic;font-size:13px">Sin contenido aún.</div>`;
-    sec.innerHTML = `<div class="scrivenings-section-title" style="cursor:pointer" onclick="loadChapter('${id}')">${ch.title}</div><div class="scrivenings-section-body">${bodyText}</div>`;
-    view.appendChild(sec);
-  });
-}
+function addPersonaje(){toast('Personaje añadido')}
+function addRef(){toast('Referencia añadida')}
 
-/* ══════════════════════════════════════════
+/* ════════════════════════════════════════
    EDITOR
-══════════════════════════════════════════ */
-function fmt(cmd) {
-  const ed = document.getElementById('mainEditor');
-  ed.focus();
-  if (cmd === 'h2') document.execCommand('formatBlock', false, 'h2');
-  else if (cmd === 'h3') document.execCommand('formatBlock', false, 'h3');
-  else if (cmd === 'quote') document.execCommand('formatBlock', false, 'blockquote');
-  else if (cmd === 'ul') document.execCommand('insertUnorderedList');
-  else document.execCommand(cmd, false, null);
+════════════════════════════════════════ */
+function fmt(cmd){
+  const ed=document.getElementById('mainEditor');ed.focus();
+  if(cmd==='h2')document.execCommand('formatBlock',false,'h2');
+  else if(cmd==='h3')document.execCommand('formatBlock',false,'h3');
+  else if(cmd==='quote')document.execCommand('formatBlock',false,'blockquote');
+  else if(cmd==='ul')document.execCommand('insertUnorderedList');
+  else document.execCommand(cmd,false,null);
+}
+function addSep(){document.getElementById('mainEditor').focus();document.execCommand('insertHorizontalRule');}
+
+function onInput(){
+  const txt=document.getElementById('mainEditor').innerText||'';
+  const w=txt.trim()?txt.trim().split(/\s+/).length:0;
+  updateWC(w);
+  triggerSave();
 }
 
-function addSep() {
-  const ed = document.getElementById('mainEditor');
-  ed.focus();
-  document.execCommand('insertHorizontalRule');
+function updateWC(w){
+  const ch=chapters[currentChId];
+  const sesStart=ch?ch.sesStart:0;
+  const ses=Math.max(0,w-sesStart);
+  document.getElementById('sbWords').innerHTML=`Palabras: <strong>${w}</strong>`;
+  document.getElementById('sbSesion').innerHTML=`Sesión: <strong>+${ses}</strong>`;
+  document.getElementById('wc2').textContent=w;
+  const pct=Math.min(100,Math.round(w/400*100));
+  document.getElementById('progFill').style.width=pct+'%';
+  document.getElementById('pctLabel').textContent=pct+'%';
+  const bb=document.getElementById('bb-'+currentChId);
+  if(bb)bb.textContent=w;
+  const total=Object.values(chapters).reduce((a,c)=>a+(c.words||0),0)+(w-(ch?ch.words:0));
+  document.getElementById('totalWC').textContent=total;
+  updateObj(total);updateSes(ses);
 }
 
-function updateWordCountUI(words) {
-  const sesion = Math.max(0, words - sesionStartWords);
-  document.getElementById('sbWords').innerHTML = `Palabras: <strong>${words}</strong>`;
-  document.getElementById('sbSesion').innerHTML = `Sesión: <strong>+${sesion}</strong>`;
-  document.getElementById('wc2').textContent = words;
-  const pct = Math.min(100, Math.round(words / (chapters[currentChapterId]?.objetivo || 400) * 100));
-  document.getElementById('progressFill').style.width = pct + '%';
-  document.getElementById('pctLabel').textContent = pct + '%';
-  // Total proyecto
-  const total = Object.values(chapters).reduce((a, c) => a + (c.words || 0), 0);
-  document.getElementById('totalWC').textContent = total;
-  // Badge en binder
-  const badge = document.getElementById('badge-' + currentChapterId);
-  if (badge) badge.textContent = words;
-  updateObjetivo(total);
-  updateSesion(sesion);
+function triggerSave(){
+  document.getElementById('savedOk').innerHTML='Guardando… <i class="ti ti-loader" style="font-size:12px"></i>';
+  clearTimeout(saveTimer);
+  saveTimer=setTimeout(()=>{
+    saveCurrentCh();
+    document.getElementById('savedOk').innerHTML='Guardado <i class="ti ti-check" style="font-size:12px;color:var(--ok)"></i>';
+  },900);
 }
 
-function onEditorInput() {
-  const text = document.getElementById('mainEditor').innerText || '';
-  const words = text.trim() ? text.trim().split(/\s+/).length : 0;
-  updateWordCountUI(words);
-  triggerAutoSave();
-}
-
-function triggerAutoSave() {
-  document.getElementById('savedOk').innerHTML = 'Guardando… <i class="ti ti-loader" style="font-size:12px"></i>';
-  clearTimeout(autoSaveT);
-  autoSaveT = setTimeout(() => {
-    saveCurrentChapter();
-    document.getElementById('savedOk').innerHTML = 'Guardado <i class="ti ti-check" style="font-size:12px;color:var(--success)"></i>';
-  }, 1000);
-}
-
-/* ══════════════════════════════════════════
+/* ════════════════════════════════════════
    OBJETIVO
-══════════════════════════════════════════ */
-function updateObjetivo(currentTotal) {
-  const target = parseInt(document.getElementById('objTarget').value) || 5000;
-  const total = currentTotal || Object.values(chapters).reduce((a, c) => a + (c.words || 0), 0);
-  const pct = Math.min(100, Math.round(total / target * 100));
-  document.getElementById('objFill').style.width = pct + '%';
-  document.getElementById('objPct').textContent = pct + '%';
+════════════════════════════════════════ */
+function updateObj(total){
+  const t=parseInt(document.getElementById('objTarget').value)||5000;
+  const tot=total||Object.values(chapters).reduce((a,c)=>a+(c.words||0),0);
+  const p=Math.min(100,Math.round(tot/t*100));
+  document.getElementById('objFill').style.width=p+'%';
+  document.getElementById('objPct').textContent=p+'%';
 }
-function updateSesion(sw) {
-  const target = parseInt(document.getElementById('sesionTarget').value) || 500;
-  const s = sw !== undefined ? sw : Math.max(0, (parseInt(document.getElementById('wc2').textContent) || 0) - sesionStartWords);
-  const pct = Math.min(100, Math.round(s / target * 100));
-  document.getElementById('sesionFill').style.width = pct + '%';
-  document.getElementById('sesionPct').textContent = pct + '%';
+function updateSes(ses){
+  const t=parseInt(document.getElementById('sesTarget').value)||500;
+  const s=ses||0;
+  const p=Math.min(100,Math.round(s/t*100));
+  document.getElementById('sesFill').style.width=p+'%';
+  document.getElementById('sesPct').textContent=p+'%';
 }
 
-/* ══════════════════════════════════════════
+/* ════════════════════════════════════════
    IMÁGENES
-══════════════════════════════════════════ */
-function triggerImg() { document.getElementById('imgInput').click(); }
-function handleImg(e) {
-  const file = e.target.files[0]; if (!file) return;
-  const reader = new FileReader();
-  reader.onload = ev => {
-    const uid = 'img_' + Date.now();
-    const ph = document.getElementById('imgPlaceholder');
-    const w = document.createElement('div');
-    w.className = 'img-wrapper'; w.id = uid;
-    w.innerHTML = `<img src="${ev.target.result}" alt="Ilustración"/><div class="img-actions"><button class="img-act-btn" onclick="removeImg('${uid}')" title="Quitar"><i class="ti ti-trash" style="font-size:12px"></i></button></div><input class="img-caption" type="text" placeholder="Pie de imagen…"/>`;
-    ph.parentNode.insertBefore(w, ph);
-    imgCount++; document.getElementById('imgCount').textContent = imgCount;
-    showToast('Imagen insertada');
-  };
-  reader.readAsDataURL(file); e.target.value = '';
+════════════════════════════════════════ */
+function triggerImg(){document.getElementById('imgInput').click()}
+function handleImg(e){
+  const file=e.target.files[0];if(!file)return;
+  const reader=new FileReader();
+  reader.onload=ev=>{
+    const uid='img_'+Date.now();
+    const ph=document.getElementById('imgPh');
+    const w=document.createElement('div');w.className='img-wrap';w.id=uid;
+    w.innerHTML=`<img src="${ev.target.result}" alt="Ilustración"/><div class="img-acts"><button class="img-act-btn" onclick="removeImg('${uid}')"><i class="ti ti-trash" style="font-size:12px"></i></button></div><input class="img-cap" type="text" placeholder="Pie de imagen…"/>`;
+    ph.parentNode.insertBefore(w,ph);
+    imgCount++;document.getElementById('imgCount').textContent=imgCount;
+    toast('Imagen insertada');
+  };reader.readAsDataURL(file);e.target.value='';
 }
-function removeImg(id) {
-  const el = document.getElementById(id);
-  if (el) { el.remove(); imgCount = Math.max(0, imgCount - 1); document.getElementById('imgCount').textContent = imgCount; showToast('Imagen eliminada'); }
+function removeImg(id){
+  const el=document.getElementById(id);
+  if(el){el.remove();imgCount=Math.max(0,imgCount-1);document.getElementById('imgCount').textContent=imgCount;toast('Imagen eliminada');}
 }
 
-/* ══════════════════════════════════════════
-   SPLIT / DOBLE PANTALLA
-══════════════════════════════════════════ */
-function toggleSplit() {
-  isSplit = !isSplit;
-  document.getElementById('editorScrollB').style.display = isSplit ? 'block' : 'none';
-  document.getElementById('splitDivider').style.display = isSplit ? 'block' : 'none';
-  document.getElementById('splitBtn').classList.toggle('on', isSplit);
-  showToast(isSplit ? 'Doble pantalla activada' : 'Doble pantalla desactivada');
+/* ════════════════════════════════════════
+   SPLIT
+════════════════════════════════════════ */
+function toggleSplit(){
+  isSplit=!isSplit;
+  document.getElementById('scrollB').style.display=isSplit?'block':'none';
+  document.getElementById('splitDiv').style.display=isSplit?'block':'none';
+  document.getElementById('splitBtn').classList.toggle('on',isSplit);
+  toast(isSplit?'Doble pantalla activada':'Desactivada');
 }
 
-/* ══════════════════════════════════════════
+/* ════════════════════════════════════════
    SNAPSHOT
-══════════════════════════════════════════ */
-function saveSnapshot() {
+════════════════════════════════════════ */
+function saveSnap(){
   snapCount++;
-  const now = new Date();
-  const ch = chapters[currentChapterId];
-  if (ch) ch.snaps.push({ date: now.toISOString(), content: document.getElementById('mainEditor').innerHTML });
-  const container = document.getElementById('snapsContainer');
-  const item = document.createElement('div');
-  item.className = 'snap-item';
-  item.innerHTML = `<div class="snap-date">${now.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })}</div><div class="snap-label">v${snapCount + 1} — ${chapters[currentChapterId]?.title || ''}</div>`;
-  container.insertBefore(item, container.firstChild);
-  switchNote('snaps', document.querySelectorAll('.ntab')[3]);
-  showToast('Snapshot guardado');
+  const now=new Date();
+  const container=document.getElementById('snapsContainer');
+  const item=document.createElement('div');item.className='snap-item';
+  item.innerHTML=`<div class="snap-date">${now.toLocaleTimeString('es-ES',{hour:'2-digit',minute:'2-digit'})}</div><div class="snap-lbl">v${snapCount+1} — ${chapters[currentChId]?.title||''}</div>`;
+  container.insertBefore(item,container.firstChild);
+  switchNote('snaps',document.querySelectorAll('.ntab')[3]);
+  toast('Snapshot guardado');
 }
 
-/* ══════════════════════════════════════════
-   NOTAS / INSPECTOR
-══════════════════════════════════════════ */
-function switchNote(tab, el) {
-  document.querySelectorAll('.ntab').forEach(t => t.classList.remove('active'));
+/* ════════════════════════════════════════
+   INSPECTOR TABS
+════════════════════════════════════════ */
+function switchNote(tab,el){
+  document.querySelectorAll('.ntab').forEach(t=>t.classList.remove('active'));
   el.classList.add('active');
-  ['meta', 'sinopsis', 'notas', 'snaps', 'objetivo'].forEach(id => {
-    const el = document.getElementById('tab-' + id);
-    if (el) el.style.display = id === tab ? 'block' : 'none';
+  ['meta','sinopsis','notas','snaps','obj'].forEach(id=>{
+    const el=document.getElementById('tab-'+id);if(el)el.style.display=id===tab?'block':'none';
   });
 }
 
-/* ══════════════════════════════════════════
-   PANELES
-══════════════════════════════════════════ */
-function toggleBinder() { document.getElementById('binder').classList.toggle('collapsed'); }
-function toggleNotes() { document.getElementById('notesPanel').classList.toggle('collapsed'); }
-function toggleNotepad() { document.getElementById('notepadPanel').classList.toggle('open'); }
-
-/* ══════════════════════════════════════════
+/* ════════════════════════════════════════
    MODO COMPOSICIÓN
-══════════════════════════════════════════ */
-function openCompose() {
-  document.getElementById('composeEditor').innerHTML = document.getElementById('mainEditor').innerHTML;
-  document.getElementById('composeMode').classList.add('open');
-  document.getElementById('modePill').textContent = 'Foco';
-  document.getElementById('composeEditor').focus();
+════════════════════════════════════════ */
+function openCompose(){
+  document.getElementById('composeEd').innerHTML=document.getElementById('mainEditor').innerHTML;
+  document.getElementById('compose').classList.add('open');
+  document.getElementById('composeEd').focus();
+  const txt=document.getElementById('composeEd').innerText||'';
+  document.getElementById('composeWC').textContent=txt.trim()?txt.trim().split(/\s+/).length:0;
 }
-function closeCompose() {
-  document.getElementById('mainEditor').innerHTML = document.getElementById('composeEditor').innerHTML;
-  document.getElementById('composeMode').classList.remove('open');
-  document.getElementById('modePill').textContent = 'Escritura';
-  onEditorInput();
+function closeCompose(){
+  document.getElementById('mainEditor').innerHTML=document.getElementById('composeEd').innerHTML;
+  document.getElementById('compose').classList.remove('open');
+  onInput();
 }
-function onComposeInput() {
-  const text = document.getElementById('composeEditor').innerText || '';
-  const words = text.trim() ? text.trim().split(/\s+/).length : 0;
-  const sesion = Math.max(0, words - sesionStartWords);
-  document.getElementById('composeWC').textContent = words;
-  document.getElementById('composeSesWC').textContent = '+' + sesion;
+function onComposeInput(){
+  const txt=document.getElementById('composeEd').innerText||'';
+  document.getElementById('composeWC').textContent=txt.trim()?txt.trim().split(/\s+/).length:0;
 }
 
-document.addEventListener('keydown', e => {
-  if (e.key === 'Escape' && document.getElementById('composeMode').classList.contains('open')) closeCompose();
-  if ((e.ctrlKey || e.metaKey) && e.key === 's') { e.preventDefault(); saveSnapshot(); }
-});
-
-/* ══════════════════════════════════════════
+/* ════════════════════════════════════════
    MODAL COMPILAR
-══════════════════════════════════════════ */
-function openModal(id) { document.getElementById('modal-' + id).classList.add('open'); }
-function closeModal(id) { document.getElementById('modal-' + id).classList.remove('open'); }
-document.querySelectorAll('.modal-overlay').forEach(m => m.addEventListener('click', e => { if (e.target === m) m.classList.remove('open'); }));
+════════════════════════════════════════ */
+function openModal(){document.getElementById('modal').classList.add('open')}
+function closeModal(){document.getElementById('modal').classList.remove('open')}
+document.getElementById('modal').addEventListener('click',e=>{if(e.target===document.getElementById('modal'))closeModal()});
 
-function compilar(format) {
-  saveCurrentChapter();
-  const title = document.getElementById('projectName').textContent;
-  let fullContent = '';
-  Object.values(chapters).forEach(ch => {
-    if (ch.incluir) {
-      const tmp = document.createElement('div');
-      tmp.innerHTML = ch.content;
-      fullContent += `\n\n${ch.title}\n${'─'.repeat(ch.title.length)}\n\n${tmp.innerText}`;
-    }
-  });
-  let blob, filename;
-  if (format === 'txt') {
-    blob = new Blob([`${title}\n${'═'.repeat(40)}${fullContent}`], { type: 'text/plain' });
-    filename = title.replace(/[^\w\s]/g, '') + '.txt';
-  } else if (format === 'md') {
-    let md = `# ${title}\n`;
-    Object.values(chapters).forEach(ch => {
-      if (ch.incluir) {
-        const tmp = document.createElement('div'); tmp.innerHTML = ch.content;
-        md += `\n## ${ch.title}\n\n${tmp.innerText}\n`;
-      }
-    });
-    blob = new Blob([md], { type: 'text/markdown' });
-    filename = title.replace(/[^\w\s]/g, '') + '.md';
-  } else if (format === 'html') {
-    let html = `<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8"><title>${title}</title><style>body{font-family:Georgia,serif;max-width:680px;margin:60px auto;line-height:1.85;color:#1a1208}h1{font-size:28px}h2{font-size:20px;margin:2em 0 0.5em}img{max-width:100%;border-radius:6px;margin:20px 0}
-/* ── VISTAS ALTERNATIVAS (personajes, investigación, etc.) ── */
-.alt-view { display:none; flex:1; overflow-y:auto; padding:20px 24px; background:var(--surface); flex-direction:column; gap:16px; }
-.alt-view.active { display:flex; }
-.alt-view-header { font-family:'Playfair Display',serif; font-size:20px; font-weight:600; color:var(--text); padding-bottom:10px; border-bottom:2px solid var(--accent-border); margin-bottom:4px; }
-.alt-view-sub { font-size:12px; color:var(--text-muted); margin-top:-10px; }
-
-/* Personaje card */
-.personaje-card { background:var(--surface-1); border:1px solid var(--border); border-radius:8px; overflow:hidden; }
-.personaje-card-header { padding:10px 14px; background:var(--surface-2); border-bottom:1px solid var(--border); display:flex; align-items:center; gap:8px; cursor:pointer; }
-.personaje-avatar { width:32px; height:32px; border-radius:50%; background:var(--binder-gold); display:flex; align-items:center; justify-content:center; font-size:13px; font-weight:600; color:var(--binder-bg); flex-shrink:0; }
-.personaje-card-title { font-size:13px; font-weight:500; color:var(--text); flex:1; }
-.personaje-card-body { padding:12px 14px; display:grid; grid-template-columns:1fr 1fr; gap:10px; }
-.personaje-campo label { display:block; font-size:10px; color:var(--text-muted); margin-bottom:3px; text-transform:uppercase; letter-spacing:0.05em; }
-.personaje-campo input, .personaje-campo textarea { width:100%; border:1px solid var(--border-strong); border-radius:4px; padding:5px 7px; font-size:12px; font-family:'Inter',sans-serif; color:var(--text); background:var(--surface); outline:none; transition:border-color 0.12s; }
-.personaje-campo textarea { resize:vertical; min-height:52px; line-height:1.5; }
-.personaje-campo input:focus, .personaje-campo textarea:focus { border-color:var(--accent-border); }
-.personaje-campo.full { grid-column:1/-1; }
-.add-personaje-btn { padding:10px; border:1.5px dashed var(--border-strong); border-radius:8px; background:transparent; cursor:pointer; font-size:13px; color:var(--text-muted); font-family:'Inter',sans-serif; display:flex; align-items:center; justify-content:center; gap:6px; transition:all 0.12s; }
-.add-personaje-btn:hover { border-color:var(--accent-border); color:var(--accent); background:var(--accent-bg); }
-
-/* Investigación */
-.ref-card { background:var(--surface-1); border:1px solid var(--border); border-radius:8px; padding:14px; }
-.ref-card-title { font-size:13px; font-weight:500; color:var(--text); margin-bottom:6px; display:flex; align-items:center; gap:6px; }
-.ref-card textarea { width:100%; resize:none; min-height:80px; border:1px solid var(--border-strong); border-radius:4px; padding:7px 9px; font-size:12px; font-family:'Lora',serif; color:var(--text); background:var(--surface); outline:none; line-height:1.65; }
-.ref-card textarea:focus { border-color:var(--accent-border); }
-
-/* Brainstorming cork */
-.brainstorm-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(160px,1fr)); gap:12px; }
-.brainstorm-card { background:#fffdf6; border-radius:4px; padding:10px; border-top:3px solid var(--gold); box-shadow:0 2px 6px rgba(0,0,0,0.08); position:relative; }
-.brainstorm-card textarea { width:100%; border:none; background:transparent; resize:none; font-size:12px; font-family:'Lora',serif; color:#2a1a0a; line-height:1.6; outline:none; min-height:80px; }
-.brainstorm-pin { position:absolute; top:-6px; left:50%; transform:translateX(-50%); width:10px; height:10px; border-radius:50%; background:#c0392b; box-shadow:0 1px 3px rgba(0,0,0,0.3); }
-.add-brainstorm-btn { background:rgba(201,169,110,0.1); border:1.5px dashed rgba(201,169,110,0.4); border-radius:6px; padding:20px; cursor:pointer; display:flex; flex-direction:column; align-items:center; gap:6px; color:rgba(201,169,110,0.7); font-size:12px; font-family:'Inter',sans-serif; transition:all 0.12s; }
-.add-brainstorm-btn:hover { background:rgba(201,169,110,0.18); color:var(--gold); }
-</style></head><body><h1>${title}</h1>`;
-    Object.values(chapters).forEach(ch => { if (ch.incluir) html += `<h2>${ch.title}</h2><div>${ch.content}</div>`; });
-    html += '</body></html>';
-    blob = new Blob([html], { type: 'text/html' });
-    filename = title.replace(/[^\w\s]/g, '') + '.html';
-  } else if (format === 'json') {
-    blob = new Blob([JSON.stringify({ proyecto: title, capitulos: chapters, fecha: new Date().toISOString() }, null, 2)], { type: 'application/json' });
-    filename = title.replace(/[^\w\s]/g, '') + '.json';
+function compilar(fmt){
+  saveCurrentCh();
+  const title=document.querySelector('.binder-project').textContent.trim();
+  let blob,filename;
+  if(fmt==='txt'){
+    let txt=title+'\n'+'═'.repeat(40);
+    Object.values(chapters).forEach(ch=>{const d=document.createElement('div');d.innerHTML=ch.content;txt+='\n\n'+ch.title+'\n'+'─'.repeat(ch.title.length)+'\n\n'+d.innerText;});
+    blob=new Blob([txt],{type:'text/plain'});filename=title+'.txt';
+  } else if(fmt==='md'){
+    let md='# '+title+'\n';
+    Object.values(chapters).forEach(ch=>{const d=document.createElement('div');d.innerHTML=ch.content;md+='\n## '+ch.title+'\n\n'+d.innerText+'\n';});
+    blob=new Blob([md],{type:'text/markdown'});filename=title+'.md';
+  } else if(fmt==='html'){
+    let html=`<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8"><title>${title}</title><style>body{font-family:Georgia,serif;max-width:680px;margin:60px auto;line-height:1.85;color:#1a1208}h1{font-size:28px}h2{font-size:20px;margin:2em 0 .5em}img{max-width:100%;border-radius:6px;margin:20px 0}</style></head><body><h1>${title}</h1>`;
+    Object.values(chapters).forEach(ch=>{html+=`<h2>${ch.title}</h2><div>${ch.content}</div>`;});
+    html+='</body></html>';
+    blob=new Blob([html],{type:'text/html'});filename=title+'.html';
+  } else {
+    blob=new Blob([JSON.stringify({proyecto:title,capitulos:chapters,fecha:new Date().toISOString()},null,2)],{type:'application/json'});filename=title+'.json';
   }
-  const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = filename; a.click();
-  closeModal('compilar');
-  showToast('Compilado como ' + format.toUpperCase());
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=filename.replace(/[^\w\s.-]/g,'');a.click();
+  closeModal();toast('Compilado como '+fmt.toUpperCase());
 }
 
-/* ══════════════════════════════════════════
-   INIT
-══════════════════════════════════════════ */
-// Marcar data-id en los items del binder al cargar
-document.addEventListener('DOMContentLoaded', () => {
-  const items = document.querySelectorAll('.binder-item.sub');
-  const ids = ['cap1', 'cap2', 'cap3'];
-  items.forEach((item, i) => { if (ids[i]) item.id = 'binder-' + ids[i]; });
-  updateObjetivo();
-  updateSesion(0);
-  sesionStartWords = 47;
+/* ════════════════════════════════════════
+   PERSONAJES Y BRAINSTORM
+════════════════════════════════════════ */
+function addPjCard(){
+  const c=document.createElement('div');c.className='pj-card';c.style.marginTop='12px';
+  c.innerHTML=`<div class="pj-head"><div class="pj-av" style="background:#888;color:#fff">NP</div><input type="text" placeholder="Nombre del personaje" style="flex:1;border:none;background:transparent;outline:none;font-size:13px;font-weight:500;color:var(--tx);font-family:'Inter',sans-serif"/></div><div class="pj-body"><div class="pj-campo"><label>Nombre completo</label><input type="text" placeholder="Nombre…"/></div><div class="pj-campo"><label>Edad</label><input type="text" placeholder="Edad…"/></div><div class="pj-campo"><label>Descripción física</label><textarea placeholder="Apariencia…"></textarea></div><div class="pj-campo"><label>Rol en la historia</label><input type="text" placeholder="Protagonista, antagonista…"/></div><div class="pj-campo"><label>Deseo principal</label><input type="text" placeholder="¿Qué quiere?"/></div><div class="pj-campo"><label>Mayor miedo</label><input type="text" placeholder="¿Qué teme?"/></div><div class="pj-campo full"><label>Notas</label><textarea placeholder="Ideas, conexiones…"></textarea></div></div>`;
+  document.getElementById('pj-container').appendChild(c);
+  toast('Personaje añadido');
+}
+
+function addStorm(){
+  const grid=document.getElementById('stormGrid');
+  const addBtn=grid.querySelector('.add-storm');
+  const colors=['#c0392b','#3D6B5E','#185FA5','#8B5E3C','#7a3b8c'];
+  const color=colors[Math.floor(Math.random()*colors.length)];
+  const card=document.createElement('div');card.className='storm-card';
+  card.innerHTML=`<div class="storm-pin" style="background:${color}"></div><textarea placeholder="Escribe tu idea…" autofocus></textarea>`;
+  grid.insertBefore(card,addBtn);
+  card.querySelector('textarea').focus();
+}
+
+/* ════════════════════════════════════════
+   NOTEPAD
+════════════════════════════════════════ */
+function toggleNotepad(){document.getElementById('notepad').classList.toggle('open')}
+
+/* ════════════════════════════════════════
+   TECLADO
+════════════════════════════════════════ */
+document.addEventListener('keydown',e=>{
+  if(e.key==='Escape'&&document.getElementById('compose').classList.contains('open'))closeCompose();
+  if((e.ctrlKey||e.metaKey)&&e.key==='s'){e.preventDefault();saveSnap();}
 });
+
+/* ════════════════════════════════════════
+   INIT
+════════════════════════════════════════ */
+// Guardar el contenido inicial del cap1 (el que está en el HTML)
+chapters.cap1.content = document.getElementById('mainEditor').innerHTML;
+updateObj();updateSes(0);
 </script>
 </body>
 </html>
