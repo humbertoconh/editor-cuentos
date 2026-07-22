@@ -6,644 +6,305 @@
 <title>Editor de cuentos ilustrados</title>
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Lora:ital,wght@0,400;0,500;1,400&family=Inter:wght@400;500&display=swap" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Lora:ital,wght@0,400;0,500;1,400&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.31.0/dist/tabler-icons.min.css" />
 <style>
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --binder-bg:#1a1208;--binder-border:#7a5230;--binder-gold:#c9a96e;--binder-gold-dim:rgba(201,169,110,0.4);
+  --binder-text:#e8d8b8;--cork-bg:#e8d8c0;--cork-card:#fffdf6;
+  --surface:#ffffff;--surface-1:#f8f5f0;--surface-2:#f0ebe3;
+  --border:rgba(0,0,0,0.09);--border-strong:rgba(0,0,0,0.16);
+  --text:#1a1208;--text-2:#5a4a38;--text-muted:#9a8a78;
+  --accent:#185FA5;--accent-bg:#e6f1fb;--accent-border:#85b7eb;
+  --green:#3D6B5E;--green-dark:#2e5247;--green-bg:#e0ede9;
+  --gold:#c9a96e;--gold-bg:#faf3e6;
+  --success-bg:#eaf3de;--success:#3b6d11;
+  --danger:#a32d2d;--danger-bg:#fcebeb;
+  --radius:6px;
+}
+html,body{height:100%;overflow:hidden;font-family:'Inter',sans-serif;background:var(--surface-1);color:var(--text)}
 
-  :root {
-    --binder-bg: #1e150d;
-    --binder-border: #7a5230;
-    --binder-gold: #c9a96e;
-    --binder-gold-dim: rgba(201,169,110,0.45);
-    --binder-text: #e8d8b8;
-    --binder-spine: #5c3a1e;
-    --cork-bg: #ede0cc;
-    --cork-card: #fffbf4;
-    --accent-green: #3D6B5E;
-    --accent-green-dark: #2e5247;
-    --surface: #ffffff;
-    --surface-1: #f8f6f2;
-    --surface-2: #f2ede6;
-    --border: rgba(0,0,0,0.1);
-    --border-strong: rgba(0,0,0,0.18);
-    --text: #1a1208;
-    --text-2: #5a4a38;
-    --text-muted: #9a8a78;
-    --accent: #185FA5;
-    --accent-bg: #e6f1fb;
-    --accent-border: #85b7eb;
-    --success: #3b6d11;
-    --success-bg: #eaf3de;
-    --radius: 6px;
-  }
+/* ── APP SHELL ── */
+.app{display:flex;height:100vh;overflow:hidden;position:relative}
 
-  html, body {
-    height: 100%;
-    overflow: hidden;
-    font-family: 'Inter', sans-serif;
-    background: var(--surface-1);
-    color: var(--text);
-  }
+/* ── BINDER ── */
+.binder{width:230px;min-width:230px;background:var(--binder-bg);display:flex;flex-direction:column;border-right:3px solid var(--binder-border);flex-shrink:0;position:relative;transition:width 0.2s}
+.binder.collapsed{width:0;min-width:0;border:none;overflow:hidden}
+.binder-spine{position:absolute;left:0;top:0;bottom:0;width:7px;background:repeating-linear-gradient(180deg,var(--binder-border) 0,#5c3a1e 2px,#2e1a0a 4px,var(--binder-border) 6px);opacity:0.5;pointer-events:none}
+.binder-header{padding:16px 12px 12px 22px;border-bottom:1px solid rgba(139,94,60,0.3);cursor:default;flex-shrink:0}
+.binder-project{font-family:'Playfair Display',serif;font-size:14px;color:var(--binder-gold);letter-spacing:0.04em;font-weight:600;outline:none;background:transparent;border:none;color:var(--binder-gold);width:100%}
+.binder-project:focus{border-bottom:1px solid var(--binder-gold-dim)}
+.binder-sub{font-size:11px;color:var(--binder-gold-dim);margin-top:3px}
+.binder-body{flex:1;overflow-y:auto;padding:6px 0}
+.binder-body::-webkit-scrollbar{width:3px}
+.binder-body::-webkit-scrollbar-thumb{background:rgba(201,169,110,0.15);border-radius:2px}
+.binder-section-label{padding:10px 10px 4px 22px;font-size:10px;color:var(--binder-gold-dim);text-transform:uppercase;letter-spacing:0.1em;font-weight:600}
+.binder-item{padding:7px 8px 7px 22px;display:flex;align-items:center;gap:7px;cursor:pointer;border-left:3px solid transparent;transition:background 0.1s;user-select:none}
+.binder-item:hover{background:rgba(201,169,110,0.07)}
+.binder-item.active{background:rgba(201,169,110,0.13);border-left-color:var(--binder-gold)}
+.binder-item .bi{font-size:13px;color:var(--binder-gold);opacity:0.8;flex-shrink:0}
+.binder-item .bl{font-size:13px;color:var(--binder-text);flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.binder-item .bb{font-size:10px;background:rgba(201,169,110,0.15);color:var(--binder-gold);padding:1px 5px;border-radius:8px;flex-shrink:0}
+.binder-item.sub{padding-left:34px}
+.binder-item.sub .bl{font-size:12px}
+.binder-divider{height:1px;background:rgba(139,94,60,0.2);margin:6px 12px 6px 22px}
+.binder-add-btn{margin:4px 10px 4px 22px;padding:5px 8px;background:rgba(201,169,110,0.07);border:1px dashed rgba(201,169,110,0.25);border-radius:var(--radius);cursor:pointer;display:flex;align-items:center;gap:5px;color:rgba(201,169,110,0.5);font-size:11px;font-family:'Inter',sans-serif;transition:all 0.12s;text-align:left}
+.binder-add-btn:hover{background:rgba(201,169,110,0.14);color:var(--binder-gold)}
+.compile-btn{margin:8px 10px;padding:9px;background:var(--green);color:#fff;border:none;border-radius:var(--radius);cursor:pointer;font-size:13px;font-weight:500;display:flex;align-items:center;justify-content:center;gap:6px;font-family:'Inter',sans-serif;transition:background 0.12s;flex-shrink:0}
+.compile-btn:hover{background:var(--green-dark)}
 
-  .app {
-    display: flex;
-    height: 100vh;
-    overflow: hidden;
-  }
+/* ── MIDDLE PANEL ── */
+.middle-panel{width:215px;min-width:190px;flex-shrink:0;background:var(--surface-1);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden;transition:width 0.2s}
+.middle-panel.collapsed{width:0;min-width:0;overflow:hidden}
+.ptabs{display:flex;border-bottom:1px solid var(--border);background:var(--surface);flex-shrink:0}
+.ptab{flex:1;padding:9px 4px;font-size:11px;color:var(--text-muted);cursor:pointer;text-align:center;border-bottom:2px solid transparent;transition:all 0.12s;user-select:none}
+.ptab.active{color:var(--accent);border-bottom-color:var(--accent)}
+.ptab:hover:not(.active){background:var(--surface-1)}
 
-  /* ── BINDER ── */
-  .binder {
-    width: 220px;
-    min-width: 220px;
-    background: var(--binder-bg);
-    display: flex;
-    flex-direction: column;
-    border-right: 3px solid var(--binder-border);
-    position: relative;
-    flex-shrink: 0;
-  }
-  .binder-spine {
-    position: absolute;
-    left: 0; top: 0; bottom: 0;
-    width: 7px;
-    background: repeating-linear-gradient(
-      180deg,
-      var(--binder-border) 0px,
-      #5c3a1e 2px,
-      #2e1a0a 4px,
-      var(--binder-border) 6px
-    );
-    opacity: 0.55;
-    pointer-events: none;
-  }
+/* CORKBOARD */
+.corkboard{flex:1;overflow-y:auto;padding:12px;background:var(--cork-bg);display:flex;flex-direction:column;gap:10px}
+.corkboard::-webkit-scrollbar{width:3px}
+.corkboard::-webkit-scrollbar-thumb{background:rgba(139,94,60,0.2);border-radius:2px}
+.cork-card{background:var(--cork-card);border-radius:3px;padding:11px 11px 9px;cursor:pointer;border-top:4px solid var(--binder-gold);box-shadow:0 2px 6px rgba(0,0,0,0.1);transition:transform 0.12s,box-shadow 0.12s;position:relative}
+.cork-card:hover{transform:translateY(-2px);box-shadow:0 5px 12px rgba(0,0,0,0.15)}
+.cork-card.active{border-top-color:var(--green)}
+.cork-pin{position:absolute;top:-7px;left:50%;transform:translateX(-50%);width:11px;height:11px;border-radius:50%;background:#c0392b;box-shadow:0 1px 3px rgba(0,0,0,0.3)}
+.cork-card .ct{font-family:'Playfair Display',serif;font-size:13px;font-weight:600;color:#2a1a0a;margin-bottom:4px}
+.cork-card .cs{font-size:11px;color:#7a6a58;line-height:1.5}
+.cork-card .cst{display:inline-block;font-size:10px;padding:2px 7px;border-radius:8px;margin-top:6px}
+.st-borrador{background:#fde8cc;color:#7a4a18}
+.st-revision{background:var(--green-bg);color:var(--green)}
+.st-final{background:var(--accent-bg);color:var(--accent)}
 
-  .binder-header {
-    padding: 18px 14px 14px 22px;
-    border-bottom: 1px solid rgba(139,94,60,0.35);
-    cursor: default;
-  }
-  .binder-project {
-    font-family: 'Playfair Display', serif;
-    font-size: 14px;
-    color: var(--binder-gold);
-    letter-spacing: 0.04em;
-    font-weight: 600;
-  }
-  .binder-sub {
-    font-size: 11px;
-    color: var(--binder-gold-dim);
-    margin-top: 3px;
-  }
+/* OUTLINER */
+.outliner{flex:1;overflow-y:auto;display:none}
+.ol-item{padding:8px 10px 8px 12px;display:flex;align-items:center;gap:6px;cursor:pointer;font-size:12px;color:var(--text);border-bottom:1px solid var(--border);transition:background 0.1s}
+.ol-item:hover{background:var(--surface-2)}
+.ol-item.active{background:var(--accent-bg);color:var(--accent)}
+.ol-item .oi{font-size:12px;color:var(--text-muted)}
+.ol-item.active .oi{color:var(--accent)}
+.ol-item .ow{margin-left:auto;font-size:10px;color:var(--text-muted);white-space:nowrap}
+.ol-item .os{font-size:10px;padding:1px 5px;border-radius:6px;margin-left:4px}
 
-  .binder-body { flex: 1; overflow-y: auto; padding: 6px 0; }
-  .binder-body::-webkit-scrollbar { width: 4px; }
-  .binder-body::-webkit-scrollbar-track { background: transparent; }
-  .binder-body::-webkit-scrollbar-thumb { background: rgba(201,169,110,0.2); border-radius: 2px; }
+/* SCRIVENINGS */
+.scrivenings-view{flex:1;overflow-y:auto;display:none;padding:12px;background:var(--surface-1)}
+.scrivenings-section{background:var(--surface);border-radius:var(--radius);border:1px solid var(--border);margin-bottom:10px;overflow:hidden}
+.scrivenings-section-title{padding:8px 12px;background:var(--surface-2);border-bottom:1px solid var(--border);font-family:'Playfair Display',serif;font-size:13px;font-weight:600;color:var(--text-2)}
+.scrivenings-section-body{padding:12px;font-family:'Lora',serif;font-size:14px;line-height:1.8;color:var(--text);min-height:60px}
 
-  .binder-section-label {
-    padding: 10px 12px 4px 22px;
-    font-size: 10px;
-    color: var(--binder-gold-dim);
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
-    font-weight: 600;
-  }
+/* ── EDITOR ── */
+.editor-area{flex:1;display:flex;flex-direction:column;overflow:hidden;background:var(--surface)}
+.editor-toolbar{padding:6px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:3px;background:var(--surface-1);flex-wrap:wrap;flex-shrink:0}
+.tg{display:flex;gap:1px}
+.tg+.tg{margin-left:5px;padding-left:5px;border-left:1px solid var(--border-strong)}
+.tbtn{padding:5px 8px;border:none;background:transparent;border-radius:4px;cursor:pointer;color:var(--text-2);font-size:12px;font-family:'Inter',sans-serif;display:flex;align-items:center;gap:3px;transition:background 0.1s,color 0.1s;white-space:nowrap}
+.tbtn:hover{background:var(--surface-2);color:var(--text)}
+.tbtn.on{background:var(--accent-bg);color:var(--accent)}
+.tbtn i{font-size:15px}
+.editor-title-bar{padding:14px 24px 0;background:var(--surface);flex-shrink:0}
+.chapter-title{width:100%;font-family:'Playfair Display',serif;font-size:24px;font-weight:600;color:var(--text);border:none;background:transparent;outline:none;padding-bottom:10px;border-bottom:2px solid var(--accent-border)}
+.editor-split{flex:1;display:flex;overflow:hidden}
+.editor-scroll{flex:1;overflow-y:auto;padding:20px 24px;background:var(--surface)}
+.editor-scroll::-webkit-scrollbar{width:5px}
+.editor-scroll::-webkit-scrollbar-thumb{background:var(--border-strong);border-radius:3px}
+.editor-content{max-width:640px;margin:0 auto}
+.text-editor{width:100%;min-height:220px;font-family:'Lora',serif;font-size:17px;line-height:1.85;color:var(--text);border:none;background:transparent;resize:none;outline:none}
+.text-editor p{margin-bottom:0.3em}
+.text-editor h2{font-family:'Playfair Display',serif;font-size:21px;margin:1em 0 0.4em;color:var(--text)}
+.text-editor h3{font-family:'Playfair Display',serif;font-size:17px;margin:0.8em 0 0.3em}
+.text-editor blockquote{border-left:3px solid var(--gold);padding-left:16px;color:var(--text-2);font-style:italic;margin:1em 0}
+.text-editor ul,.text-editor ol{padding-left:24px;margin:0.5em 0}
+.text-editor hr{border:none;border-top:1px solid var(--border-strong);margin:24px 0}
 
-  .binder-item {
-    padding: 7px 10px 7px 22px;
-    display: flex;
-    align-items: center;
-    gap: 7px;
-    cursor: pointer;
-    border-left: 3px solid transparent;
-    transition: background 0.12s;
-    user-select: none;
-  }
-  .binder-item:hover { background: rgba(201,169,110,0.07); }
-  .binder-item.active { background: rgba(201,169,110,0.13); border-left-color: var(--binder-gold); }
-  .binder-item .bi { font-size: 13px; color: var(--binder-gold); opacity: 0.8; flex-shrink: 0; }
-  .binder-item .bl { font-size: 13px; color: var(--binder-text); flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .binder-item .bb { font-size: 10px; background: rgba(201,169,110,0.18); color: var(--binder-gold); padding: 1px 5px; border-radius: 8px; flex-shrink: 0; }
-  .binder-item.sub { padding-left: 34px; }
-  .binder-item.sub .bl { font-size: 12px; }
+/* SPLIT EDITOR */
+.split-divider{width:4px;background:var(--border);cursor:col-resize;flex-shrink:0}
+.split-divider:hover{background:var(--accent-border)}
+.editor-scroll-b{flex:1;overflow-y:auto;padding:20px 24px;background:var(--surface-1);display:none}
+.editor-scroll-b::-webkit-scrollbar{width:5px}
+.editor-scroll-b::-webkit-scrollbar-thumb{background:var(--border-strong);border-radius:3px}
 
-  .binder-divider { height: 1px; background: rgba(139,94,60,0.22); margin: 6px 14px 6px 22px; }
+/* IMAGES */
+.img-placeholder{width:100%;background:var(--surface-1);border:1.5px dashed var(--border-strong);border-radius:8px;padding:24px 16px;text-align:center;cursor:pointer;margin:18px 0;transition:all 0.12s}
+.img-placeholder:hover{border-color:var(--accent-border);background:var(--accent-bg)}
+.img-placeholder i{font-size:28px;color:var(--text-muted);display:block;margin-bottom:6px}
+.img-placeholder span{font-size:13px;color:var(--text-muted)}
+.img-wrapper{margin:18px 0;position:relative}
+.img-wrapper img{width:100%;border-radius:8px;display:block}
+.img-actions{position:absolute;top:8px;right:8px;display:none;gap:4px}
+.img-wrapper:hover .img-actions{display:flex}
+.img-act-btn{width:28px;height:28px;background:rgba(0,0,0,0.6);border:none;border-radius:4px;cursor:pointer;color:#fff;display:flex;align-items:center;justify-content:center;font-size:13px;transition:background 0.1s}
+.img-act-btn:hover{background:rgba(0,0,0,0.85)}
+.img-caption{width:100%;font-family:'Lora',serif;font-style:italic;font-size:13px;color:var(--text-2);border:none;background:transparent;text-align:center;padding:6px 0;outline:none;border-bottom:1px solid transparent;transition:border-color 0.12s}
+.img-caption:focus{border-bottom-color:var(--border-strong)}
+input[type="file"]{display:none}
 
-  .binder-add-btn {
-    margin: 5px 12px 5px 22px;
-    padding: 6px 10px;
-    background: rgba(201,169,110,0.08);
-    border: 1px dashed rgba(201,169,110,0.28);
-    border-radius: var(--radius);
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    color: rgba(201,169,110,0.55);
-    font-size: 12px;
-    font-family: 'Inter', sans-serif;
-    transition: all 0.14s;
-  }
-  .binder-add-btn:hover { background: rgba(201,169,110,0.16); color: var(--binder-gold); border-color: rgba(201,169,110,0.5); }
+/* STATUS BAR */
+.status-bar{padding:5px 18px;background:var(--surface-1);border-top:1px solid var(--border);display:flex;align-items:center;gap:12px;font-size:11px;color:var(--text-muted);flex-shrink:0}
+.mode-pill{background:var(--success-bg);color:var(--success);padding:2px 8px;border-radius:10px;font-size:10px;font-weight:500}
+.saved-ok{display:flex;align-items:center;gap:3px;margin-left:auto}
+.saved-ok i{font-size:12px;color:var(--success)}
 
-  .compile-btn {
-    margin: 8px 12px;
-    padding: 9px;
-    background: var(--accent-green);
-    color: #fff;
-    border: none;
-    border-radius: var(--radius);
-    cursor: pointer;
-    font-size: 13px;
-    font-weight: 500;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 7px;
-    font-family: 'Inter', sans-serif;
-    transition: background 0.14s;
-  }
-  .compile-btn:hover { background: var(--accent-green-dark); }
+/* ── NOTES PANEL ── */
+.notes-panel{width:235px;min-width:210px;flex-shrink:0;background:var(--surface-1);border-left:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden;transition:width 0.2s}
+.notes-panel.collapsed{width:0;min-width:0;overflow:hidden}
+.notes-header{padding:12px 13px;border-bottom:1px solid var(--border);background:var(--surface);display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.notes-header-title{font-size:13px;font-weight:500;color:var(--text)}
+.ntabs{display:flex;gap:3px;padding:7px 9px;border-bottom:1px solid var(--border);background:var(--surface);flex-shrink:0;flex-wrap:wrap}
+.ntab{padding:3px 8px;font-size:11px;border-radius:var(--radius);cursor:pointer;color:var(--text-muted);border:1px solid transparent;transition:all 0.1s;font-family:'Inter',sans-serif;user-select:none}
+.ntab.active{background:var(--accent-bg);color:var(--accent);border-color:var(--accent-border)}
+.ntab:hover:not(.active){background:var(--surface-2)}
+.notes-scroll{flex:1;overflow-y:auto;padding:10px}
+.notes-scroll::-webkit-scrollbar{width:3px}
+.notes-scroll::-webkit-scrollbar-thumb{background:var(--border-strong);border-radius:2px}
+.meta-row{display:flex;align-items:center;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--border)}
+.meta-label{font-size:11px;color:var(--text-muted)}
+.meta-select{font-size:11px;background:var(--surface);border:1px solid var(--border-strong);border-radius:4px;padding:2px 4px;color:var(--text);font-family:'Inter',sans-serif;cursor:pointer}
+.meta-val{font-size:12px;color:var(--text);font-weight:500}
+.ntextarea{width:100%;resize:none;font-size:12px;line-height:1.65;color:var(--text);background:var(--surface);border:1px solid var(--border-strong);border-radius:var(--radius);padding:7px 9px;outline:none;font-family:'Inter',sans-serif;margin:7px 0;transition:border-color 0.12s}
+.ntextarea:focus{border-color:var(--accent-border)}
+.section-label{font-size:11px;color:var(--text-muted);margin:10px 0 5px}
+.snap-item{padding:8px 9px;background:var(--surface);border-radius:var(--radius);border:1px solid var(--border);margin-bottom:6px;cursor:pointer;transition:border-color 0.12s}
+.snap-item:hover{border-color:var(--border-strong)}
+.snap-date{font-size:10px;color:var(--text-muted)}
+.snap-label{font-size:12px;color:var(--text);margin-top:2px;font-weight:500}
+.progress-wrap{margin-top:10px;padding:9px;background:var(--surface);border-radius:var(--radius);border:1px solid var(--border)}
+.progress-header{font-size:11px;color:var(--text-muted);margin-bottom:6px;display:flex;justify-content:space-between}
+.progress-track{background:var(--surface-2);border-radius:6px;height:6px;overflow:hidden}
+.progress-fill{height:100%;background:var(--accent);border-radius:6px;transition:width 0.3s}
+.wc-footer{padding:8px 12px;background:var(--surface);border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;flex-shrink:0}
+.wc-label{font-size:11px;color:var(--text-muted)}
+.wc-val{font-size:12px;color:var(--text);font-weight:500}
 
-  /* ── MIDDLE PANEL ── */
-  .middle-panel {
-    width: 210px;
-    min-width: 190px;
-    flex-shrink: 0;
-    background: var(--surface-1);
-    border-right: 1px solid var(--border);
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-  }
+/* ── OBJETIVO DE PALABRAS ── */
+.objetivo-wrap{margin-top:10px;padding:9px;background:var(--gold-bg);border-radius:var(--radius);border:1px solid rgba(201,169,110,0.3)}
+.objetivo-header{font-size:11px;color:var(--text-2);margin-bottom:6px;display:flex;justify-content:space-between;align-items:center}
+.objetivo-track{background:rgba(201,169,110,0.2);border-radius:6px;height:6px;overflow:hidden}
+.objetivo-fill{height:100%;background:var(--gold);border-radius:6px;transition:width 0.3s}
+.objetivo-row{display:flex;gap:6px;margin-top:8px}
+.objetivo-input{flex:1;padding:4px 6px;border:1px solid rgba(201,169,110,0.4);border-radius:4px;font-size:11px;background:var(--surface);font-family:'Inter',sans-serif;color:var(--text)}
+.objetivo-btn{padding:4px 8px;background:var(--gold);color:var(--binder-bg);border:none;border-radius:4px;font-size:11px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif}
 
-  .ptabs {
-    display: flex;
-    border-bottom: 1px solid var(--border);
-    background: var(--surface);
-  }
-  .ptab {
-    flex: 1;
-    padding: 10px 6px;
-    font-size: 12px;
-    color: var(--text-muted);
-    cursor: pointer;
-    text-align: center;
-    border-bottom: 2px solid transparent;
-    transition: all 0.13s;
-    user-select: none;
-  }
-  .ptab.active { color: var(--accent); border-bottom-color: var(--accent); }
-  .ptab:hover:not(.active) { background: var(--surface-1); }
+/* ── PERSONAJE FICHA ── */
+.personaje-ficha{background:var(--surface);border-radius:var(--radius);border:1px solid var(--border);overflow:hidden;margin-bottom:8px}
+.personaje-ficha-header{padding:8px 10px;background:var(--surface-2);border-bottom:1px solid var(--border);display:flex;align-items:center;gap:6px;cursor:pointer}
+.personaje-ficha-title{font-size:12px;font-weight:500;color:var(--text);flex:1}
+.personaje-ficha-body{padding:8px 10px;display:none}
+.personaje-campo{margin-bottom:6px}
+.personaje-campo label{display:block;font-size:10px;color:var(--text-muted);margin-bottom:2px}
+.personaje-campo input,.personaje-campo textarea{width:100%;border:1px solid var(--border-strong);border-radius:4px;padding:4px 6px;font-size:12px;font-family:'Inter',sans-serif;color:var(--text);background:var(--surface);outline:none}
+.personaje-campo textarea{resize:none;min-height:44px;line-height:1.5}
+.personaje-campo input:focus,.personaje-campo textarea:focus{border-color:var(--accent-border)}
 
-  /* CORKBOARD */
-  .corkboard {
-    flex: 1;
-    overflow-y: auto;
-    padding: 12px;
-    background: var(--cork-bg);
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-  }
-  .corkboard::-webkit-scrollbar { width: 4px; }
-  .corkboard::-webkit-scrollbar-thumb { background: rgba(139,94,60,0.25); border-radius: 2px; }
+/* ── MODAL COMPILAR ── */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.45);display:none;align-items:center;justify-content:center;z-index:100}
+.modal-overlay.open{display:flex}
+.modal{background:var(--surface);border-radius:10px;padding:24px;width:400px;max-width:90vw;border:1px solid var(--border)}
+.modal-title{font-family:'Playfair Display',serif;font-size:18px;font-weight:600;color:var(--text);margin-bottom:4px}
+.modal-sub{font-size:12px;color:var(--text-muted);margin-bottom:18px}
+.modal-section{margin-bottom:14px}
+.modal-section-label{font-size:11px;color:var(--text-muted);margin-bottom:6px;text-transform:uppercase;letter-spacing:0.06em}
+.format-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.format-btn{padding:8px 10px;border:1px solid var(--border-strong);border-radius:var(--radius);cursor:pointer;font-size:12px;font-family:'Inter',sans-serif;background:var(--surface);color:var(--text);display:flex;align-items:center;gap:6px;transition:all 0.12s}
+.format-btn:hover{border-color:var(--accent-border);background:var(--accent-bg);color:var(--accent)}
+.format-btn i{font-size:15px}
+.modal-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:18px}
+.modal-btn-cancel{padding:7px 14px;border:1px solid var(--border-strong);border-radius:var(--radius);background:transparent;cursor:pointer;font-size:13px;font-family:'Inter',sans-serif;color:var(--text)}
+.modal-btn-ok{padding:7px 14px;border:none;border-radius:var(--radius);background:var(--green);color:#fff;cursor:pointer;font-size:13px;font-family:'Inter',sans-serif;font-weight:500}
 
-  .cork-card {
-    background: var(--cork-card);
-    border-radius: 3px;
-    padding: 11px 11px 9px;
-    cursor: pointer;
-    border-top: 4px solid var(--binder-gold);
-    box-shadow: 0 2px 6px rgba(0,0,0,0.12);
-    transition: transform 0.14s, box-shadow 0.14s;
-    position: relative;
-  }
-  .cork-card:hover { transform: translateY(-2px); box-shadow: 0 5px 12px rgba(0,0,0,0.16); }
-  .cork-card.active { border-top-color: var(--accent-green); }
-  .cork-pin {
-    position: absolute;
-    top: -7px; left: 50%;
-    transform: translateX(-50%);
-    width: 11px; height: 11px;
-    border-radius: 50%;
-    background: #c0392b;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.35);
-  }
-  .cork-card .ct { font-family: 'Playfair Display', serif; font-size: 13px; font-weight: 600; color: #2a1a0a; margin-bottom: 5px; }
-  .cork-card .cs { font-size: 11px; color: #7a6a58; line-height: 1.5; }
-  .cork-card .cst { display: inline-block; font-size: 10px; padding: 2px 7px; border-radius: 8px; margin-top: 7px; }
-  .st-borrador { background: #fde8cc; color: #7a4a18; }
-  .st-revision { background: #ddf0e8; color: var(--accent-green); }
-  .st-final { background: #d4eaff; color: var(--accent); }
+/* ── MODO COMPOSICIÓN ── */
+.compose-mode{position:fixed;inset:0;background:#1a1a18;z-index:200;display:none;flex-direction:column;align-items:center;overflow-y:auto}
+.compose-mode.open{display:flex}
+.compose-inner{width:100%;max-width:680px;padding:60px 40px;flex:1}
+.compose-title{font-family:'Playfair Display',serif;font-size:28px;font-weight:600;color:#e8e0d0;border:none;background:transparent;outline:none;width:100%;margin-bottom:24px;padding-bottom:12px;border-bottom:1px solid rgba(255,255,255,0.1)}
+.compose-editor{font-family:'Lora',serif;font-size:18px;line-height:2;color:#d0c8b8;min-height:400px;outline:none;width:100%}
+.compose-editor p{margin-bottom:0.3em}
+.compose-bar{position:fixed;bottom:0;left:0;right:0;padding:10px 24px;background:rgba(26,26,24,0.9);display:flex;align-items:center;gap:16px;font-size:12px;color:rgba(200,190,170,0.5);border-top:1px solid rgba(255,255,255,0.07)}
+.compose-bar .wc{color:rgba(200,190,170,0.7)}
+.compose-exit{margin-left:auto;padding:5px 12px;border:1px solid rgba(255,255,255,0.15);border-radius:var(--radius);background:transparent;color:rgba(200,190,170,0.6);cursor:pointer;font-size:12px;font-family:'Inter',sans-serif}
+.compose-exit:hover{color:#e8e0d0;border-color:rgba(255,255,255,0.3)}
 
-  /* OUTLINER */
-  .outliner { flex: 1; overflow-y: auto; display: none; }
-  .ol-item {
-    padding: 9px 12px 9px 14px;
-    display: flex;
-    align-items: center;
-    gap: 7px;
-    cursor: pointer;
-    font-size: 13px;
-    color: var(--text);
-    border-bottom: 1px solid var(--border);
-    transition: background 0.12s;
-  }
-  .ol-item:hover { background: var(--surface-2); }
-  .ol-item.active { background: var(--accent-bg); color: var(--accent); }
-  .ol-item .oi { font-size: 13px; color: var(--text-muted); }
-  .ol-item .ow { margin-left: auto; font-size: 11px; color: var(--text-muted); }
-  .ol-item.active .oi, .ol-item.active .ow { color: var(--accent); }
+/* ── TOAST ── */
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(50px);background:#1a1208;color:#e8d8b8;padding:8px 16px;border-radius:20px;font-size:12px;font-family:'Inter',sans-serif;pointer-events:none;opacity:0;transition:opacity 0.2s,transform 0.2s;z-index:500;white-space:nowrap}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 
-  /* ── EDITOR ── */
-  .editor-area {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-    background: var(--surface);
-  }
-
-  .editor-toolbar {
-    padding: 7px 16px;
-    border-bottom: 1px solid var(--border);
-    display: flex;
-    align-items: center;
-    gap: 4px;
-    background: var(--surface-1);
-    flex-wrap: wrap;
-    flex-shrink: 0;
-  }
-  .tg { display: flex; gap: 1px; }
-  .tg + .tg { margin-left: 6px; padding-left: 6px; border-left: 1px solid var(--border-strong); }
-  .tbtn {
-    padding: 5px 9px;
-    border: none;
-    background: transparent;
-    border-radius: 4px;
-    cursor: pointer;
-    color: var(--text-2);
-    font-size: 13px;
-    font-family: 'Inter', sans-serif;
-    display: flex;
-    align-items: center;
-    gap: 4px;
-    transition: background 0.1s, color 0.1s;
-  }
-  .tbtn:hover { background: var(--surface-2); color: var(--text); }
-  .tbtn.on { background: var(--accent-bg); color: var(--accent); }
-  .tbtn i { font-size: 16px; }
-  .tbtn-label { font-size: 12px; }
-
-  .editor-title-bar {
-    padding: 14px 24px 0;
-    background: var(--surface);
-    flex-shrink: 0;
-  }
-  .chapter-title {
-    width: 100%;
-    font-family: 'Playfair Display', serif;
-    font-size: 26px;
-    font-weight: 600;
-    color: var(--text);
-    border: none;
-    background: transparent;
-    outline: none;
-    padding-bottom: 10px;
-    border-bottom: 2px solid var(--accent-border);
-  }
-
-  .editor-scroll {
-    flex: 1;
-    overflow-y: auto;
-    padding: 24px;
-    background: var(--surface);
-  }
-  .editor-scroll::-webkit-scrollbar { width: 6px; }
-  .editor-scroll::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 3px; }
-
-  .editor-content { max-width: 640px; margin: 0 auto; }
-
-  .text-editor {
-    width: 100%;
-    min-height: 200px;
-    font-family: 'Lora', serif;
-    font-size: 17px;
-    line-height: 1.85;
-    color: var(--text);
-    border: none;
-    background: transparent;
-    resize: none;
-    outline: none;
-  }
-  .text-editor p { margin-bottom: 0.4em; }
-  .text-editor h2 { font-family: 'Playfair Display', serif; font-size: 20px; margin: 1em 0 0.4em; color: var(--text); }
-  .text-editor h3 { font-family: 'Playfair Display', serif; font-size: 17px; margin: 0.8em 0 0.3em; }
-  .text-editor blockquote {
-    border-left: 3px solid var(--binder-gold);
-    padding-left: 16px;
-    color: var(--text-2);
-    font-style: italic;
-    margin: 1em 0;
-  }
-
-  /* IMAGE BLOCKS */
-  .img-placeholder {
-    width: 100%;
-    background: var(--surface-1);
-    border: 1.5px dashed var(--border-strong);
-    border-radius: 8px;
-    padding: 28px 20px;
-    text-align: center;
-    cursor: pointer;
-    margin: 20px 0;
-    transition: all 0.14s;
-  }
-  .img-placeholder:hover { border-color: var(--accent-border); background: var(--accent-bg); }
-  .img-placeholder i { font-size: 30px; color: var(--text-muted); display: block; margin-bottom: 8px; }
-  .img-placeholder span { font-size: 13px; color: var(--text-muted); }
-
-  .img-wrapper {
-    margin: 20px 0;
-    position: relative;
-  }
-  .img-wrapper img { width: 100%; border-radius: 8px; display: block; }
-  .img-actions {
-    position: absolute;
-    top: 8px; right: 8px;
-    display: none;
-    gap: 5px;
-  }
-  .img-wrapper:hover .img-actions { display: flex; }
-  .img-act-btn {
-    width: 30px; height: 30px;
-    background: rgba(0,0,0,0.62);
-    border: none; border-radius: 5px;
-    cursor: pointer;
-    color: white;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 14px;
-    transition: background 0.12s;
-  }
-  .img-act-btn:hover { background: rgba(0,0,0,0.82); }
-  .img-caption {
-    width: 100%;
-    font-family: 'Lora', serif;
-    font-style: italic;
-    font-size: 13px;
-    color: var(--text-2);
-    border: none;
-    background: transparent;
-    text-align: center;
-    padding: 7px 0;
-    outline: none;
-    border-bottom: 1px solid transparent;
-    transition: border-color 0.13s;
-  }
-  .img-caption:focus { border-bottom-color: var(--border-strong); }
-
-  input[type="file"] { display: none; }
-
-  /* STATUS BAR */
-  .status-bar {
-    padding: 5px 20px;
-    background: var(--surface-1);
-    border-top: 1px solid var(--border);
-    display: flex;
-    align-items: center;
-    gap: 14px;
-    font-size: 12px;
-    color: var(--text-muted);
-    flex-shrink: 0;
-  }
-  .mode-pill {
-    background: var(--success-bg);
-    color: var(--success);
-    padding: 2px 9px;
-    border-radius: 10px;
-    font-size: 11px;
-    font-weight: 500;
-  }
-  .saved-indicator { margin-left: auto; display: flex; align-items: center; gap: 4px; }
-  .saved-indicator i { font-size: 13px; color: var(--success); }
-
-  /* ── NOTES PANEL ── */
-  .notes-panel {
-    width: 230px;
-    min-width: 210px;
-    flex-shrink: 0;
-    background: var(--surface-1);
-    border-left: 1px solid var(--border);
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-  }
-
-  .notes-header {
-    padding: 13px 14px;
-    border-bottom: 1px solid var(--border);
-    background: var(--surface);
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-  }
-  .notes-header-title { font-size: 13px; font-weight: 500; color: var(--text); }
-
-  .ntabs { display: flex; gap: 4px; padding: 8px 10px; border-bottom: 1px solid var(--border); background: var(--surface); }
-  .ntab {
-    padding: 4px 10px;
-    font-size: 12px;
-    border-radius: var(--radius);
-    cursor: pointer;
-    color: var(--text-muted);
-    border: 1px solid transparent;
-    transition: all 0.12s;
-    font-family: 'Inter', sans-serif;
-    user-select: none;
-  }
-  .ntab.active { background: var(--accent-bg); color: var(--accent); border-color: var(--accent-border); }
-  .ntab:hover:not(.active) { background: var(--surface-2); }
-
-  .notes-scroll { flex: 1; overflow-y: auto; padding: 12px; }
-  .notes-scroll::-webkit-scrollbar { width: 4px; }
-  .notes-scroll::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 2px; }
-
-  .meta-row {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 7px 0;
-    border-bottom: 1px solid var(--border);
-  }
-  .meta-label { font-size: 11px; color: var(--text-muted); }
-  .meta-select {
-    font-size: 12px;
-    background: var(--surface);
-    border: 1px solid var(--border-strong);
-    border-radius: 4px;
-    padding: 2px 6px;
-    color: var(--text);
-    font-family: 'Inter', sans-serif;
-    cursor: pointer;
-  }
-  .meta-val { font-size: 12px; color: var(--text); font-weight: 500; }
-
-  .ntextarea {
-    width: 100%;
-    resize: none;
-    font-size: 12px;
-    line-height: 1.65;
-    color: var(--text);
-    background: var(--surface);
-    border: 1px solid var(--border-strong);
-    border-radius: var(--radius);
-    padding: 8px 10px;
-    outline: none;
-    font-family: 'Inter', sans-serif;
-    margin: 8px 0;
-    transition: border-color 0.13s;
-  }
-  .ntextarea:focus { border-color: var(--accent-border); }
-
-  .section-label { font-size: 11px; color: var(--text-muted); margin: 10px 0 5px; }
-
-  .snap-item {
-    padding: 9px 10px;
-    background: var(--surface);
-    border-radius: var(--radius);
-    border: 1px solid var(--border);
-    margin-bottom: 7px;
-    cursor: pointer;
-    transition: border-color 0.12s;
-  }
-  .snap-item:hover { border-color: var(--border-strong); }
-  .snap-date { font-size: 11px; color: var(--text-muted); }
-  .snap-label { font-size: 12px; color: var(--text); margin-top: 2px; font-weight: 500; }
-
-  .progress-wrap {
-    margin-top: 12px;
-    padding: 10px;
-    background: var(--surface);
-    border-radius: var(--radius);
-    border: 1px solid var(--border);
-  }
-  .progress-label { font-size: 11px; color: var(--text-muted); margin-bottom: 7px; display: flex; justify-content: space-between; }
-  .progress-track { background: var(--surface-2); border-radius: 6px; height: 7px; overflow: hidden; }
-  .progress-fill { height: 100%; background: var(--accent); border-radius: 6px; transition: width 0.3s; }
-
-  .wc-footer {
-    padding: 9px 14px;
-    background: var(--surface);
-    border-top: 1px solid var(--border);
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    flex-shrink: 0;
-  }
-  .wc-label { font-size: 11px; color: var(--text-muted); }
-  .wc-val { font-size: 12px; color: var(--text); font-weight: 500; }
-
-  /* TOAST */
-  .toast {
-    position: fixed;
-    bottom: 28px;
-    left: 50%;
-    transform: translateX(-50%) translateY(60px);
-    background: #1a1208;
-    color: #e8d8b8;
-    padding: 9px 18px;
-    border-radius: 20px;
-    font-size: 13px;
-    font-family: 'Inter', sans-serif;
-    pointer-events: none;
-    opacity: 0;
-    transition: opacity 0.2s, transform 0.2s;
-    z-index: 1000;
-    white-space: nowrap;
-  }
-  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
-
-  /* FOCUS MODE */
-  .focus-mode .binder,
-  .focus-mode .middle-panel,
-  .focus-mode .notes-panel { display: none; }
-  .focus-mode .editor-area { background: #fffdf9; }
-  .focus-mode .editor-scroll { padding: 48px; }
-  .focus-mode .editor-content { max-width: 680px; }
+/* ── NOTEPAD GLOBAL ── */
+.notepad-panel{position:fixed;bottom:50px;right:250px;width:280px;background:var(--surface);border:1px solid var(--border-strong);border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,0.12);z-index:90;display:none;flex-direction:column;overflow:hidden}
+.notepad-panel.open{display:flex}
+.notepad-header{padding:9px 12px;background:var(--surface-2);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;cursor:move}
+.notepad-title{font-size:12px;font-weight:500;color:var(--text)}
+.notepad-close{background:none;border:none;cursor:pointer;color:var(--text-muted);font-size:15px;padding:0}
+.notepad-body{padding:10px}
+.notepad-area{width:100%;height:160px;resize:none;border:none;outline:none;font-size:13px;font-family:'Lora',serif;line-height:1.65;color:var(--text);background:transparent}
 </style>
 </head>
 <body>
 
+<!-- ═══ APP ═══ -->
 <div class="app" id="app">
 
-  <!-- ════ BINDER ════ -->
-  <div class="binder">
+  <!-- ══ BINDER ══ -->
+  <div class="binder" id="binder">
     <div class="binder-spine"></div>
     <div class="binder-header">
       <div class="binder-project" id="projectName" contenteditable="true" spellcheck="false">Mi proyecto</div>
       <div class="binder-sub">Cuentos ilustrados</div>
     </div>
-
     <div class="binder-body" id="binderBody">
       <div class="binder-section-label">Manuscrito</div>
-
-      <div class="binder-item active" data-section="root" onclick="selectBinder(this,'El bosque encantado')">
-        <i class="ti ti-book bi"></i>
-        <span class="bl">El bosque encantado</span>
+      <div class="binder-item active" onclick="selectBinder(this,'El bosque encantado','root')">
+        <i class="ti ti-book bi"></i><span class="bl">El bosque encantado</span>
       </div>
-      <div class="binder-item sub" data-section="cap1" onclick="selectBinder(this,'Cap. 1 — La llegada')">
+      <div class="binder-item sub" onclick="selectBinder(this,'Cap. 1 — La llegada','cap1')">
         <i class="ti ti-file-text bi" style="font-size:12px"></i>
-        <span class="bl">Cap. 1 — La llegada</span>
-        <span class="bb" id="badge-cap1">320</span>
+        <span class="bl">Cap. 1 — La llegada</span><span class="bb" id="badge-cap1">320</span>
       </div>
-      <div class="binder-item sub" data-section="cap2" onclick="selectBinder(this,'Cap. 2 — La criatura')">
+      <div class="binder-item sub" onclick="selectBinder(this,'Cap. 2 — La criatura','cap2')">
         <i class="ti ti-file-text bi" style="font-size:12px"></i>
-        <span class="bl">Cap. 2 — La criatura</span>
-        <span class="bb" id="badge-cap2">215</span>
+        <span class="bl">Cap. 2 — La criatura</span><span class="bb" id="badge-cap2">215</span>
       </div>
-      <div class="binder-item sub" data-section="cap3" onclick="selectBinder(this,'Cap. 3 — El regreso')">
+      <div class="binder-item sub" onclick="selectBinder(this,'Cap. 3 — El regreso','cap3')">
         <i class="ti ti-file-text bi" style="font-size:12px"></i>
-        <span class="bl">Cap. 3 — El regreso</span>
-        <span class="bb" id="badge-cap3">0</span>
+        <span class="bl">Cap. 3 — El regreso</span><span class="bb" id="badge-cap3">0</span>
       </div>
-
-      <button class="binder-add-btn" onclick="addChapter()">
-        <i class="ti ti-plus" style="font-size:13px"></i> Añadir capítulo
-      </button>
-
+      <button class="binder-add-btn" onclick="addChapter()"><i class="ti ti-plus" style="font-size:12px"></i> Añadir capítulo</button>
       <div class="binder-divider"></div>
       <div class="binder-section-label">Personajes</div>
-      <div class="binder-item" onclick="selectBinder(this,'Lía — protagonista')">
-        <i class="ti ti-user bi"></i><span class="bl">Lía — protagonista</span>
+      <div class="binder-item" onclick="selectBinder(this,'Personajes','personajes')">
+        <i class="ti ti-users bi"></i><span class="bl">Fichas de personajes</span>
       </div>
-      <div class="binder-item" onclick="selectBinder(this,'El guardián del bosque')">
-        <i class="ti ti-ghost bi"></i><span class="bl">El guardián</span>
+      <div class="binder-item sub" onclick="selectBinder(this,'Lía','lia')">
+        <i class="ti ti-user bi" style="font-size:12px"></i><span class="bl">Lía — protagonista</span>
       </div>
-
+      <div class="binder-item sub" onclick="selectBinder(this,'El guardián','guardian')">
+        <i class="ti ti-ghost bi" style="font-size:12px"></i><span class="bl">El guardián</span>
+      </div>
+      <button class="binder-add-btn" onclick="addPersonaje()"><i class="ti ti-plus" style="font-size:12px"></i> Añadir personaje</button>
       <div class="binder-divider"></div>
-      <div class="binder-section-label">Referencias</div>
-      <div class="binder-item" onclick="selectBinder(this,'Paleta visual')">
-        <i class="ti ti-palette bi"></i><span class="bl">Paleta visual</span>
+      <div class="binder-section-label">Investigación</div>
+      <div class="binder-item" onclick="selectBinder(this,'Referencias visuales','refs')">
+        <i class="ti ti-palette bi"></i><span class="bl">Referencias visuales</span>
       </div>
-      <div class="binder-item" onclick="selectBinder(this,'Notas de estilo')">
+      <div class="binder-item" onclick="selectBinder(this,'Notas de estilo','estilo')">
         <i class="ti ti-notes bi"></i><span class="bl">Notas de estilo</span>
       </div>
+      <div class="binder-item" onclick="selectBinder(this,'Brainstorming','brainstorm')">
+        <i class="ti ti-bulb bi"></i><span class="bl">Brainstorming</span>
+      </div>
+      <button class="binder-add-btn" onclick="addRef()"><i class="ti ti-plus" style="font-size:12px"></i> Añadir referencia</button>
     </div>
-
-    <button class="compile-btn" onclick="compileProject()">
-      <i class="ti ti-download"></i> Compilar proyecto
+    <button class="compile-btn" onclick="openModal('compilar')">
+      <i class="ti ti-package-export"></i> Compilar proyecto
     </button>
   </div>
 
-  <!-- ════ MIDDLE PANEL ════ -->
-  <div class="middle-panel">
+  <!-- ══ MIDDLE PANEL ══ -->
+  <div class="middle-panel" id="middlePanel">
     <div class="ptabs">
       <div class="ptab active" onclick="switchMiddle('cork',this)">Corcho</div>
       <div class="ptab" onclick="switchMiddle('outline',this)">Esquema</div>
+      <div class="ptab" onclick="switchMiddle('scrivenings',this)">Todo</div>
     </div>
-
     <div class="corkboard" id="corkboard">
       <div class="cork-card active" onclick="activateCard(this,'Cap. 1 — La llegada','cap1')">
         <div class="cork-pin"></div>
@@ -664,53 +325,64 @@
         <div class="cst st-borrador">Borrador</div>
       </div>
     </div>
-
     <div class="outliner" id="outliner">
       <div class="ol-item active" onclick="activateCard(null,'Cap. 1 — La llegada','cap1')">
-        <i class="ti ti-file-text oi"></i><span>La llegada</span><span class="ow">320p</span>
+        <i class="ti ti-file-text oi"></i><span>La llegada</span>
+        <span class="os st-revision">Revisión</span><span class="ow">320p</span>
       </div>
       <div class="ol-item" onclick="activateCard(null,'Cap. 2 — La criatura','cap2')">
-        <i class="ti ti-file-text oi"></i><span>La criatura</span><span class="ow">215p</span>
+        <i class="ti ti-file-text oi"></i><span>La criatura</span>
+        <span class="os st-borrador">Borrador</span><span class="ow">215p</span>
       </div>
       <div class="ol-item" onclick="activateCard(null,'Cap. 3 — El regreso','cap3')">
-        <i class="ti ti-file-text oi"></i><span>El regreso</span><span class="ow">0p</span>
+        <i class="ti ti-file-text oi"></i><span>El regreso</span>
+        <span class="os st-borrador">Borrador</span><span class="ow">0p</span>
+      </div>
+    </div>
+    <div class="scrivenings-view" id="scriveningsView">
+      <div class="scrivenings-section">
+        <div class="scrivenings-section-title">Cap. 1 — La llegada</div>
+        <div class="scrivenings-section-body">Lía nunca había visto el bosque de noche. Su linterna parpadeaba como un corazón nervioso mientras los árboles cerraban el cielo sobre su cabeza.<br><br>—Aquí hay algo —susurró, aunque nadie la escuchaba.</div>
+      </div>
+      <div class="scrivenings-section">
+        <div class="scrivenings-section-title">Cap. 2 — La criatura</div>
+        <div class="scrivenings-section-body" style="color:var(--text-muted);font-style:italic">Sin contenido aún.</div>
+      </div>
+      <div class="scrivenings-section">
+        <div class="scrivenings-section-title">Cap. 3 — El regreso</div>
+        <div class="scrivenings-section-body" style="color:var(--text-muted);font-style:italic">Sin contenido aún.</div>
       </div>
     </div>
   </div>
 
-  <!-- ════ EDITOR ════ -->
+  <!-- ══ EDITOR ══ -->
   <div class="editor-area">
     <div class="editor-toolbar">
       <div class="tg">
-        <button class="tbtn" onclick="fmt('bold')" title="Negrita (Ctrl+B)"><i class="ti ti-bold"></i></button>
-        <button class="tbtn" onclick="fmt('italic')" title="Cursiva (Ctrl+I)"><i class="ti ti-italic"></i></button>
-        <button class="tbtn" onclick="fmt('underline')" title="Subrayado (Ctrl+U)"><i class="ti ti-underline"></i></button>
+        <button class="tbtn" onclick="fmt('bold')" title="Negrita"><i class="ti ti-bold"></i></button>
+        <button class="tbtn" onclick="fmt('italic')" title="Cursiva"><i class="ti ti-italic"></i></button>
+        <button class="tbtn" onclick="fmt('underline')" title="Subrayado"><i class="ti ti-underline"></i></button>
         <button class="tbtn" onclick="fmt('strikeThrough')" title="Tachado"><i class="ti ti-strikethrough"></i></button>
       </div>
       <div class="tg">
-        <button class="tbtn" onclick="fmt('h1')" title="Título"><i class="ti ti-h-1"></i></button>
-        <button class="tbtn" onclick="fmt('h2')" title="Subtítulo"><i class="ti ti-h-2"></i></button>
+        <button class="tbtn" onclick="fmt('h2')" title="Título"><i class="ti ti-h-1"></i></button>
+        <button class="tbtn" onclick="fmt('h3')" title="Subtítulo"><i class="ti ti-h-2"></i></button>
         <button class="tbtn" onclick="fmt('quote')" title="Cita"><i class="ti ti-quote"></i></button>
-        <button class="tbtn" onclick="fmt('insertUnorderedList')" title="Lista"><i class="ti ti-list"></i></button>
+        <button class="tbtn" onclick="fmt('ul')" title="Lista"><i class="ti ti-list"></i></button>
       </div>
       <div class="tg">
-        <button class="tbtn" onclick="triggerImg()" title="Insertar imagen">
-          <i class="ti ti-photo"></i><span class="tbtn-label">Imagen</span>
-        </button>
-        <button class="tbtn" onclick="addSeparator()" title="Separador de sección">
-          <i class="ti ti-minus"></i><span class="tbtn-label">Separador</span>
-        </button>
+        <button class="tbtn" onclick="triggerImg()" title="Imagen"><i class="ti ti-photo"></i> <span style="font-size:11px">Imagen</span></button>
+        <button class="tbtn" onclick="addSep()" title="Separador"><i class="ti ti-minus"></i></button>
       </div>
       <div class="tg">
-        <button class="tbtn" onclick="saveSnapshot()" title="Guardar versión">
-          <i class="ti ti-camera"></i><span class="tbtn-label">Snapshot</span>
-        </button>
-        <button class="tbtn" id="focusBtn" onclick="toggleFocus()" title="Modo escritura a pantalla completa">
-          <i class="ti ti-eye"></i><span class="tbtn-label">Foco</span>
-        </button>
-        <button class="tbtn" onclick="exportText()" title="Exportar texto">
-          <i class="ti ti-file-export"></i><span class="tbtn-label">Exportar</span>
-        </button>
+        <button class="tbtn" onclick="toggleSplit()" id="splitBtn" title="Doble pantalla"><i class="ti ti-layout-columns"></i></button>
+        <button class="tbtn" onclick="saveSnapshot()" title="Snapshot"><i class="ti ti-camera"></i> <span style="font-size:11px">Snap</span></button>
+        <button class="tbtn" onclick="openCompose()" title="Modo composición"><i class="ti ti-arrows-maximize"></i> <span style="font-size:11px">Foco</span></button>
+      </div>
+      <div class="tg">
+        <button class="tbtn" onclick="toggleBinder()" title="Ocultar binder"><i class="ti ti-layout-sidebar"></i></button>
+        <button class="tbtn" onclick="toggleNotes()" title="Ocultar notas"><i class="ti ti-layout-sidebar-right"></i></button>
+        <button class="tbtn" onclick="toggleNotepad()" title="Libreta del proyecto"><i class="ti ti-notebook"></i></button>
       </div>
     </div>
 
@@ -718,136 +390,142 @@
       <input type="text" class="chapter-title" id="chapterTitle" value="Cap. 1 — La llegada" />
     </div>
 
-    <div class="editor-scroll">
-      <div class="editor-content" id="editorContent">
-
-        <div class="img-wrapper" id="imgDemo">
-          <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='640' height='220' viewBox='0 0 640 220'%3E%3Crect width='640' height='220' fill='%23c8dfc0'/%3E%3Crect y='140' width='640' height='80' fill='%23a5c799'/%3E%3Cellipse cx='100' cy='60' rx='70' ry='110' fill='%23386b44'/%3E%3Cellipse cx='210' cy='40' rx='80' ry='120' fill='%234a7c54'/%3E%3Cellipse cx='430' cy='50' rx='85' ry='115' fill='%23386b44'/%3E%3Cellipse cx='550' cy='65' rx='72' ry='108' fill='%234a7c54'/%3E%3Cellipse cx='640' cy='80' rx='60' ry='100' fill='%23386b44'/%3E%3Ccircle cx='320' cy='90' r='22' fill='%23f9e04a' opacity='0.95'/%3E%3Ccircle cx='320' cy='90' r='14' fill='%23fdf3a0'/%3E%3Cellipse cx='320' cy='104' rx='38' ry='26' fill='%23f5c842' opacity='0.25'/%3E%3Crect x='312' y='112' width='16' height='60' fill='%23b8763a'/%3E%3C/svg%3E" alt="El bosque de noche" />
-          <div class="img-actions">
-            <button class="img-act-btn" onclick="removeImg('imgDemo')" title="Quitar"><i class="ti ti-trash" style="font-size:13px"></i></button>
+    <div class="editor-split">
+      <div class="editor-scroll" id="editorScrollA">
+        <div class="editor-content" id="editorContent">
+          <div class="img-wrapper" id="imgDemo">
+            <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='640' height='200' viewBox='0 0 640 200'%3E%3Crect width='640' height='200' fill='%23c0d8b8'/%3E%3Cellipse cx='100' cy='50' rx='75' ry='115' fill='%23386b44'/%3E%3Cellipse cx='220' cy='35' rx='85' ry='125' fill='%234a7c54'/%3E%3Cellipse cx='440' cy='45' rx='88' ry='118' fill='%23386b44'/%3E%3Cellipse cx='560' cy='55' rx='75' ry='110' fill='%234a7c54'/%3E%3Ccircle cx='320' cy='85' r='22' fill='%23f9e04a' opacity='0.95'/%3E%3Ccircle cx='320' cy='85' r='14' fill='%23fdf3a0'/%3E%3Cellipse cx='320' cy='100' rx='40' ry='28' fill='%23f5c842' opacity='0.22'/%3E%3Crect x='312' y='107' width='16' height='60' fill='%23b8763a'/%3E%3C/svg%3E" alt="El bosque de noche" />
+            <div class="img-actions">
+              <button class="img-act-btn" onclick="removeImg('imgDemo')" title="Quitar"><i class="ti ti-trash" style="font-size:12px"></i></button>
+            </div>
+            <input class="img-caption" type="text" value="El bosque brillaba bajo la luna, como si los árboles respiraran luz." />
           </div>
-          <input class="img-caption" type="text" value="El bosque brillaba bajo la luna, como si los árboles respiraran luz." />
+          <div id="mainEditor" contenteditable="true" class="text-editor" oninput="onEditorInput()" spellcheck="true">
+            <p>Lía nunca había visto el bosque de noche. Su linterna parpadeaba como un corazón nervioso mientras los árboles cerraban el cielo sobre su cabeza.</p>
+            <p><br></p>
+            <p>—Aquí hay algo —susurró, aunque nadie la escuchaba.</p>
+            <p><br></p>
+            <p>Y entonces lo oyó: un sonido suave, como hojas que aprenden a hablar.</p>
+          </div>
+          <div class="img-placeholder" id="imgPlaceholder" onclick="triggerImg()">
+            <i class="ti ti-photo-plus" aria-hidden="true"></i>
+            <span>Haz clic aquí para insertar una ilustración</span>
+          </div>
+          <input type="file" id="imgInput" accept="image/*" onchange="handleImg(event)" />
         </div>
-
-        <div id="mainEditor" contenteditable="true" class="text-editor" oninput="onEditorInput()" spellcheck="true">
-          <p>Lía nunca había visto el bosque de noche. Su linterna parpadeaba como un corazón nervioso mientras los árboles cerraban el cielo sobre su cabeza.</p>
-          <p><br></p>
-          <p>—Aquí hay algo —susurró, aunque nadie la escuchaba.</p>
-          <p><br></p>
-          <p>Y entonces lo oyó: un sonido suave, como hojas que aprenden a hablar.</p>
+      </div>
+      <div class="split-divider" id="splitDivider" style="display:none"></div>
+      <div class="editor-scroll-b" id="editorScrollB">
+        <div style="padding:16px;font-family:'Lora',serif;font-size:15px;line-height:1.8;color:var(--text-2)">
+          <p style="font-family:'Playfair Display',serif;font-size:16px;font-weight:600;color:var(--text);margin-bottom:12px">Cap. 2 — La criatura</p>
+          <p>El guardián emergió entre los helechos. Era alto como tres hombres juntos, hecho de musgo y luciérnagas que parpadeaban en lugar de latidos.</p>
         </div>
-
-        <div class="img-placeholder" id="imgPlaceholder" onclick="triggerImg()">
-          <i class="ti ti-photo-plus" aria-hidden="true"></i>
-          <span>Haz clic aquí para insertar una ilustración</span>
-        </div>
-
-        <input type="file" id="imgInput" accept="image/*" onchange="handleImg(event)" />
       </div>
     </div>
 
     <div class="status-bar">
       <span class="mode-pill" id="modePill">Escritura</span>
       <span id="sbWords">Palabras: <strong>47</strong></span>
-      <span id="sbChapter">Capítulo 1 de 3</span>
-      <span class="saved-indicator" id="savedIndicator">
-        Guardado <i class="ti ti-check"></i>
-      </span>
+      <span id="sbSesion">Sesión: <strong>0</strong></span>
+      <span id="sbChapter">Cap. 1 de 3</span>
+      <span class="saved-ok" id="savedOk">Guardado <i class="ti ti-check"></i></span>
     </div>
   </div>
 
-  <!-- ════ NOTES PANEL ════ -->
-  <div class="notes-panel">
+  <!-- ══ NOTES PANEL ══ -->
+  <div class="notes-panel" id="notesPanel">
     <div class="notes-header">
-      <span class="notes-header-title">Notas</span>
-      <i class="ti ti-layout-sidebar-right" style="font-size:15px; color:var(--text-muted); cursor:pointer" onclick="toggleNotesPanel()" title="Ocultar panel"></i>
+      <span class="notes-header-title">Inspector</span>
+      <i class="ti ti-x" style="font-size:14px;color:var(--text-muted);cursor:pointer" onclick="toggleNotes()"></i>
     </div>
-
     <div class="ntabs">
       <div class="ntab active" onclick="switchNote('meta',this)">Info</div>
-      <div class="ntab" onclick="switchNote('notes',this)">Notas</div>
+      <div class="ntab" onclick="switchNote('sinopsis',this)">Sinopsis</div>
+      <div class="ntab" onclick="switchNote('notas',this)">Notas</div>
       <div class="ntab" onclick="switchNote('snaps',this)">Snaps</div>
+      <div class="ntab" onclick="switchNote('objetivo',this)">Objetivo</div>
     </div>
-
     <div class="notes-scroll">
 
-      <!-- INFO TAB -->
+      <!-- INFO -->
       <div id="tab-meta">
-        <div class="meta-row">
-          <span class="meta-label">Estado</span>
-          <select class="meta-select" onchange="updateStatus(this.value)">
-            <option>Borrador</option>
-            <option selected>En revisión</option>
-            <option>Final</option>
-          </select>
+        <div class="meta-row"><span class="meta-label">Estado</span>
+          <select class="meta-select"><option>Borrador</option><option selected>En revisión</option><option>Final</option></select>
         </div>
-        <div class="meta-row">
-          <span class="meta-label">Punto de vista</span>
-          <select class="meta-select">
-            <option>1.ª persona</option>
-            <option selected>3.ª persona</option>
-            <option>2.ª persona</option>
-          </select>
+        <div class="meta-row"><span class="meta-label">Etiqueta</span>
+          <select class="meta-select"><option selected>Misterio</option><option>Acción</option><option>Emoción</option><option>Comedia</option></select>
         </div>
-        <div class="meta-row">
-          <span class="meta-label">Palabras</span>
+        <div class="meta-row"><span class="meta-label">PDV</span>
+          <select class="meta-select"><option>1.ª persona</option><option selected>3.ª persona</option><option>2.ª persona</option></select>
+        </div>
+        <div class="meta-row"><span class="meta-label">Palabras</span>
           <span class="meta-val"><span id="wc2">47</span> / 400</span>
         </div>
-        <div class="meta-row">
-          <span class="meta-label">Imágenes</span>
+        <div class="meta-row" style="border:none"><span class="meta-label">Imágenes</span>
           <span class="meta-val" id="imgCount">1</span>
         </div>
-        <div class="meta-row" style="border:none">
-          <span class="meta-label">Etiqueta</span>
-          <select class="meta-select">
-            <option>Acción</option>
-            <option selected>Misterio</option>
-            <option>Emoción</option>
-            <option>Comedia</option>
-          </select>
+        <div class="meta-row" style="border:none;margin-top:4px">
+          <label style="font-size:11px;color:var(--text-muted);display:flex;align-items:center;gap:5px;cursor:pointer">
+            <input type="checkbox" checked style="cursor:pointer"> Incluir en compilación
+          </label>
         </div>
-
-        <div class="section-label" style="margin-top:12px">Sinopsis de la escena</div>
-        <textarea class="ntextarea" style="min-height:72px">Lía llega al bosque con su linterna. Oye algo en la oscuridad.</textarea>
-
         <div class="progress-wrap">
-          <div class="progress-label">
-            <span>Progreso</span>
-            <span id="pctLabel">12%</span>
-          </div>
-          <div class="progress-track">
-            <div class="progress-fill" id="progressFill" style="width:12%"></div>
-          </div>
+          <div class="progress-header"><span>Progreso capítulo</span><span id="pctLabel">12%</span></div>
+          <div class="progress-track"><div class="progress-fill" id="progressFill" style="width:12%"></div></div>
         </div>
       </div>
 
-      <!-- NOTES TAB -->
-      <div id="tab-notes" style="display:none">
-        <div class="section-label">Notas del autor</div>
-        <textarea class="ntextarea" style="min-height:110px">Recordar: la linterna es un símbolo. La luz = el coraje de Lía.
-
-¿Añadir sonido de búhos en el cap. 2?</textarea>
-        <div class="section-label">Referencias visuales</div>
-        <textarea class="ntextarea" style="min-height:80px">Paleta: verdes oscuros + amarillo linterna.
-Inspiración: ilustradores nórdicos de los años 70.</textarea>
-        <div class="section-label">Lista de pendientes</div>
-        <textarea class="ntextarea" style="min-height:70px">☐ Revisar diálogos cap. 1
-☐ Añadir ilustración de la criatura
-☐ Corrección ortográfica final</textarea>
+      <!-- SINOPSIS -->
+      <div id="tab-sinopsis" style="display:none">
+        <div class="section-label">Sinopsis de la escena</div>
+        <textarea class="ntextarea" style="min-height:100px">Lía llega al bosque con su linterna. Oye algo en la oscuridad que la llama. Primer contacto con el mundo mágico.</textarea>
+        <div class="section-label">Palabras clave</div>
+        <input type="text" class="ntextarea" style="min-height:auto;padding:5px 8px" value="bosque, linterna, misterio, noche" />
       </div>
 
-      <!-- SNAPSHOTS TAB -->
+      <!-- NOTAS -->
+      <div id="tab-notas" style="display:none">
+        <div class="section-label">Notas del autor</div>
+        <textarea class="ntextarea" style="min-height:100px">La linterna = símbolo del coraje de Lía. Revisar ritmo del diálogo en la p.3.</textarea>
+        <div class="section-label">Referencias visuales</div>
+        <textarea class="ntextarea" style="min-height:70px">Paleta: verdes oscuros + amarillo cálido. Inspiración: ilustradores nórdicos años 70.</textarea>
+        <div class="section-label">Pendientes</div>
+        <textarea class="ntextarea" style="min-height:80px">☐ Revisar diálogos&#10;☐ Añadir ilustración criatura&#10;☐ Corrección final</textarea>
+      </div>
+
+      <!-- SNAPSHOTS -->
       <div id="tab-snaps" style="display:none">
         <div class="section-label">Versiones guardadas</div>
-        <div class="snap-item">
-          <div class="snap-date">Hoy, 10:42</div>
-          <div class="snap-label">Primera versión</div>
-        </div>
+        <div class="snap-item"><div class="snap-date">Hoy, 10:42</div><div class="snap-label">Versión inicial</div></div>
         <div id="snapsContainer"></div>
-        <div style="font-size:11px; color:var(--text-muted); margin-top:10px; text-align:center; line-height:1.5">Usa el botón "Snapshot" en la barra para guardar la versión actual</div>
+        <div style="font-size:11px;color:var(--text-muted);margin-top:8px;text-align:center;line-height:1.5">Botón "Snap" en la barra para guardar la versión actual</div>
       </div>
-    </div>
 
+      <!-- OBJETIVO -->
+      <div id="tab-objetivo" style="display:none">
+        <div class="section-label">Objetivo del proyecto</div>
+        <div class="objetivo-wrap">
+          <div class="objetivo-header"><span>Meta total</span><span id="objPct">0%</span></div>
+          <div class="objetivo-track"><div class="objetivo-fill" id="objFill" style="width:0%"></div></div>
+          <div class="objetivo-row">
+            <input class="objetivo-input" type="number" id="objTarget" placeholder="Palabras objetivo" value="5000" min="1" onchange="updateObjetivo()"/>
+            <button class="objetivo-btn" onclick="updateObjetivo()">OK</button>
+          </div>
+        </div>
+        <div class="section-label" style="margin-top:12px">Objetivo de sesión</div>
+        <div class="objetivo-wrap">
+          <div class="objetivo-header"><span>Esta sesión</span><span id="sesionPct">0%</span></div>
+          <div class="objetivo-track"><div class="objetivo-fill" id="sesionFill" style="width:0%"></div></div>
+          <div class="objetivo-row">
+            <input class="objetivo-input" type="number" id="sesionTarget" placeholder="Palabras/sesión" value="500" min="1" onchange="updateSesion()"/>
+            <button class="objetivo-btn" onclick="updateSesion()">OK</button>
+          </div>
+        </div>
+        <div class="section-label" style="margin-top:12px">Fecha límite</div>
+        <input type="date" class="ntextarea" style="min-height:auto;padding:5px 8px" />
+      </div>
+
+    </div>
     <div class="wc-footer">
       <span class="wc-label">Total proyecto</span>
       <span class="wc-val"><span id="totalWC">535</span> palabras</span>
@@ -855,206 +533,280 @@ Inspiración: ilustradores nórdicos de los años 70.</textarea>
   </div>
 </div>
 
+<!-- ══ MODO COMPOSICIÓN ══ -->
+<div class="compose-mode" id="composeMode">
+  <div class="compose-inner">
+    <input type="text" class="compose-title" id="composeTitleInput" value="Cap. 1 — La llegada" />
+    <div id="composeEditor" contenteditable="true" class="compose-editor" oninput="onComposeInput()" spellcheck="true">
+      <p>Lía nunca había visto el bosque de noche. Su linterna parpadeaba como un corazón nervioso mientras los árboles cerraban el cielo sobre su cabeza.</p>
+      <p><br></p>
+      <p>—Aquí hay algo —susurró, aunque nadie la escuchaba.</p>
+      <p><br></p>
+      <p>Y entonces lo oyó: un sonido suave, como hojas que aprenden a hablar.</p>
+    </div>
+  </div>
+  <div class="compose-bar">
+    <span class="wc">Palabras: <strong id="composeWC">47</strong></span>
+    <span class="wc">Sesión: <strong id="composeSesWC">0</strong></span>
+    <span style="color:rgba(200,190,170,0.4)">Esc para salir · Ctrl+S para snapshot</span>
+    <button class="compose-exit" onclick="closeCompose()"><i class="ti ti-arrows-minimize" style="font-size:13px"></i> Salir del foco</button>
+  </div>
+</div>
+
+<!-- ══ MODAL COMPILAR ══ -->
+<div class="modal-overlay" id="modal-compilar">
+  <div class="modal">
+    <div class="modal-title">Compilar proyecto</div>
+    <div class="modal-sub">Exporta tu manuscrito en el formato que necesites</div>
+    <div class="modal-section">
+      <div class="modal-section-label">Formato de salida</div>
+      <div class="format-grid">
+        <button class="format-btn" onclick="compilar('txt')"><i class="ti ti-file-text"></i> Texto plano (.txt)</button>
+        <button class="format-btn" onclick="compilar('html')"><i class="ti ti-file-code"></i> Web (.html)</button>
+        <button class="format-btn" onclick="compilar('md')"><i class="ti ti-markdown"></i> Markdown (.md)</button>
+        <button class="format-btn" onclick="compilar('json')"><i class="ti ti-file-export"></i> JSON (backup)</button>
+      </div>
+    </div>
+    <div class="modal-section">
+      <div class="modal-section-label">Incluir en la compilación</div>
+      <label style="display:flex;align-items:center;gap:6px;font-size:12px;color:var(--text);cursor:pointer;margin-bottom:5px"><input type="checkbox" checked> Capítulos marcados "incluir"</label>
+      <label style="display:flex;align-items:center;gap:6px;font-size:12px;color:var(--text);cursor:pointer"><input type="checkbox"> Notas del autor</label>
+    </div>
+    <div class="modal-actions">
+      <button class="modal-btn-cancel" onclick="closeModal('compilar')">Cancelar</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ LIBRETA GLOBAL ══ -->
+<div class="notepad-panel" id="notepadPanel">
+  <div class="notepad-header">
+    <span class="notepad-title"><i class="ti ti-notebook" style="font-size:13px;margin-right:4px"></i>Libreta del proyecto</span>
+    <button class="notepad-close" onclick="toggleNotepad()"><i class="ti ti-x"></i></button>
+  </div>
+  <div class="notepad-body">
+    <textarea class="notepad-area" placeholder="Ideas, pensamientos, notas sueltas del proyecto…">Idea para el cap. 4: Lía vuelve al bosque con su madre.
+La criatura podría hablar en forma de poemas.</textarea>
+  </div>
+</div>
+
 <div class="toast" id="toast"></div>
 
 <script>
-  /* ── STATE ── */
-  let snapCount = 0;
-  let imgCount = 1;
-  let isFocusMode = false;
-  let isNotesPanelHidden = false;
-  let autoSaveTimer = null;
+/* ── STATE ── */
+let snapCount=0,imgCount=1,isSplit=false,sesionWords=0,startWords=47,autoSaveT=null;
+const totalProjectWords=535;
 
-  /* ── TOAST ── */
-  function showToast(msg) {
-    const t = document.getElementById('toast');
-    t.textContent = msg;
-    t.classList.add('show');
-    setTimeout(() => t.classList.remove('show'), 2200);
-  }
+/* ── TOAST ── */
+function showToast(m){const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2200)}
 
-  /* ── BINDER ── */
-  function selectBinder(el, title) {
-    document.querySelectorAll('.binder-item').forEach(i => i.classList.remove('active'));
-    el.classList.add('active');
-    document.getElementById('chapterTitle').value = title;
-  }
+/* ── BINDER ── */
+function selectBinder(el,title,section){
+  document.querySelectorAll('.binder-item').forEach(i=>i.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('chapterTitle').value=title;
+  document.getElementById('composeTitleInput').value=title;
+}
+function addChapter(){
+  const n=document.querySelectorAll('.binder-item.sub').length+1;
+  const title=`Cap. ${n} — Nuevo capítulo`;
+  const body=document.getElementById('binderBody');
+  const btn=body.querySelector('.binder-add-btn');
+  const item=document.createElement('div');
+  item.className='binder-item sub';
+  item.innerHTML=`<i class="ti ti-file-text bi" style="font-size:12px"></i><span class="bl">${title}</span><span class="bb">0</span>`;
+  item.onclick=()=>{selectBinder(item,title,'new');};
+  body.insertBefore(item,btn);
+  addCorkCard(title);
+  showToast('Capítulo añadido');
+}
+function addPersonaje(){showToast('Personaje añadido')}
+function addRef(){showToast('Referencia añadida')}
 
-  function addChapter() {
-    const num = document.querySelectorAll('.binder-item.sub').length + 1;
-    const title = `Cap. ${num} — Nuevo capítulo`;
-    const binderBody = document.getElementById('binderBody');
-    const addBtn = binderBody.querySelector('.binder-add-btn');
-    const item = document.createElement('div');
-    item.className = 'binder-item sub';
-    item.innerHTML = `<i class="ti ti-file-text bi" style="font-size:12px"></i><span class="bl">${title}</span><span class="bb">0</span>`;
-    item.onclick = () => { selectBinder(item, title); };
-    binderBody.insertBefore(item, addBtn);
-    selectBinder(item, title);
-    addCorkCard(title);
-    showToast('Capítulo añadido');
-  }
+/* ── MIDDLE ── */
+function switchMiddle(mode,tabEl){
+  document.querySelectorAll('.ptab').forEach(t=>t.classList.remove('active'));
+  tabEl.classList.add('active');
+  document.getElementById('corkboard').style.display=mode==='cork'?'flex':'none';
+  document.getElementById('outliner').style.display=mode==='outline'?'block':'none';
+  document.getElementById('scriveningsView').style.display=mode==='scrivenings'?'block':'none';
+}
+function activateCard(card,title,section){
+  if(card){document.querySelectorAll('.cork-card').forEach(c=>c.classList.remove('active'));card.classList.add('active');}
+  document.querySelectorAll('.ol-item').forEach(i=>i.classList.remove('active'));
+  document.getElementById('chapterTitle').value=title;
+  document.getElementById('composeTitleInput').value=title;
+}
+function addCorkCard(title){
+  const cork=document.getElementById('corkboard');
+  const card=document.createElement('div');
+  card.className='cork-card';
+  card.innerHTML=`<div class="cork-pin" style="background:#9a9a9a"></div><div class="ct">${title.replace(/Cap\. \d+ — /,'')}</div><div class="cs">Sin escribir aún.</div><div class="cst st-borrador">Borrador</div>`;
+  card.onclick=()=>activateCard(card,title);
+  cork.appendChild(card);
+}
 
-  /* ── MIDDLE PANEL ── */
-  function switchMiddle(mode, tabEl) {
-    document.querySelectorAll('.ptab').forEach(t => t.classList.remove('active'));
-    tabEl.classList.add('active');
-    document.getElementById('corkboard').style.display = mode === 'cork' ? 'flex' : 'none';
-    document.getElementById('outliner').style.display = mode === 'outline' ? 'block' : 'none';
-  }
+/* ── EDITOR ── */
+function fmt(cmd){
+  const ed=document.getElementById('mainEditor');ed.focus();
+  if(cmd==='h2')document.execCommand('formatBlock',false,'h2');
+  else if(cmd==='h3')document.execCommand('formatBlock',false,'h3');
+  else if(cmd==='quote')document.execCommand('formatBlock',false,'blockquote');
+  else if(cmd==='ul')document.execCommand('insertUnorderedList');
+  else document.execCommand(cmd,false,null);
+}
+function addSep(){const ed=document.getElementById('mainEditor');ed.focus();document.execCommand('insertHorizontalRule');}
 
-  function activateCard(card, title, section) {
-    if (card) {
-      document.querySelectorAll('.cork-card').forEach(c => c.classList.remove('active'));
-      card.classList.add('active');
-    }
-    document.querySelectorAll('.ol-item').forEach(i => i.classList.remove('active'));
-    document.getElementById('chapterTitle').value = title;
-  }
+function onEditorInput(){
+  const text=document.getElementById('mainEditor').innerText||'';
+  const words=text.trim()?text.trim().split(/\s+/).length:0;
+  const diff=Math.max(0,words-startWords);
+  sesionWords=diff;
+  document.getElementById('sbWords').innerHTML=`Palabras: <strong>${words}</strong>`;
+  document.getElementById('sbSesion').innerHTML=`Sesión: <strong>+${diff}</strong>`;
+  document.getElementById('wc2').textContent=words;
+  const pct=Math.min(100,Math.round(words/400*100));
+  document.getElementById('progressFill').style.width=pct+'%';
+  document.getElementById('pctLabel').textContent=pct+'%';
+  updateObjetivo(words);updateSesion(diff);
+  triggerAutoSave();
+}
+function triggerAutoSave(){
+  document.getElementById('savedOk').innerHTML='Guardando… <i class="ti ti-loader" style="font-size:12px"></i>';
+  clearTimeout(autoSaveT);
+  autoSaveT=setTimeout(()=>{document.getElementById('savedOk').innerHTML='Guardado <i class="ti ti-check" style="font-size:12px;color:var(--success)"></i>';},1200);
+}
 
-  function addCorkCard(title) {
-    const cork = document.getElementById('corkboard');
-    const card = document.createElement('div');
-    card.className = 'cork-card';
-    card.innerHTML = `<div class="cork-pin" style="background:#9a9a9a"></div>
-      <div class="ct">${title.replace(/Cap\. \d+ — /, '')}</div>
-      <div class="cs">Sin escribir aún.</div>
-      <div class="cst st-borrador">Borrador</div>`;
-    card.onclick = () => activateCard(card, title);
-    cork.appendChild(card);
-  }
+/* ── OBJETIVO ── */
+function updateObjetivo(currentWords){
+  const target=parseInt(document.getElementById('objTarget').value)||5000;
+  const total=parseInt(document.getElementById('totalWC').textContent)||535;
+  const w=currentWords||total;
+  const pct=Math.min(100,Math.round(w/target*100));
+  document.getElementById('objFill').style.width=pct+'%';
+  document.getElementById('objPct').textContent=pct+'%';
+}
+function updateSesion(sw){
+  const target=parseInt(document.getElementById('sesionTarget').value)||500;
+  const s=sw||sesionWords;
+  const pct=Math.min(100,Math.round(s/target*100));
+  document.getElementById('sesionFill').style.width=pct+'%';
+  document.getElementById('sesionPct').textContent=pct+'%';
+  document.getElementById('sbSesion').innerHTML=`Sesión: <strong>+${s}</strong>`;
+}
 
-  /* ── EDITOR ── */
-  function fmt(cmd) {
-    const editor = document.getElementById('mainEditor');
-    editor.focus();
-    if (cmd === 'h1') { document.execCommand('formatBlock', false, 'h2'); }
-    else if (cmd === 'h2') { document.execCommand('formatBlock', false, 'h3'); }
-    else if (cmd === 'quote') { document.execCommand('formatBlock', false, 'blockquote'); }
-    else { document.execCommand(cmd, false, null); }
-  }
+/* ── IMÁGENES ── */
+function triggerImg(){document.getElementById('imgInput').click()}
+function handleImg(e){
+  const file=e.target.files[0];if(!file)return;
+  const reader=new FileReader();
+  reader.onload=ev=>{
+    const uid='img_'+Date.now();
+    const ph=document.getElementById('imgPlaceholder');
+    const w=document.createElement('div');w.className='img-wrapper';w.id=uid;
+    w.innerHTML=`<img src="${ev.target.result}" alt="Ilustración"/><div class="img-actions"><button class="img-act-btn" onclick="removeImg('${uid}')" title="Quitar"><i class="ti ti-trash" style="font-size:12px"></i></button></div><input class="img-caption" type="text" placeholder="Pie de imagen…"/>`;
+    ph.parentNode.insertBefore(w,ph);
+    imgCount++;document.getElementById('imgCount').textContent=imgCount;
+    showToast('Imagen insertada');
+  };reader.readAsDataURL(file);e.target.value='';
+}
+function removeImg(id){const el=document.getElementById(id);if(el){el.remove();imgCount=Math.max(0,imgCount-1);document.getElementById('imgCount').textContent=imgCount;showToast('Imagen eliminada');}}
 
-  function onEditorInput() {
-    const text = document.getElementById('mainEditor').innerText || '';
-    const words = text.trim() ? text.trim().split(/\s+/).length : 0;
-    document.getElementById('sbWords').innerHTML = `Palabras: <strong>${words}</strong>`;
-    document.getElementById('wc2').textContent = words;
-    const pct = Math.min(100, Math.round(words / 400 * 100));
-    document.getElementById('progressFill').style.width = pct + '%';
-    document.getElementById('pctLabel').textContent = pct + '%';
-    triggerAutoSave();
-  }
+/* ── SPLIT ── */
+function toggleSplit(){
+  isSplit=!isSplit;
+  document.getElementById('editorScrollB').style.display=isSplit?'block':'none';
+  document.getElementById('splitDivider').style.display=isSplit?'block':'none';
+  document.getElementById('splitBtn').classList.toggle('on',isSplit);
+  showToast(isSplit?'Doble pantalla activada':'Doble pantalla desactivada');
+}
 
-  function triggerAutoSave() {
-    document.getElementById('savedIndicator').innerHTML = 'Guardando… <i class="ti ti-loader" style="font-size:13px"></i>';
-    clearTimeout(autoSaveTimer);
-    autoSaveTimer = setTimeout(() => {
-      document.getElementById('savedIndicator').innerHTML = 'Guardado <i class="ti ti-check" style="font-size:13px; color:var(--success)"></i>';
-    }, 1200);
-  }
+/* ── SNAPSHOT ── */
+function saveSnapshot(){
+  snapCount++;
+  const now=new Date();
+  const label=document.getElementById('chapterTitle').value;
+  const container=document.getElementById('snapsContainer');
+  const item=document.createElement('div');item.className='snap-item';
+  item.innerHTML=`<div class="snap-date">${now.toLocaleTimeString('es-ES',{hour:'2-digit',minute:'2-digit'})}</div><div class="snap-label">v${snapCount+1} — ${label}</div>`;
+  container.insertBefore(item,container.firstChild);
+  switchNote('snaps',document.querySelectorAll('.ntab')[3]);
+  showToast('Snapshot guardado');
+}
 
-  /* ── IMAGES ── */
-  function triggerImg() { document.getElementById('imgInput').click(); }
-
-  function handleImg(e) {
-    const file = e.target.files[0];
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onload = (ev) => {
-      const uid = 'img_' + Date.now();
-      const placeholder = document.getElementById('imgPlaceholder');
-      const wrapper = document.createElement('div');
-      wrapper.className = 'img-wrapper';
-      wrapper.id = uid;
-      wrapper.innerHTML = `
-        <img src="${ev.target.result}" alt="Ilustración" />
-        <div class="img-actions">
-          <button class="img-act-btn" onclick="removeImg('${uid}')" title="Quitar imagen"><i class="ti ti-trash" style="font-size:13px"></i></button>
-        </div>
-        <input class="img-caption" type="text" placeholder="Pie de imagen…" />
-      `;
-      placeholder.parentNode.insertBefore(wrapper, placeholder);
-      imgCount++;
-      document.getElementById('imgCount').textContent = imgCount;
-      showToast('Imagen insertada');
-    };
-    reader.readAsDataURL(file);
-    e.target.value = '';
-  }
-
-  function removeImg(id) {
-    const el = document.getElementById(id);
-    if (el) { el.remove(); imgCount = Math.max(0, imgCount - 1); document.getElementById('imgCount').textContent = imgCount; showToast('Imagen eliminada'); }
-  }
-
-  function addSeparator() {
-    const editor = document.getElementById('mainEditor');
-    editor.focus();
-    document.execCommand('insertHorizontalRule');
-  }
-
-  /* ── SNAPSHOT ── */
-  function saveSnapshot() {
-    snapCount++;
-    const now = new Date();
-    const label = document.getElementById('chapterTitle').value;
-    const container = document.getElementById('snapsContainer');
-    const item = document.createElement('div');
-    item.className = 'snap-item';
-    item.innerHTML = `<div class="snap-date">${now.toLocaleTimeString('es-ES', {hour:'2-digit', minute:'2-digit'})}</div>
-      <div class="snap-label">Versión ${snapCount + 1} — ${label}</div>`;
-    container.insertBefore(item, container.firstChild);
-    switchNote('snaps', document.querySelectorAll('.ntab')[2]);
-    showToast('Snapshot guardado');
-  }
-
-  /* ── NOTES PANEL ── */
-  function switchNote(tab, el) {
-    document.querySelectorAll('.ntab').forEach(t => t.classList.remove('active'));
-    el.classList.add('active');
-    ['meta','notes','snaps'].forEach(id => {
-      document.getElementById('tab-' + id).style.display = id === tab ? 'block' : 'none';
-    });
-  }
-
-  function toggleNotesPanel() {
-    const panel = document.querySelector('.notes-panel');
-    isNotesPanelHidden = !isNotesPanelHidden;
-    panel.style.display = isNotesPanelHidden ? 'none' : 'flex';
-  }
-
-  /* ── FOCUS MODE ── */
-  function toggleFocus() {
-    isFocusMode = !isFocusMode;
-    const app = document.getElementById('app');
-    const btn = document.getElementById('focusBtn');
-    app.classList.toggle('focus-mode', isFocusMode);
-    btn.classList.toggle('on', isFocusMode);
-    document.getElementById('modePill').textContent = isFocusMode ? 'Foco' : 'Escritura';
-    showToast(isFocusMode ? 'Modo foco activado (Esc para salir)' : 'Modo foco desactivado');
-  }
-
-  document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape' && isFocusMode) toggleFocus();
+/* ── NOTES ── */
+function switchNote(tab,el){
+  document.querySelectorAll('.ntab').forEach(t=>t.classList.remove('active'));
+  el.classList.add('active');
+  ['meta','sinopsis','notas','snaps','objetivo'].forEach(id=>{
+    const el=document.getElementById('tab-'+id);if(el)el.style.display=id===tab?'block':'none';
   });
+}
 
-  /* ── COMPILE / EXPORT ── */
-  function compileProject() {
-    showToast('Preparando compilación…');
+/* ── PANELS ── */
+function toggleBinder(){const b=document.getElementById('binder');b.classList.toggle('collapsed')}
+function toggleNotes(){const n=document.getElementById('notesPanel');n.classList.toggle('collapsed')}
+function toggleMiddle(){const m=document.getElementById('middlePanel');m.classList.toggle('collapsed')}
+function toggleNotepad(){document.getElementById('notepadPanel').classList.toggle('open')}
+
+/* ── COMPOSE MODE ── */
+function openCompose(){
+  const ed=document.getElementById('mainEditor');
+  document.getElementById('composeEditor').innerHTML=ed.innerHTML;
+  document.getElementById('composeMode').classList.add('open');
+  document.getElementById('modePill').textContent='Foco';
+  document.getElementById('composeEditor').focus();
+}
+function closeCompose(){
+  const ced=document.getElementById('composeEditor');
+  document.getElementById('mainEditor').innerHTML=ced.innerHTML;
+  document.getElementById('composeMode').classList.remove('open');
+  document.getElementById('modePill').textContent='Escritura';
+  onEditorInput();
+}
+function onComposeInput(){
+  const text=document.getElementById('composeEditor').innerText||'';
+  const words=text.trim()?text.trim().split(/\s+/).length:0;
+  const diff=Math.max(0,words-startWords);
+  document.getElementById('composeWC').textContent=words;
+  document.getElementById('composeSesWC').textContent='+'+diff;
+}
+document.addEventListener('keydown',e=>{
+  if(e.key==='Escape'&&document.getElementById('composeMode').classList.contains('open'))closeCompose();
+  if((e.ctrlKey||e.metaKey)&&e.key==='s'){e.preventDefault();saveSnapshot();}
+});
+
+/* ── MODAL ── */
+function openModal(id){document.getElementById('modal-'+id).classList.add('open')}
+function closeModal(id){document.getElementById('modal-'+id).classList.remove('open')}
+document.querySelectorAll('.modal-overlay').forEach(m=>m.addEventListener('click',e=>{if(e.target===m)m.classList.remove('open')}));
+
+/* ── COMPILAR ── */
+function compilar(format){
+  const title=document.getElementById('projectName').textContent;
+  const content=document.getElementById('mainEditor').innerText;
+  const chTitle=document.getElementById('chapterTitle').value;
+  let blob,filename;
+  if(format==='txt'){
+    blob=new Blob([`${title}\n${'═'.repeat(40)}\n\n${chTitle}\n${'-'.repeat(chTitle.length)}\n\n${content}`],{type:'text/plain'});
+    filename=title.replace(/[^\w\s]/g,'')+'.txt';
+  }else if(format==='md'){
+    blob=new Blob([`# ${title}\n\n## ${chTitle}\n\n${content}`],{type:'text/markdown'});
+    filename=title.replace(/[^\w\s]/g,'')+'.md';
+  }else if(format==='html'){
+    blob=new Blob([`<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8"><title>${title}</title><style>body{font-family:'Georgia',serif;max-width:680px;margin:60px auto;line-height:1.85;color:#1a1208}h1{font-size:28px;margin-bottom:8px}h2{font-size:20px;margin:2em 0 0.5em}img{max-width:100%;border-radius:6px;margin:20px 0}</style></head><body><h1>${title}</h1><h2>${chTitle}</h2><div>${document.getElementById('mainEditor').innerHTML}</div></body></html>`],{type:'text/html'});
+    filename=title.replace(/[^\w\s]/g,'')+'.html';
+  }else if(format==='json'){
+    const data={proyecto:title,capitulo:chTitle,contenido:content,palabras:parseInt(document.getElementById('wc2').textContent),fecha:new Date().toISOString()};
+    blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
+    filename=title.replace(/[^\w\s]/g,'')+'.json';
   }
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=filename;a.click();
+  closeModal('compilar');showToast('Proyecto compilado como '+format.toUpperCase());
+}
 
-  function exportText() {
-    const title = document.getElementById('chapterTitle').value;
-    const content = document.getElementById('mainEditor').innerText;
-    const blob = new Blob([`${title}\n${'─'.repeat(title.length)}\n\n${content}`], {type: 'text/plain'});
-    const a = document.createElement('a');
-    a.href = URL.createObjectURL(blob);
-    a.download = title.replace(/[^a-zA-ZáéíóúñÁÉÍÓÚÑ0-9 ]/g, '') + '.txt';
-    a.click();
-    showToast('Texto exportado');
-  }
-
-  function updateStatus(val) { /* para expansión futura */ }
+/* ── INIT ── */
+updateObjetivo();updateSesion();
 </script>
 </body>
 </html>
