@@ -11,8 +11,8 @@
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
-  --binder-bg:#1a1208;--binder-border:#7a5230;--gold:#c9a96e;--gold-dim:rgba(201,169,110,0.4);
-  --binder-text:#e8d8b8;--cork:#e8d8c0;
+  --bb:#1a1208;--bb-border:#7a5230;--gold:#c9a96e;--gold-dim:rgba(201,169,110,0.4);
+  --bt:#e8d8b8;--cork:#e8d8c0;
   --s0:#ffffff;--s1:#f8f5f0;--s2:#f0ebe3;
   --bd:rgba(0,0,0,0.09);--bd2:rgba(0,0,0,0.16);
   --tx:#1a1208;--tx2:#5a4a38;--txm:#9a8a78;
@@ -23,15 +23,49 @@
 }
 html,body{height:100%;overflow:hidden;font-family:'Inter',sans-serif;background:var(--s1);color:var(--tx)}
 
-/* ── LAYOUT ── */
+/* ── PANTALLA DE PROYECTOS ── */
+#projectsScreen{position:fixed;inset:0;background:var(--bb);z-index:500;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;padding:60px 24px 40px;overflow-y:auto}
+#projectsScreen.hidden{display:none}
+.ps-logo{font-family:'Playfair Display',serif;font-size:32px;color:var(--gold);font-weight:600;margin-bottom:8px;text-align:center}
+.ps-sub{font-size:14px;color:var(--gold-dim);margin-bottom:48px;text-align:center}
+.ps-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:16px;width:100%;max-width:900px}
+.ps-card{background:rgba(201,169,110,0.08);border:1px solid rgba(201,169,110,0.2);border-radius:10px;padding:20px;cursor:pointer;transition:all .15s;position:relative}
+.ps-card:hover{background:rgba(201,169,110,0.15);border-color:rgba(201,169,110,0.4);transform:translateY(-2px)}
+.ps-card.new-card{border-style:dashed;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;min-height:130px}
+.ps-card.new-card i{font-size:28px;color:var(--gold-dim)}
+.ps-card.new-card span{font-size:13px;color:var(--gold-dim)}
+.ps-card.new-card:hover i,.ps-card.new-card:hover span{color:var(--gold)}
+.ps-card-title{font-family:'Playfair Display',serif;font-size:16px;color:var(--gold);font-weight:600;margin-bottom:6px}
+.ps-card-desc{font-size:12px;color:var(--gold-dim);line-height:1.5;margin-bottom:10px}
+.ps-card-meta{font-size:11px;color:rgba(201,169,110,0.35);display:flex;gap:10px}
+.ps-card-del{position:absolute;top:10px;right:10px;background:none;border:none;cursor:pointer;color:rgba(201,169,110,0.3);font-size:16px;padding:2px;transition:color .12s}
+.ps-card-del:hover{color:#c0392b}
+.ps-new-form{width:100%;max-width:400px;margin-top:40px;background:rgba(201,169,110,0.06);border:1px solid rgba(201,169,110,0.2);border-radius:10px;padding:24px;display:none}
+.ps-new-form.visible{display:block}
+.ps-new-form h3{font-family:'Playfair Display',serif;color:var(--gold);font-size:18px;margin-bottom:16px}
+.ps-input{width:100%;padding:9px 12px;background:rgba(255,255,255,0.05);border:1px solid rgba(201,169,110,0.3);border-radius:var(--r);color:var(--bt);font-size:14px;font-family:'Inter',sans-serif;outline:none;margin-bottom:10px}
+.ps-input:focus{border-color:var(--gold)}
+.ps-input::placeholder{color:var(--gold-dim)}
+.ps-btn-row{display:flex;gap:8px;margin-top:4px}
+.ps-btn{padding:8px 16px;border-radius:var(--r);font-size:13px;font-family:'Inter',sans-serif;cursor:pointer;font-weight:500;border:none}
+.ps-btn-ok{background:var(--gr);color:#fff}
+.ps-btn-ok:hover{background:var(--gr-dark)}
+.ps-btn-cancel{background:transparent;color:var(--gold-dim);border:1px solid rgba(201,169,110,0.2)}
+.ps-btn-cancel:hover{color:var(--gold)}
+.ps-loading{color:var(--gold-dim);font-size:14px;text-align:center;margin-top:20px}
+
+/* ── APP ── */
 .app{display:flex;height:100vh;overflow:hidden}
 
 /* ── BINDER ── */
-.binder{width:230px;min-width:230px;background:var(--binder-bg);display:flex;flex-direction:column;border-right:3px solid var(--binder-border);flex-shrink:0;position:relative}
-.binder-spine{position:absolute;left:0;top:0;bottom:0;width:7px;background:repeating-linear-gradient(180deg,var(--binder-border) 0,#5c3a1e 2px,#2e1a0a 4px,var(--binder-border) 6px);opacity:.5;pointer-events:none}
-.binder-head{padding:16px 12px 12px 22px;border-bottom:1px solid rgba(139,94,60,.3)}
-.binder-project{font-family:'Playfair Display',serif;font-size:14px;color:var(--gold);letter-spacing:.04em;font-weight:600;background:transparent;border:none;outline:none;width:100%}
-.binder-sub{font-size:11px;color:var(--gold-dim);margin-top:3px}
+.binder{width:230px;min-width:230px;background:var(--bb);display:flex;flex-direction:column;border-right:3px solid var(--bb-border);flex-shrink:0;position:relative}
+.binder-spine{position:absolute;left:0;top:0;bottom:0;width:7px;background:repeating-linear-gradient(180deg,var(--bb-border) 0,#5c3a1e 2px,#2e1a0a 4px,var(--bb-border) 6px);opacity:.5;pointer-events:none}
+.binder-head{padding:14px 12px 10px 22px;border-bottom:1px solid rgba(139,94,60,.3);flex-shrink:0}
+.binder-project{font-family:'Playfair Display',serif;font-size:14px;color:var(--gold);letter-spacing:.04em;font-weight:600;background:transparent;border:none;outline:none;width:100%;cursor:text}
+.binder-project:focus{border-bottom:1px solid var(--gold-dim)}
+.binder-sub{font-size:10px;color:var(--gold-dim);margin-top:2px}
+.back-btn{display:flex;align-items:center;gap:5px;font-size:11px;color:rgba(201,169,110,0.5);cursor:pointer;margin-top:6px;background:none;border:none;font-family:'Inter',sans-serif;padding:0;transition:color .12s}
+.back-btn:hover{color:var(--gold)}
 .binder-body{flex:1;overflow-y:auto;padding:6px 0}
 .binder-body::-webkit-scrollbar{width:3px}
 .binder-body::-webkit-scrollbar-thumb{background:rgba(201,169,110,.15);border-radius:2px}
@@ -40,7 +74,7 @@ html,body{height:100%;overflow:hidden;font-family:'Inter',sans-serif;background:
 .bitem:hover{background:rgba(201,169,110,.07)}
 .bitem.active{background:rgba(201,169,110,.13);border-left-color:var(--gold)}
 .bitem i{font-size:13px;color:var(--gold);opacity:.8;flex-shrink:0}
-.bitem .bl{font-size:13px;color:var(--binder-text);flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bitem .bl{font-size:13px;color:var(--bt);flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .bitem .bb{font-size:10px;background:rgba(201,169,110,.15);color:var(--gold);padding:1px 5px;border-radius:8px;flex-shrink:0}
 .bitem.sub{padding-left:34px}
 .bitem.sub .bl{font-size:12px}
@@ -66,9 +100,7 @@ html,body{height:100%;overflow:hidden;font-family:'Inter',sans-serif;background:
 .ccard .ct{font-family:'Playfair Display',serif;font-size:13px;font-weight:600;color:#2a1a0a;margin-bottom:4px}
 .ccard .cs{font-size:11px;color:#7a6a58;line-height:1.5}
 .ccard .cst{display:inline-block;font-size:10px;padding:2px 7px;border-radius:8px;margin-top:6px}
-.st-b{background:#fde8cc;color:#7a4a18}
-.st-r{background:var(--gr-bg);color:var(--gr)}
-.st-f{background:var(--ac-bg);color:var(--ac)}
+.st-b{background:#fde8cc;color:#7a4a18}.st-r{background:var(--gr-bg);color:var(--gr)}.st-f{background:var(--ac-bg);color:var(--ac)}
 .outline{flex:1;overflow-y:auto;display:none}
 .oitem{padding:8px 10px 8px 12px;display:flex;align-items:center;gap:6px;cursor:pointer;font-size:12px;color:var(--tx);border-bottom:1px solid var(--bd);transition:background .1s}
 .oitem:hover{background:var(--s2)}
@@ -83,7 +115,7 @@ html,body{height:100%;overflow:hidden;font-family:'Inter',sans-serif;background:
 .ssec-title:hover{background:var(--ac-bg);color:var(--ac)}
 .ssec-body{padding:12px;font-family:'Lora',serif;font-size:13px;line-height:1.8;color:var(--tx)}
 
-/* ── MAIN AREA ── */
+/* ── MAIN ── */
 .main{flex:1;display:flex;flex-direction:column;overflow:hidden;background:var(--s0)}
 .toolbar{padding:6px 14px;border-bottom:1px solid var(--bd);display:flex;align-items:center;gap:3px;background:var(--s1);flex-wrap:wrap;flex-shrink:0}
 .tg{display:flex;gap:1px}
@@ -92,8 +124,6 @@ html,body{height:100%;overflow:hidden;font-family:'Inter',sans-serif;background:
 .tbtn:hover{background:var(--s2);color:var(--tx)}
 .tbtn.on{background:var(--ac-bg);color:var(--ac)}
 .tbtn i{font-size:15px}
-
-/* ── PANEL DE CONTENIDO (contiene todo lo que cambia) ── */
 .content-area{flex:1;display:flex;overflow:hidden;position:relative}
 
 /* ── EDITOR VIEW ── */
@@ -129,33 +159,31 @@ html,body{height:100%;overflow:hidden;font-family:'Inter',sans-serif;background:
 .img-cap:focus{border-bottom-color:var(--bd2)}
 input[type="file"]{display:none}
 
-/* ── ALT VIEW (personajes, refs, brainstorm) ── */
+/* ── ALT VIEWS ── */
 .alt-view{flex:1;overflow-y:auto;padding:24px;background:var(--s0);display:none;flex-direction:column;gap:16px}
 .alt-view.visible{display:flex}
 .av-title{font-family:'Playfair Display',serif;font-size:22px;font-weight:600;color:var(--tx);padding-bottom:10px;border-bottom:2px solid var(--ac-bd)}
 .av-sub{font-size:12px;color:var(--txm);margin-top:-8px}
-
-/* Personaje card */
-.pj-card{background:var(--s1);border:1px solid var(--bd);border-radius:8px;overflow:hidden}
+.pj-card{background:var(--s1);border:1px solid var(--bd);border-radius:8px;overflow:hidden;margin-bottom:12px}
 .pj-head{padding:10px 14px;background:var(--s2);border-bottom:1px solid var(--bd);display:flex;align-items:center;gap:8px}
-.pj-av{width:34px;height:34px;border-radius:50%;background:var(--gold);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;color:var(--binder-bg);flex-shrink:0}
+.pj-av{width:34px;height:34px;border-radius:50%;background:var(--gold);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;color:var(--bb);flex-shrink:0}
 .pj-name{font-size:13px;font-weight:500;color:var(--tx);flex:1}
+.pj-del{background:none;border:none;cursor:pointer;color:var(--txm);font-size:15px;padding:0;transition:color .12s}
+.pj-del:hover{color:#c0392b}
 .pj-body{padding:14px;display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .pj-campo label{display:block;font-size:10px;color:var(--txm);margin-bottom:3px;text-transform:uppercase;letter-spacing:.05em}
 .pj-campo input,.pj-campo textarea{width:100%;border:1px solid var(--bd2);border-radius:4px;padding:5px 7px;font-size:12px;font-family:'Inter',sans-serif;color:var(--tx);background:var(--s0);outline:none;transition:border-color .12s}
 .pj-campo textarea{resize:vertical;min-height:52px;line-height:1.5}
 .pj-campo input:focus,.pj-campo textarea:focus{border-color:var(--ac-bd)}
 .pj-campo.full{grid-column:1/-1}
-.add-pj-btn{padding:12px;border:1.5px dashed var(--bd2);border-radius:8px;background:transparent;cursor:pointer;font-size:13px;color:var(--txm);font-family:'Inter',sans-serif;display:flex;align-items:center;justify-content:center;gap:6px;transition:all .12s}
+.add-pj-btn{padding:12px;border:1.5px dashed var(--bd2);border-radius:8px;background:transparent;cursor:pointer;font-size:13px;color:var(--txm);font-family:'Inter',sans-serif;display:flex;align-items:center;justify-content:center;gap:6px;transition:all .12s;width:100%}
 .add-pj-btn:hover{border-color:var(--ac-bd);color:var(--ac);background:var(--ac-bg)}
-
-/* Ref card */
-.ref-card{background:var(--s1);border:1px solid var(--bd);border-radius:8px;padding:14px}
+.ref-card{background:var(--s1);border:1px solid var(--bd);border-radius:8px;padding:14px;margin-bottom:12px}
 .ref-title{font-size:13px;font-weight:500;color:var(--tx);margin-bottom:8px;display:flex;align-items:center;gap:6px}
+.ref-del{margin-left:auto;background:none;border:none;cursor:pointer;color:var(--txm);font-size:14px;padding:0;transition:color .12s}
+.ref-del:hover{color:#c0392b}
 .ref-card textarea{width:100%;resize:none;min-height:80px;border:1px solid var(--bd2);border-radius:4px;padding:7px 9px;font-size:12px;font-family:'Lora',serif;color:var(--tx);background:var(--s0);outline:none;line-height:1.65}
 .ref-card textarea:focus{border-color:var(--ac-bd)}
-
-/* Brainstorm */
 .storm-bg{background:var(--cork);padding:16px;border-radius:8px;min-height:260px;display:grid;grid-template-columns:repeat(auto-fill,minmax(155px,1fr));gap:12px;align-content:start}
 .storm-card{background:#fffdf6;border-radius:3px;padding:10px;border-top:3px solid var(--gold);box-shadow:0 2px 6px rgba(0,0,0,.1);position:relative}
 .storm-card textarea{width:100%;border:none;background:transparent;resize:none;font-size:12px;font-family:'Lora',serif;color:#2a1a0a;line-height:1.6;outline:none;min-height:72px}
@@ -163,11 +191,12 @@ input[type="file"]{display:none}
 .add-storm{background:rgba(201,169,110,.1);border:1.5px dashed rgba(201,169,110,.4);border-radius:6px;display:flex;align-items:center;justify-content:center;gap:6px;color:rgba(201,169,110,.7);font-size:12px;font-family:'Inter',sans-serif;cursor:pointer;padding:20px;transition:all .12s;min-height:96px}
 .add-storm:hover{background:rgba(201,169,110,.18);color:var(--gold)}
 
-/* ── STATUS BAR ── */
+/* ── STATUS ── */
 .status-bar{padding:5px 18px;background:var(--s1);border-top:1px solid var(--bd);display:flex;align-items:center;gap:12px;font-size:11px;color:var(--txm);flex-shrink:0}
 .mode-pill{padding:2px 8px;border-radius:10px;font-size:10px;font-weight:500}
 .pill-write{background:var(--ok-bg);color:var(--ok)}
 .pill-ref{background:var(--ac-bg);color:var(--ac)}
+.pill-sync{background:#fde8cc;color:#7a4a18}
 .saved-ok{display:flex;align-items:center;gap:3px;margin-left:auto}
 .saved-ok i{font-size:12px;color:var(--ok)}
 
@@ -190,8 +219,7 @@ input[type="file"]{display:none}
 .ntarea{width:100%;resize:none;font-size:12px;line-height:1.65;color:var(--tx);background:var(--s0);border:1px solid var(--bd2);border-radius:var(--r);padding:7px 9px;outline:none;font-family:'Inter',sans-serif;margin:7px 0;transition:border-color .12s}
 .ntarea:focus{border-color:var(--ac-bd)}
 .slabel{font-size:11px;color:var(--txm);margin:10px 0 4px}
-.snap-item{padding:8px 9px;background:var(--s0);border-radius:var(--r);border:1px solid var(--bd);margin-bottom:6px;cursor:pointer;transition:border-color .12s}
-.snap-item:hover{border-color:var(--bd2)}
+.snap-item{padding:8px 9px;background:var(--s0);border-radius:var(--r);border:1px solid var(--bd);margin-bottom:6px}
 .snap-date{font-size:10px;color:var(--txm)}
 .snap-lbl{font-size:12px;color:var(--tx);margin-top:2px;font-weight:500}
 .prog-wrap{margin-top:10px;padding:9px;background:var(--s0);border-radius:var(--r);border:1px solid var(--bd)}
@@ -204,12 +232,12 @@ input[type="file"]{display:none}
 .obj-fill{height:100%;background:var(--gold);border-radius:6px;transition:width .3s}
 .obj-row{display:flex;gap:6px;margin-top:8px}
 .obj-input{flex:1;padding:4px 6px;border:1px solid rgba(201,169,110,.4);border-radius:4px;font-size:11px;background:var(--s0);font-family:'Inter',sans-serif;color:var(--tx);outline:none}
-.obj-btn{padding:4px 8px;background:var(--gold);color:var(--binder-bg);border:none;border-radius:4px;font-size:11px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif}
+.obj-btn{padding:4px 8px;background:var(--gold);color:var(--bb);border:none;border-radius:4px;font-size:11px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif}
 .insp-footer{padding:8px 12px;background:var(--s0);border-top:1px solid var(--bd);display:flex;justify-content:space-between;align-items:center;flex-shrink:0}
 .insp-footer-label{font-size:11px;color:var(--txm)}
 .insp-footer-val{font-size:12px;color:var(--tx);font-weight:500}
 
-/* ── MODO COMPOSICIÓN ── */
+/* ── COMPOSE ── */
 .compose{position:fixed;inset:0;background:#1a1a18;z-index:200;display:none;flex-direction:column;align-items:center;overflow-y:auto}
 .compose.open{display:flex}
 .compose-inner{width:100%;max-width:680px;padding:60px 40px;flex:1}
@@ -219,7 +247,7 @@ input[type="file"]{display:none}
 .compose-bar{position:fixed;bottom:0;left:0;right:0;padding:10px 24px;background:rgba(26,26,24,.92);display:flex;align-items:center;gap:16px;font-size:12px;color:rgba(200,190,170,.5);border-top:1px solid rgba(255,255,255,.07)}
 .compose-bar .wc{color:rgba(200,190,170,.7)}
 .compose-exit{margin-left:auto;padding:5px 12px;border:1px solid rgba(255,255,255,.15);border-radius:var(--r);background:transparent;color:rgba(200,190,170,.6);cursor:pointer;font-size:12px;font-family:'Inter',sans-serif}
-.compose-exit:hover{color:#e8e0d0;border-color:rgba(255,255,255,.3)}
+.compose-exit:hover{color:#e8e0d0}
 
 /* ── MODAL ── */
 .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.45);display:none;align-items:center;justify-content:center;z-index:100}
@@ -243,33 +271,50 @@ input[type="file"]{display:none}
 .notepad-area{width:100%;height:160px;resize:none;border:none;outline:none;font-size:13px;font-family:'Lora',serif;line-height:1.65;color:var(--tx);background:transparent;padding:10px}
 
 /* ── TOAST ── */
-.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(50px);background:#1a1208;color:#e8d8b8;padding:8px 16px;border-radius:20px;font-size:12px;font-family:'Inter',sans-serif;pointer-events:none;opacity:0;transition:opacity .2s,transform .2s;z-index:500;white-space:nowrap}
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(50px);background:#1a1208;color:#e8d8b8;padding:8px 16px;border-radius:20px;font-size:12px;pointer-events:none;opacity:0;transition:opacity .2s,transform .2s;z-index:600;white-space:nowrap}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 </style>
 </head>
 <body>
+
+<!-- ══ PANTALLA DE PROYECTOS ══ -->
+<div id="projectsScreen">
+  <div class="ps-logo">Editor de cuentos ilustrados</div>
+  <div class="ps-sub">Selecciona un proyecto o crea uno nuevo</div>
+  <div class="ps-grid" id="psGrid">
+    <div class="ps-loading" id="psLoading">Cargando proyectos…</div>
+  </div>
+  <div class="ps-new-form" id="psNewForm">
+    <h3>Nuevo proyecto</h3>
+    <input class="ps-input" id="psNewName" placeholder="Título del proyecto" maxlength="60"/>
+    <input class="ps-input" id="psNewDesc" placeholder="Descripción breve (opcional)" maxlength="120"/>
+    <div class="ps-btn-row">
+      <button class="ps-btn ps-btn-ok" onclick="createProject()">Crear proyecto</button>
+      <button class="ps-btn ps-btn-cancel" onclick="hideNewForm()">Cancelar</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ APP ══ -->
 <div class="app">
 
-<!-- ══ BINDER ══ -->
+<!-- BINDER -->
 <div class="binder">
   <div class="binder-spine"></div>
   <div class="binder-head">
-    <div class="binder-project" contenteditable="true" spellcheck="false">Mi proyecto</div>
+    <input class="binder-project" id="binderProjectName" value="Mi proyecto" onchange="saveProjectMeta()"/>
     <div class="binder-sub">Cuentos ilustrados</div>
+    <button class="back-btn" onclick="goToProjects()"><i class="ti ti-arrow-left" style="font-size:11px"></i> Mis proyectos</button>
   </div>
-  <div class="binder-body">
+  <div class="binder-body" id="binderBody">
     <div class="bsec">Manuscrito</div>
-    <div class="bitem active" id="b-root" onclick="nav(this,'root')"><i class="ti ti-book"></i><span class="bl">El bosque encantado</span></div>
-    <div class="bitem sub" id="b-cap1" onclick="nav(this,'cap1')"><i class="ti ti-file-text" style="font-size:12px"></i><span class="bl">Cap. 1 — La llegada</span><span class="bb" id="bb-cap1">47</span></div>
-    <div class="bitem sub" id="b-cap2" onclick="nav(this,'cap2')"><i class="ti ti-file-text" style="font-size:12px"></i><span class="bl">Cap. 2 — La criatura</span><span class="bb" id="bb-cap2">23</span></div>
-    <div class="bitem sub" id="b-cap3" onclick="nav(this,'cap3')"><i class="ti ti-file-text" style="font-size:12px"></i><span class="bl">Cap. 3 — El regreso</span><span class="bb" id="bb-cap3">0</span></div>
+    <div id="chaptersInBinder"></div>
     <button class="badd" onclick="addChapter()"><i class="ti ti-plus" style="font-size:12px"></i> Añadir capítulo</button>
     <div class="bdiv"></div>
     <div class="bsec">Personajes</div>
     <div class="bitem" id="b-personajes" onclick="nav(this,'personajes')"><i class="ti ti-users"></i><span class="bl">Fichas de personajes</span></div>
-    <div class="bitem sub" id="b-lia" onclick="nav(this,'lia')"><i class="ti ti-user" style="font-size:12px"></i><span class="bl">Lía — protagonista</span></div>
-    <div class="bitem sub" id="b-guardian" onclick="nav(this,'guardian')"><i class="ti ti-ghost" style="font-size:12px"></i><span class="bl">El guardián</span></div>
-    <button class="badd" onclick="addPersonaje()"><i class="ti ti-plus" style="font-size:12px"></i> Añadir personaje</button>
+    <div id="charactersInBinder"></div>
+    <button class="badd" onclick="addCharacter()"><i class="ti ti-plus" style="font-size:12px"></i> Añadir personaje</button>
     <div class="bdiv"></div>
     <div class="bsec">Investigación</div>
     <div class="bitem" id="b-refs" onclick="nav(this,'refs')"><i class="ti ti-palette"></i><span class="bl">Referencias visuales</span></div>
@@ -280,39 +325,19 @@ input[type="file"]{display:none}
   <button class="compile-btn" onclick="openModal()"><i class="ti ti-package-export"></i> Compilar proyecto</button>
 </div>
 
-<!-- ══ MIDDLE ══ -->
+<!-- MIDDLE -->
 <div class="mid">
   <div class="ptabs">
     <div class="ptab active" onclick="switchMid('cork',this)">Corcho</div>
     <div class="ptab" onclick="switchMid('outline',this)">Esquema</div>
     <div class="ptab" onclick="switchMid('scriv',this)">Todo</div>
   </div>
-  <div class="cork" id="cork">
-    <div class="ccard active" id="cc-cap1" onclick="nav(document.getElementById('b-cap1'),'cap1')">
-      <div class="cpin"></div><div class="ct">La llegada</div>
-      <div class="cs">Lía llega al bosque con su linterna. Algo la llama desde adentro.</div>
-      <div class="cst st-r">En revisión</div>
-    </div>
-    <div class="ccard" id="cc-cap2" onclick="nav(document.getElementById('b-cap2'),'cap2')">
-      <div class="cpin" style="background:#3D6B5E"></div><div class="ct">La criatura</div>
-      <div class="cs">Descubre al guardián: un ser hecho de musgo y luciérnagas.</div>
-      <div class="cst st-b">Borrador</div>
-    </div>
-    <div class="ccard" id="cc-cap3" onclick="nav(document.getElementById('b-cap3'),'cap3')">
-      <div class="cpin" style="background:#9a9a9a"></div><div class="ct">El regreso</div>
-      <div class="cs">Sin escribir aún.</div>
-      <div class="cst st-b">Borrador</div>
-    </div>
-  </div>
-  <div class="outline" id="outline">
-    <div class="oitem active" onclick="nav(document.getElementById('b-cap1'),'cap1')"><i class="ti ti-file-text"></i><span>La llegada</span><span class="os st-r">Rev.</span><span class="ow">47p</span></div>
-    <div class="oitem" onclick="nav(document.getElementById('b-cap2'),'cap2')"><i class="ti ti-file-text"></i><span>La criatura</span><span class="os st-b">Bor.</span><span class="ow">23p</span></div>
-    <div class="oitem" onclick="nav(document.getElementById('b-cap3'),'cap3')"><i class="ti ti-file-text"></i><span>El regreso</span><span class="os st-b">Bor.</span><span class="ow">0p</span></div>
-  </div>
+  <div class="cork" id="cork"></div>
+  <div class="outline" id="outline"></div>
   <div class="scriv" id="scriv"></div>
 </div>
 
-<!-- ══ MAIN ══ -->
+<!-- MAIN -->
 <div class="main">
   <div class="toolbar">
     <div class="tg">
@@ -342,27 +367,15 @@ input[type="file"]{display:none}
   </div>
 
   <div class="content-area">
-
-    <!-- EDITOR VIEW -->
+    <!-- EDITOR -->
     <div class="editor-view" id="editorView">
       <div class="editor-title-bar">
-        <input type="text" class="chapter-title" id="chapterTitle" value="Cap. 1 — La llegada"/>
+        <input type="text" class="chapter-title" id="chapterTitle" value="" onchange="saveCurrentChTitle()"/>
       </div>
       <div class="editor-body">
         <div class="editor-scroll" id="scrollA">
           <div class="editor-content">
-            <div class="img-wrap" id="imgDemo">
-              <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='640' height='200' viewBox='0 0 640 200'%3E%3Crect width='640' height='200' fill='%23c0d8b8'/%3E%3Cellipse cx='100' cy='50' rx='75' ry='115' fill='%23386b44'/%3E%3Cellipse cx='220' cy='35' rx='85' ry='125' fill='%234a7c54'/%3E%3Cellipse cx='440' cy='45' rx='88' ry='118' fill='%23386b44'/%3E%3Cellipse cx='560' cy='55' rx='75' ry='110' fill='%234a7c54'/%3E%3Ccircle cx='320' cy='85' r='22' fill='%23f9e04a' opacity='.95'/%3E%3Ccircle cx='320' cy='85' r='14' fill='%23fdf3a0'/%3E%3Crect x='312' y='107' width='16' height='60' fill='%23b8763a'/%3E%3C/svg%3E" alt="El bosque de noche"/>
-              <div class="img-acts"><button class="img-act-btn" onclick="removeImg('imgDemo')"><i class="ti ti-trash" style="font-size:12px"></i></button></div>
-              <input class="img-cap" type="text" value="El bosque brillaba bajo la luna, como si los árboles respiraran luz."/>
-            </div>
-            <div id="mainEditor" contenteditable="true" class="texted" oninput="onInput()" spellcheck="true">
-              <p>Lía nunca había visto el bosque de noche. Su linterna parpadeaba como un corazón nervioso mientras los árboles cerraban el cielo sobre su cabeza.</p>
-              <p><br></p>
-              <p>—Aquí hay algo —susurró, aunque nadie la escuchaba.</p>
-              <p><br></p>
-              <p>Y entonces lo oyó: un sonido suave, como hojas que aprenden a hablar.</p>
-            </div>
+            <div id="mainEditor" contenteditable="true" class="texted" oninput="onInput()" spellcheck="true"></div>
             <div class="img-ph" id="imgPh" onclick="triggerImg()">
               <i class="ti ti-photo-plus"></i><span>Insertar ilustración aquí</span>
             </div>
@@ -371,10 +384,7 @@ input[type="file"]{display:none}
         </div>
         <div class="split-div" id="splitDiv" style="display:none"></div>
         <div class="editor-scroll-b" id="scrollB">
-          <div style="padding:16px;font-family:'Lora',serif;font-size:15px;line-height:1.8;color:var(--tx2)">
-            <p style="font-family:'Playfair Display',serif;font-size:16px;font-weight:600;color:var(--tx);margin-bottom:12px">Cap. 2 — La criatura</p>
-            <p>El guardián emergió entre los helechos. Era alto como tres hombres juntos, hecho de musgo y luciérnagas que parpadeaban en lugar de latidos.</p>
-          </div>
+          <div id="splitContent" style="padding:16px;font-family:'Lora',serif;font-size:15px;line-height:1.8;color:var(--tx2)"></div>
         </div>
       </div>
     </div>
@@ -383,124 +393,45 @@ input[type="file"]{display:none}
     <div class="alt-view" id="view-personajes">
       <div class="av-title">Fichas de personajes</div>
       <div class="av-sub">Boceto detallado de cada personaje del proyecto</div>
-      <div id="pj-container">
-        <div class="pj-card">
-          <div class="pj-head"><div class="pj-av">LÍ</div><span class="pj-name">Lía — protagonista</span></div>
-          <div class="pj-body">
-            <div class="pj-campo"><label>Nombre completo</label><input type="text" value="Lía Martínez"/></div>
-            <div class="pj-campo"><label>Edad</label><input type="text" value="9 años"/></div>
-            <div class="pj-campo"><label>Descripción física</label><textarea>Pelo rizado oscuro, ojos grandes color avellana. Siempre lleva su linterna amarilla.</textarea></div>
-            <div class="pj-campo"><label>Profesión / rol</label><input type="text" value="Protagonista, exploradora"/></div>
-            <div class="pj-campo"><label>Deseo principal</label><input type="text" value="Descubrir los secretos del bosque"/></div>
-            <div class="pj-campo"><label>Mayor miedo</label><input type="text" value="La oscuridad sin su linterna"/></div>
-            <div class="pj-campo full"><label>Notas</label><textarea>Su linterna es el símbolo central del relato. Representa valentía.</textarea></div>
-          </div>
-        </div>
-        <div class="pj-card" style="margin-top:12px">
-          <div class="pj-head"><div class="pj-av" style="background:var(--gr);color:#fff">GU</div><span class="pj-name">El guardián del bosque</span></div>
-          <div class="pj-body">
-            <div class="pj-campo"><label>Nombre completo</label><input type="text" value="El guardián (sin nombre)"/></div>
-            <div class="pj-campo"><label>Naturaleza</label><input type="text" value="Ser del bosque, hecho de musgo"/></div>
-            <div class="pj-campo"><label>Descripción física</label><textarea>Alto como tres hombres. Cuerpo de musgo y raíces. Luciérnagas como ojos.</textarea></div>
-            <div class="pj-campo"><label>Rol en la historia</label><input type="text" value="Antagonista / guía espiritual"/></div>
-            <div class="pj-campo"><label>Deseo principal</label><input type="text" value="Proteger el bosque de intrusos"/></div>
-            <div class="pj-campo"><label>Mayor miedo</label><input type="text" value="Que el bosque desaparezca"/></div>
-            <div class="pj-campo full"><label>Notas</label><textarea>¿Podría hablar en forma de poemas? ¿Conocía a la abuela de Lía?</textarea></div>
-          </div>
-        </div>
-      </div>
-      <button class="add-pj-btn" onclick="addPjCard()"><i class="ti ti-plus"></i> Añadir personaje</button>
+      <div id="pj-container"></div>
+      <button class="add-pj-btn" onclick="addCharacter()"><i class="ti ti-plus"></i> Añadir personaje</button>
     </div>
 
-    <!-- ALT: LÍA -->
-    <div class="alt-view" id="view-lia">
-      <div class="av-title">Lía — protagonista</div>
-      <div class="pj-card">
-        <div class="pj-body">
-          <div class="pj-campo"><label>Nombre completo</label><input type="text" value="Lía Martínez"/></div>
-          <div class="pj-campo"><label>Edad</label><input type="text" value="9 años"/></div>
-          <div class="pj-campo"><label>Descripción física</label><textarea>Pelo rizado oscuro, ojos grandes color avellana. Siempre lleva su linterna amarilla.</textarea></div>
-          <div class="pj-campo"><label>Deseo principal</label><textarea>Descubrir los secretos del bosque y ser valiente.</textarea></div>
-          <div class="pj-campo"><label>Mayor miedo</label><input type="text" value="La oscuridad sin su linterna"/></div>
-          <div class="pj-campo"><label>Primer amor</label><input type="text" value="La naturaleza y los libros de aventuras"/></div>
-          <div class="pj-campo full"><label>Historia personal</label><textarea style="min-height:80px">Lía creció escuchando historias del bosque que su abuela le contaba antes de dormir. Cuando la abuela murió, Lía sintió que el bosque la llamaba.</textarea></div>
-        </div>
-      </div>
-    </div>
-
-    <!-- ALT: GUARDIÁN -->
-    <div class="alt-view" id="view-guardian">
-      <div class="av-title">El guardián del bosque</div>
-      <div class="pj-card">
-        <div class="pj-body">
-          <div class="pj-campo full"><label>Descripción física</label><textarea>Alto como tres hombres juntos. Hecho de musgo, raíces y luciérnagas parpadeantes que hacen las veces de ojos.</textarea></div>
-          <div class="pj-campo"><label>Rol en la historia</label><input type="text" value="Antagonista / guía espiritual"/></div>
-          <div class="pj-campo"><label>Forma de hablar</label><input type="text" value="En poemas y acertijos"/></div>
-          <div class="pj-campo full"><label>Notas de desarrollo</label><textarea style="min-height:80px">¿Revelar al final que conocía a la abuela de Lía? Podría ser el guardián que ella invocó antes de morir para proteger a su nieta.</textarea></div>
-        </div>
-      </div>
-    </div>
-
-    <!-- ALT: REFERENCIAS VISUALES -->
+    <!-- ALT: REFERENCIAS -->
     <div class="alt-view" id="view-refs">
       <div class="av-title">Referencias visuales</div>
-      <div class="ref-card">
-        <div class="ref-title"><i class="ti ti-palette" style="font-size:15px;color:var(--gold)"></i> Paleta de color</div>
-        <textarea>Verdes oscuros profundos: #386b44, #1e4a2a
-Amarillo cálido de linterna: #f9e04a, #f5c842
-Marrones tierra: #8B5E3C, #5c3a1e
-Fondo nocturno: #1a1208</textarea>
-      </div>
-      <div class="ref-card">
-        <div class="ref-title"><i class="ti ti-brush" style="font-size:15px;color:var(--gold)"></i> Estilo de ilustración</div>
-        <textarea>Inspiración: ilustradores nórdicos años 70 (Tove Jansson, John Bauer).
-Líneas limpias, sombras suaves, atmósfera onírica.
-Formato: doble página para escenas clave, viñeta para momentos de acción.</textarea>
-      </div>
+      <div id="refs-container"></div>
+      <button class="add-pj-btn" onclick="addRef()"><i class="ti ti-plus"></i> Añadir referencia</button>
     </div>
 
-    <!-- ALT: NOTAS DE ESTILO -->
+    <!-- ALT: ESTILO -->
     <div class="alt-view" id="view-estilo">
       <div class="av-title">Notas de estilo</div>
-      <div class="ref-card">
-        <div class="ref-title"><i class="ti ti-pencil" style="font-size:15px;color:var(--gold)"></i> Voz narrativa</div>
-        <textarea style="min-height:100px">3ª persona cercana al PDV de Lía. El lector sabe solo lo que Lía sabe.
-Frases cortas en momentos de tensión. Más líricas en descripciones del bosque.</textarea>
-      </div>
-      <div class="ref-card">
-        <div class="ref-title"><i class="ti ti-vocabulary" style="font-size:15px;color:var(--gold)"></i> Vocabulario</div>
-        <textarea>Accesible para lectores de 7-10 años. Evitar tecnicismos.
-Permitidas: metáforas sencillas y comparaciones con la naturaleza.</textarea>
-      </div>
+      <div id="estilo-container"></div>
+      <button class="add-pj-btn" onclick="addEstilo()"><i class="ti ti-plus"></i> Añadir nota</button>
     </div>
 
-    <!-- ALT: BRAINSTORMING -->
+    <!-- ALT: BRAINSTORM -->
     <div class="alt-view" id="view-brainstorm">
       <div class="av-title">Brainstorming</div>
       <div class="storm-bg" id="stormGrid">
-        <div class="storm-card"><div class="storm-pin"></div><textarea>¿Y si el bosque es el recuerdo de la abuela de Lía?</textarea></div>
-        <div class="storm-card"><div class="storm-pin" style="background:#3D6B5E"></div><textarea>La linterna se apaga en el momento más peligroso.</textarea></div>
-        <div class="storm-card"><div class="storm-pin" style="background:#185FA5"></div><textarea>El guardián habla en acertijos que Lía debe resolver.</textarea></div>
-        <div class="storm-card"><div class="storm-pin" style="background:#8B5E3C"></div><textarea>Hay otros niños perdidos en el bosque.</textarea></div>
         <div class="add-storm" onclick="addStorm()"><i class="ti ti-plus" style="font-size:16px"></i> Nueva idea</div>
       </div>
     </div>
-
-  </div><!-- /content-area -->
+  </div>
 
   <div class="status-bar">
     <span class="mode-pill pill-write" id="modePill">Escritura</span>
-    <span id="sbWords">Palabras: <strong>47</strong></span>
+    <span id="sbWords">Palabras: <strong>0</strong></span>
     <span id="sbSesion">Sesión: <strong>+0</strong></span>
     <span class="saved-ok" id="savedOk">Guardado <i class="ti ti-check"></i></span>
   </div>
 </div>
 
-<!-- ══ INSPECTOR ══ -->
+<!-- INSPECTOR -->
 <div class="inspector">
   <div class="insp-head">
     <span class="insp-head-title">Inspector</span>
-    <i class="ti ti-x" style="font-size:14px;color:var(--txm);cursor:pointer" onclick="this.closest('.inspector').style.display='none'"></i>
   </div>
   <div class="ntabs">
     <div class="ntab active" onclick="switchNote('meta',this)">Info</div>
@@ -511,74 +442,73 @@ Permitidas: metáforas sencillas y comparaciones con la naturaleza.</textarea>
   </div>
   <div class="insp-scroll">
     <div id="tab-meta">
-      <div class="mrow"><span class="mlabel">Estado</span><select class="msel"><option>Borrador</option><option selected>En revisión</option><option>Final</option></select></div>
-      <div class="mrow"><span class="mlabel">Etiqueta</span><select class="msel"><option selected>Misterio</option><option>Acción</option><option>Emoción</option><option>Comedia</option></select></div>
-      <div class="mrow"><span class="mlabel">PDV</span><select class="msel"><option>1.ª persona</option><option selected>3.ª persona</option><option>2.ª persona</option></select></div>
-      <div class="mrow"><span class="mlabel">Palabras</span><span class="mval"><span id="wc2">47</span> / 400</span></div>
-      <div class="mrow"><span class="mlabel">Imágenes</span><span class="mval" id="imgCount">1</span></div>
-      <div class="mrow" style="border:none"><label style="font-size:11px;color:var(--txm);display:flex;align-items:center;gap:5px;cursor:pointer"><input type="checkbox" checked> Incluir en compilación</label></div>
+      <div class="mrow"><span class="mlabel">Estado</span><select class="msel" id="chStatus" onchange="saveChMeta()"><option>Borrador</option><option>En revisión</option><option>Final</option></select></div>
+      <div class="mrow"><span class="mlabel">Etiqueta</span><select class="msel" id="chLabel" onchange="saveChMeta()"><option>Misterio</option><option>Acción</option><option>Emoción</option><option>Comedia</option></select></div>
+      <div class="mrow"><span class="mlabel">PDV</span><select class="msel" id="chPdv" onchange="saveChMeta()"><option>1.ª persona</option><option>3.ª persona</option><option>2.ª persona</option></select></div>
+      <div class="mrow"><span class="mlabel">Palabras</span><span class="mval"><span id="wc2">0</span> / <span id="wcGoal">400</span></span></div>
+      <div class="mrow"><span class="mlabel">Imágenes</span><span class="mval" id="imgCount">0</span></div>
+      <div class="mrow" style="border:none"><label style="font-size:11px;color:var(--txm);display:flex;align-items:center;gap:5px;cursor:pointer"><input type="checkbox" id="chInclude" checked onchange="saveChMeta()"> Incluir en compilación</label></div>
       <div class="prog-wrap">
-        <div class="prog-head"><span>Progreso capítulo</span><span id="pctLabel">12%</span></div>
-        <div class="prog-track"><div class="prog-fill" id="progFill" style="width:12%"></div></div>
+        <div class="prog-head"><span>Progreso capítulo</span><span id="pctLabel">0%</span></div>
+        <div class="prog-track"><div class="prog-fill" id="progFill" style="width:0%"></div></div>
       </div>
     </div>
     <div id="tab-sinopsis" style="display:none">
       <div class="slabel">Sinopsis de la escena</div>
-      <textarea class="ntarea" style="min-height:100px">Lía llega al bosque con su linterna. Oye algo en la oscuridad que la llama.</textarea>
+      <textarea class="ntarea" id="chSinopsis" style="min-height:100px" onchange="saveChMeta()" placeholder="Resumen de la escena…"></textarea>
       <div class="slabel">Palabras clave</div>
-      <input type="text" class="ntarea" style="padding:5px 8px;min-height:auto" value="bosque, linterna, misterio, noche"/>
+      <input type="text" class="ntarea" id="chKeywords" style="padding:5px 8px;min-height:auto" onchange="saveChMeta()" placeholder="bosque, linterna, misterio…"/>
     </div>
     <div id="tab-notas" style="display:none">
       <div class="slabel">Notas del autor</div>
-      <textarea class="ntarea" style="min-height:100px">La linterna = símbolo del coraje de Lía.</textarea>
+      <textarea class="ntarea" id="chNotas" style="min-height:100px" onchange="saveChMeta()" placeholder="Notas, ideas, recordatorios…"></textarea>
       <div class="slabel">Pendientes</div>
-      <textarea class="ntarea" style="min-height:80px">☐ Revisar diálogos&#10;☐ Ilustración de la criatura&#10;☐ Corrección final</textarea>
+      <textarea class="ntarea" id="chTodos" style="min-height:80px" onchange="saveChMeta()" placeholder="☐ Revisar diálogos&#10;☐ Añadir ilustración"></textarea>
     </div>
     <div id="tab-snaps" style="display:none">
       <div class="slabel">Versiones guardadas</div>
-      <div class="snap-item"><div class="snap-date">Hoy, 10:42</div><div class="snap-lbl">Versión inicial</div></div>
       <div id="snapsContainer"></div>
       <div style="font-size:11px;color:var(--txm);margin-top:8px;text-align:center;line-height:1.5">Usa "Snap" en la barra para guardar la versión actual</div>
     </div>
     <div id="tab-obj" style="display:none">
       <div class="slabel">Objetivo del proyecto</div>
       <div class="obj-wrap">
-        <div class="obj-head"><span>Meta total</span><span id="objPct">1%</span></div>
-        <div class="obj-track"><div class="obj-fill" id="objFill" style="width:1%"></div></div>
-        <div class="obj-row"><input class="obj-input" type="number" id="objTarget" value="5000" min="1"/><button class="obj-btn" onclick="updateObj()">OK</button></div>
+        <div class="obj-head"><span>Meta total</span><span id="objPct">0%</span></div>
+        <div class="obj-track"><div class="obj-fill" id="objFill" style="width:0%"></div></div>
+        <div class="obj-row"><input class="obj-input" type="number" id="objTarget" value="5000" min="1" onchange="updateObj()"/><button class="obj-btn" onclick="updateObj()">OK</button></div>
       </div>
       <div class="slabel" style="margin-top:12px">Objetivo de sesión</div>
       <div class="obj-wrap">
         <div class="obj-head"><span>Esta sesión</span><span id="sesPct">0%</span></div>
         <div class="obj-track"><div class="obj-fill" id="sesFill" style="width:0%"></div></div>
-        <div class="obj-row"><input class="obj-input" type="number" id="sesTarget" value="500" min="1"/><button class="obj-btn" onclick="updateSes()">OK</button></div>
+        <div class="obj-row"><input class="obj-input" type="number" id="sesTarget" value="500" min="1" onchange="updateSes()"/><button class="obj-btn" onclick="updateSes()">OK</button></div>
       </div>
       <div class="slabel" style="margin-top:12px">Fecha límite</div>
-      <input type="date" class="ntarea" style="padding:5px 8px;min-height:auto"/>
+      <input type="date" class="ntarea" id="projDeadline" style="padding:5px 8px;min-height:auto" onchange="saveProjectMeta()"/>
     </div>
   </div>
   <div class="insp-footer">
     <span class="insp-footer-label">Total proyecto</span>
-    <span class="insp-footer-val"><span id="totalWC">70</span> palabras</span>
+    <span class="insp-footer-val"><span id="totalWC">0</span> palabras</span>
   </div>
 </div>
 
 </div><!-- /app -->
 
-<!-- ══ MODO COMPOSICIÓN ══ -->
+<!-- COMPOSE -->
 <div class="compose" id="compose">
   <div class="compose-inner">
-    <input type="text" class="compose-title" id="composeTitle" value="Cap. 1 — La llegada"/>
+    <input type="text" class="compose-title" id="composeTitle" value=""/>
     <div id="composeEd" contenteditable="true" class="compose-ed" oninput="onComposeInput()" spellcheck="true"></div>
   </div>
   <div class="compose-bar">
     <span class="wc">Palabras: <strong id="composeWC">0</strong></span>
-    <span style="color:rgba(200,190,170,.4)">Esc para salir · Ctrl+S para snapshot</span>
+    <span style="color:rgba(200,190,170,.4)">Esc para salir · Cmd+S para snapshot</span>
     <button class="compose-exit" onclick="closeCompose()"><i class="ti ti-arrows-minimize" style="font-size:13px"></i> Salir del foco</button>
   </div>
 </div>
 
-<!-- ══ MODAL COMPILAR ══ -->
+<!-- MODAL COMPILAR -->
 <div class="modal-overlay" id="modal">
   <div class="modal">
     <div class="modal-title">Compilar proyecto</div>
@@ -594,387 +524,816 @@ Permitidas: metáforas sencillas y comparaciones con la naturaleza.</textarea>
   </div>
 </div>
 
-<!-- ══ LIBRETA ══ -->
+<!-- LIBRETA -->
 <div class="notepad" id="notepad">
   <div class="notepad-head">
     <span class="notepad-title"><i class="ti ti-notebook" style="font-size:13px;margin-right:4px"></i>Libreta del proyecto</span>
     <button class="notepad-close" onclick="toggleNotepad()"><i class="ti ti-x"></i></button>
   </div>
-  <textarea class="notepad-area" placeholder="Ideas, notas sueltas del proyecto…">Idea cap. 4: Lía vuelve al bosque con su madre.
-El guardián podría hablar en poemas.</textarea>
+  <textarea class="notepad-area" id="notepadArea" placeholder="Ideas, notas sueltas del proyecto…" oninput="saveNotepad()"></textarea>
 </div>
 
 <div class="toast" id="toast"></div>
 
-<script>
-/* ════════════════════════════════════════
-   DATOS POR CAPÍTULO
-════════════════════════════════════════ */
-const chapters = {
-  cap1: { title:'Cap. 1 — La llegada', content:'', words:47, sesStart:47 },
-  cap2: { title:'Cap. 2 — La criatura', content:'<p>El guardián emergió entre los helechos. Era alto como tres hombres juntos, hecho de musgo y luciérnagas que parpadeaban en lugar de latidos.</p>', words:23, sesStart:23 },
-  cap3: { title:'Cap. 3 — El regreso', content:'', words:0, sesStart:0 },
+<!-- FIREBASE SDK -->
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getFirestore, collection, doc, addDoc, setDoc, getDoc, getDocs, deleteDoc, updateDoc, query, orderBy, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyAE1lXAUW5NoJozoiWetWN7ClrsNVNhRh0",
+  authDomain: "editor-cuentos.firebaseapp.com",
+  projectId: "editor-cuentos",
+  storageBucket: "editor-cuentos.firebasestorage.app",
+  messagingSenderId: "893556128016",
+  appId: "1:893556128016:web:7690cf9749e88455f18d95"
 };
-let currentChId = 'cap1';
+
+const fbApp = initializeApp(firebaseConfig);
+const db = getFirestore(fbApp);
+
+/* ════════════════════════════════════════
+   ESTADO GLOBAL
+════════════════════════════════════════ */
+let currentProjectId = null;
+let currentChapterId = null;
+let chapters = {}; // { id: {title, content, words, status, sinopsis, notas, ...} }
+let characters = {}; // { id: {name, fields} }
+let refs = {}; // { id: {title, content} }
+let estilos = {}; // { id: {title, content} }
+let storms = {}; // { id: {content, color} }
 let isSplit = false;
 let snapCount = 0;
-let imgCount = 1;
+let imgCount = 0;
 let saveTimer = null;
+let sesionStartWords = 0;
+let chapterOrder = [];
 
-// Qué vista muestra cada sección del binder
 const sectionMap = {
-  root:'cap1', cap1:'cap1', cap2:'cap2', cap3:'cap3',
-  personajes:'view-personajes', lia:'view-lia', guardian:'view-guardian',
-  refs:'view-refs', estilo:'view-estilo', brainstorm:'view-brainstorm',
+  personajes: 'view-personajes',
+  refs: 'view-refs',
+  estilo: 'view-estilo',
+  brainstorm: 'view-brainstorm',
 };
 
 /* ════════════════════════════════════════
    TOAST
 ════════════════════════════════════════ */
-function toast(m){const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2200)}
-
-/* ════════════════════════════════════════
-   GUARDAR CAPÍTULO ACTUAL
-════════════════════════════════════════ */
-function saveCurrentCh(){
-  const ch=chapters[currentChId];
-  if(!ch)return;
-  ch.content=document.getElementById('mainEditor').innerHTML;
-  const txt=document.getElementById('mainEditor').innerText||'';
-  ch.words=txt.trim()?txt.trim().split(/\s+/).length:0;
-  ch.title=document.getElementById('chapterTitle').value;
+window.toast = function(m) {
+  const t = document.getElementById('toast');
+  t.textContent = m;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2200);
 }
 
 /* ════════════════════════════════════════
-   CARGAR CAPÍTULO EN EL EDITOR
+   PANTALLA DE PROYECTOS
 ════════════════════════════════════════ */
-function loadChapter(id){
-  saveCurrentCh();
-  currentChId=id;
-  const ch=chapters[id];
-  document.getElementById('mainEditor').innerHTML=ch.content||'';
-  document.getElementById('chapterTitle').value=ch.title;
-  document.getElementById('composeTitle').value=ch.title;
-  const w=ch.words||0;
-  updateWC(w);
-  // Marcar corcho
-  document.querySelectorAll('.ccard').forEach(c=>c.classList.remove('active'));
-  const cc=document.getElementById('cc-'+id);
-  if(cc)cc.classList.add('active');
-  // Marcar outline
-  document.querySelectorAll('.oitem').forEach(o=>o.classList.remove('active'));
+window.showProjectsScreen = function() {
+  document.getElementById('projectsScreen').classList.remove('hidden');
+  loadProjects();
 }
 
-/* ════════════════════════════════════════
-   NAVEGACIÓN POR EL BINDER
-════════════════════════════════════════ */
-function nav(binderEl, section){
-  // Marcar activo en binder
-  document.querySelectorAll('.bitem').forEach(i=>i.classList.remove('active'));
-  if(binderEl)binderEl.classList.add('active');
-
-  const target=sectionMap[section];
-  if(!target)return;
-
-  if(target.startsWith('cap')){
-    // Es un capítulo → mostrar editor, ocultar alt-views
-    showEditor();
-    loadChapter(target);
-    document.getElementById('modePill').textContent='Escritura';
-    document.getElementById('modePill').className='mode-pill pill-write';
-  } else {
-    // Es una vista alternativa → ocultar editor, mostrar esa vista
-    saveCurrentCh();
-    showAlt(target);
-    document.getElementById('modePill').textContent='Referencia';
-    document.getElementById('modePill').className='mode-pill pill-ref';
+async function loadProjects() {
+  const grid = document.getElementById('psGrid');
+  grid.innerHTML = '<div class="ps-loading">Cargando proyectos…</div>';
+  try {
+    const q = query(collection(db, 'projects'), orderBy('updatedAt', 'desc'));
+    const snap = await getDocs(q);
+    grid.innerHTML = '';
+    snap.forEach(d => {
+      const p = d.data();
+      const card = document.createElement('div');
+      card.className = 'ps-card';
+      card.innerHTML = `
+        <button class="ps-card-del" onclick="deleteProject(event,'${d.id}')" title="Eliminar proyecto"><i class="ti ti-trash" style="font-size:13px"></i></button>
+        <div class="ps-card-title">${p.name || 'Sin título'}</div>
+        <div class="ps-card-desc">${p.description || 'Sin descripción'}</div>
+        <div class="ps-card-meta">
+          <span><i class="ti ti-calendar" style="font-size:11px"></i> ${p.updatedAt?.toDate ? p.updatedAt.toDate().toLocaleDateString('es-ES') : 'Hoy'}</span>
+        </div>`;
+      card.onclick = (e) => { if (!e.target.closest('.ps-card-del')) openProject(d.id, p); };
+      grid.appendChild(card);
+    });
+    // Botón nuevo
+    const newCard = document.createElement('div');
+    newCard.className = 'ps-card new-card';
+    newCard.innerHTML = `<i class="ti ti-plus"></i><span>Nuevo proyecto</span>`;
+    newCard.onclick = () => showNewForm();
+    grid.appendChild(newCard);
+  } catch(e) {
+    grid.innerHTML = `<div class="ps-loading" style="color:#c0392b">Error al cargar: ${e.message}</div>`;
   }
 }
 
-function showEditor(){
-  document.getElementById('editorView').style.display='flex';
-  document.querySelectorAll('.alt-view').forEach(v=>v.classList.remove('visible'));
+window.showNewForm = function() {
+  document.getElementById('psNewForm').classList.add('visible');
+  document.getElementById('psNewName').focus();
+}
+window.hideNewForm = function() {
+  document.getElementById('psNewForm').classList.remove('visible');
+  document.getElementById('psNewName').value = '';
+  document.getElementById('psNewDesc').value = '';
 }
 
-function showAlt(viewId){
-  document.getElementById('editorView').style.display='none';
-  document.querySelectorAll('.alt-view').forEach(v=>v.classList.remove('visible'));
-  const v=document.getElementById(viewId);
-  if(v)v.classList.add('visible');
+window.createProject = async function() {
+  const name = document.getElementById('psNewName').value.trim();
+  if (!name) { toast('Escribe un nombre para el proyecto'); return; }
+  try {
+    const ref = await addDoc(collection(db, 'projects'), {
+      name, description: document.getElementById('psNewDesc').value.trim(),
+      createdAt: serverTimestamp(), updatedAt: serverTimestamp()
+    });
+    // Crear primer capítulo
+    await addDoc(collection(db, 'projects', ref.id, 'chapters'), {
+      title: 'Cap. 1 — Primer capítulo', content: '', words: 0,
+      status: 'Borrador', label: 'Sin etiqueta', pdv: '3.ª persona',
+      sinopsis: '', notas: '', todos: '', keywords: '', include: true,
+      order: 0, createdAt: serverTimestamp()
+    });
+    hideNewForm();
+    openProject(ref.id, { name, description: '' });
+  } catch(e) { toast('Error: ' + e.message); }
+}
+
+window.deleteProject = async function(e, id) {
+  e.stopPropagation();
+  if (!confirm('¿Eliminar este proyecto? Esta acción no se puede deshacer.')) return;
+  try {
+    await deleteDoc(doc(db, 'projects', id));
+    loadProjects();
+    toast('Proyecto eliminado');
+  } catch(err) { toast('Error: ' + err.message); }
+}
+
+async function openProject(id, data) {
+  currentProjectId = id;
+  chapters = {}; characters = {}; refs = {}; estilos = {}; storms = {};
+  chapterOrder = [];
+  document.getElementById('binderProjectName').value = data.name || 'Mi proyecto';
+  document.getElementById('projectsScreen').classList.add('hidden');
+  await loadAllData();
+}
+
+window.goToProjects = function() {
+  saveCurrentChapter();
+  currentProjectId = null;
+  currentChapterId = null;
+  document.getElementById('projectsScreen').classList.remove('hidden');
+  loadProjects();
 }
 
 /* ════════════════════════════════════════
-   PANEL CENTRAL (CORCHO / ESQUEMA / TODO)
+   CARGAR DATOS DEL PROYECTO
 ════════════════════════════════════════ */
-function switchMid(mode,tabEl){
-  document.querySelectorAll('.ptab').forEach(t=>t.classList.remove('active'));
-  tabEl.classList.add('active');
-  document.getElementById('cork').style.display=mode==='cork'?'flex':'none';
-  document.getElementById('outline').style.display=mode==='outline'?'block':'none';
-  document.getElementById('scriv').style.display=mode==='scriv'?'block':'none';
-  if(mode==='scriv')buildScriv();
+async function loadAllData() {
+  try {
+    // Capítulos
+    const chSnap = await getDocs(query(collection(db, 'projects', currentProjectId, 'chapters'), orderBy('order')));
+    chapters = {};
+    chapterOrder = [];
+    chSnap.forEach(d => {
+      chapters[d.id] = { ...d.data(), id: d.id };
+      chapterOrder.push(d.id);
+    });
+    // Personajes
+    const pjSnap = await getDocs(collection(db, 'projects', currentProjectId, 'characters'));
+    characters = {};
+    pjSnap.forEach(d => { characters[d.id] = { ...d.data(), id: d.id }; });
+    // Referencias
+    const rfSnap = await getDocs(collection(db, 'projects', currentProjectId, 'refs'));
+    refs = {};
+    rfSnap.forEach(d => { refs[d.id] = { ...d.data(), id: d.id }; });
+    // Estilos
+    const esSnap = await getDocs(collection(db, 'projects', currentProjectId, 'estilos'));
+    estilos = {};
+    esSnap.forEach(d => { estilos[d.id] = { ...d.data(), id: d.id }; });
+    // Brainstorm
+    const stSnap = await getDocs(collection(db, 'projects', currentProjectId, 'storms'));
+    storms = {};
+    stSnap.forEach(d => { storms[d.id] = { ...d.data(), id: d.id }; });
+    // Libreta
+    const projDoc = await getDoc(doc(db, 'projects', currentProjectId));
+    if (projDoc.exists()) {
+      document.getElementById('notepadArea').value = projDoc.data().notepad || '';
+    }
+
+    renderBinder();
+    renderCork();
+    renderOutline();
+    // Cargar primer capítulo
+    if (chapterOrder.length > 0) {
+      loadChapter(chapterOrder[0]);
+    }
+    updateTotalWC();
+  } catch(e) { toast('Error al cargar datos: ' + e.message); }
 }
 
-function buildScriv(){
-  saveCurrentCh();
-  const el=document.getElementById('scriv');
-  el.innerHTML='';
-  Object.entries(chapters).forEach(([id,ch])=>{
-    const sec=document.createElement('div');sec.className='ssec';
-    const bodyHtml=ch.content||'<span style="color:var(--txm);font-style:italic">Sin contenido aún.</span>';
-    sec.innerHTML=`<div class="ssec-title" onclick="nav(document.getElementById('b-${id}'),'${id}')">${ch.title}</div><div class="ssec-body">${bodyHtml}</div>`;
-    el.appendChild(sec);
+/* ════════════════════════════════════════
+   RENDERIZAR BINDER
+════════════════════════════════════════ */
+function renderBinder() {
+  const cont = document.getElementById('chaptersInBinder');
+  cont.innerHTML = '';
+  chapterOrder.forEach(id => {
+    const ch = chapters[id];
+    if (!ch) return;
+    const item = document.createElement('div');
+    item.className = 'bitem sub';
+    item.id = 'b-' + id;
+    item.innerHTML = `<i class="ti ti-file-text" style="font-size:12px"></i><span class="bl">${ch.title}</span><span class="bb" id="bb-${id}">${ch.words || 0}</span>`;
+    item.onclick = () => nav(item, id);
+    cont.appendChild(item);
+  });
+
+  const charCont = document.getElementById('charactersInBinder');
+  charCont.innerHTML = '';
+  Object.values(characters).forEach(ch => {
+    const item = document.createElement('div');
+    item.className = 'bitem sub';
+    item.id = 'b-char-' + ch.id;
+    item.innerHTML = `<i class="ti ti-user" style="font-size:12px"></i><span class="bl">${ch.name || 'Personaje'}</span>`;
+    item.onclick = () => nav(item, 'personajes');
+    charCont.appendChild(item);
   });
 }
 
 /* ════════════════════════════════════════
-   AÑADIR CAPÍTULO
+   RENDERIZAR CORCHO Y ESQUEMA
 ════════════════════════════════════════ */
-function addChapter(){
-  const ids=Object.keys(chapters);
-  const n=ids.length+1;
-  const id='cap'+n;
-  const title=`Cap. ${n} — Nuevo capítulo`;
-  chapters[id]={title,content:'',words:0,sesStart:0};
-  sectionMap[id]=id;
-
-  // Binder
-  const body=document.getElementById('binder').querySelector('.binder-body');
-  const btn=body.querySelector('.badd');
-  const item=document.createElement('div');
-  item.className='bitem sub';item.id='b-'+id;
-  item.innerHTML=`<i class="ti ti-file-text" style="font-size:12px"></i><span class="bl">${title}</span><span class="bb" id="bb-${id}">0</span>`;
-  item.onclick=()=>nav(item,id);
-  body.insertBefore(item,btn);
-
-  // Corcho
-  const cork=document.getElementById('cork');
-  const card=document.createElement('div');
-  card.className='ccard';card.id='cc-'+id;
-  card.innerHTML=`<div class="cpin" style="background:#9a9a9a"></div><div class="ct">${title.replace(/Cap\. \d+ — /,'')}</div><div class="cs">Sin escribir aún.</div><div class="cst st-b">Borrador</div>`;
-  card.onclick=()=>nav(item,id);
-  cork.appendChild(card);
-
-  nav(item,id);
-  toast('Capítulo añadido');
+function renderCork() {
+  const cork = document.getElementById('cork');
+  cork.innerHTML = '';
+  chapterOrder.forEach(id => {
+    const ch = chapters[id];
+    if (!ch) return;
+    const stClass = ch.status === 'Final' ? 'st-f' : ch.status === 'En revisión' ? 'st-r' : 'st-b';
+    const card = document.createElement('div');
+    card.className = 'ccard';
+    card.id = 'cc-' + id;
+    card.innerHTML = `<div class="cpin"></div><div class="ct">${ch.title.replace(/Cap\. \d+ — /, '')}</div><div class="cs">${ch.sinopsis || 'Sin sinopsis aún.'}</div><div class="cst ${stClass}">${ch.status || 'Borrador'}</div>`;
+    card.onclick = () => nav(document.getElementById('b-' + id), id);
+    cork.appendChild(card);
+  });
 }
 
-function addPersonaje(){toast('Personaje añadido')}
-function addRef(){toast('Referencia añadida')}
+function renderOutline() {
+  const ol = document.getElementById('outline');
+  ol.innerHTML = '';
+  chapterOrder.forEach(id => {
+    const ch = chapters[id];
+    if (!ch) return;
+    const stClass = ch.status === 'Final' ? 'st-f' : ch.status === 'En revisión' ? 'st-r' : 'st-b';
+    const item = document.createElement('div');
+    item.className = 'oitem';
+    item.innerHTML = `<i class="ti ti-file-text"></i><span>${ch.title.replace(/Cap\. \d+ — /, '')}</span><span class="os ${stClass}">${(ch.status || 'Bor.').substring(0,3)}.</span><span class="ow">${ch.words || 0}p</span>`;
+    item.onclick = () => nav(document.getElementById('b-' + id), id);
+    ol.appendChild(item);
+  });
+}
+
+function renderScriv() {
+  const s = document.getElementById('scriv');
+  s.innerHTML = '';
+  chapterOrder.forEach(id => {
+    const ch = chapters[id];
+    if (!ch) return;
+    const sec = document.createElement('div');
+    sec.className = 'ssec';
+    sec.innerHTML = `<div class="ssec-title" onclick="nav(document.getElementById('b-${id}'),'${id}')">${ch.title}</div><div class="ssec-body">${ch.content || '<span style="color:var(--txm);font-style:italic">Sin contenido aún.</span>'}</div>`;
+    s.appendChild(sec);
+  });
+}
+
+function renderPersonajes() {
+  const cont = document.getElementById('pj-container');
+  cont.innerHTML = '';
+  Object.values(characters).forEach(ch => {
+    const initials = (ch.name || 'NP').split(' ').map(w => w[0]).join('').substring(0, 2).toUpperCase();
+    const card = document.createElement('div');
+    card.className = 'pj-card';
+    card.innerHTML = `
+      <div class="pj-head">
+        <div class="pj-av">${initials}</div>
+        <span class="pj-name">${ch.name || 'Personaje sin nombre'}</span>
+        <button class="pj-del" onclick="deleteCharacter('${ch.id}')" title="Eliminar"><i class="ti ti-trash" style="font-size:13px"></i></button>
+      </div>
+      <div class="pj-body">
+        <div class="pj-campo"><label>Nombre completo</label><input type="text" value="${ch.name || ''}" onchange="saveCharField('${ch.id}','name',this.value)"/></div>
+        <div class="pj-campo"><label>Edad</label><input type="text" value="${ch.age || ''}" onchange="saveCharField('${ch.id}','age',this.value)"/></div>
+        <div class="pj-campo"><label>Descripción física</label><textarea onchange="saveCharField('${ch.id}','physical',this.value)">${ch.physical || ''}</textarea></div>
+        <div class="pj-campo"><label>Rol en la historia</label><input type="text" value="${ch.role || ''}" onchange="saveCharField('${ch.id}','role',this.value)"/></div>
+        <div class="pj-campo"><label>Deseo principal</label><input type="text" value="${ch.desire || ''}" onchange="saveCharField('${ch.id}','desire',this.value)"/></div>
+        <div class="pj-campo"><label>Mayor miedo</label><input type="text" value="${ch.fear || ''}" onchange="saveCharField('${ch.id}','fear',this.value)"/></div>
+        <div class="pj-campo"><label>Perfume / objeto favorito</label><input type="text" value="${ch.object || ''}" onchange="saveCharField('${ch.id}','object',this.value)"/></div>
+        <div class="pj-campo"><label>Primer amor</label><input type="text" value="${ch.firstlove || ''}" onchange="saveCharField('${ch.id}','firstlove',this.value)"/></div>
+        <div class="pj-campo full"><label>Historia personal</label><textarea style="min-height:72px" onchange="saveCharField('${ch.id}','backstory',this.value)">${ch.backstory || ''}</textarea></div>
+        <div class="pj-campo full"><label>Notas del autor</label><textarea onchange="saveCharField('${ch.id}','notes',this.value)">${ch.notes || ''}</textarea></div>
+      </div>`;
+    cont.appendChild(card);
+  });
+}
+
+function renderRefs(container, data, type) {
+  const cont = document.getElementById(container);
+  cont.innerHTML = '';
+  Object.values(data).forEach(r => {
+    const card = document.createElement('div');
+    card.className = 'ref-card';
+    card.innerHTML = `
+      <div class="ref-title">
+        <i class="ti ti-file-text" style="font-size:14px;color:var(--gold)"></i>
+        <input type="text" value="${r.title || ''}" placeholder="Título…" style="flex:1;border:none;background:transparent;outline:none;font-size:13px;font-weight:500;color:var(--tx);font-family:'Inter',sans-serif" onchange="saveRefField('${type}','${r.id}','title',this.value)"/>
+        <button class="ref-del" onclick="deleteRef('${type}','${r.id}')" title="Eliminar"><i class="ti ti-trash" style="font-size:13px"></i></button>
+      </div>
+      <textarea placeholder="Contenido…" onchange="saveRefField('${type}','${r.id}','content',this.value)">${r.content || ''}</textarea>`;
+    cont.appendChild(card);
+  });
+}
+
+function renderStorms() {
+  const grid = document.getElementById('stormGrid');
+  grid.innerHTML = '';
+  const colors = ['#c0392b','#3D6B5E','#185FA5','#8B5E3C','#7a3b8c'];
+  Object.values(storms).forEach(s => {
+    const card = document.createElement('div');
+    card.className = 'storm-card';
+    card.innerHTML = `<div class="storm-pin" style="background:${s.color || colors[0]}"></div><textarea onchange="saveStormField('${s.id}','content',this.value)">${s.content || ''}</textarea>`;
+    grid.appendChild(card);
+  });
+  const addBtn = document.createElement('div');
+  addBtn.className = 'add-storm';
+  addBtn.innerHTML = `<i class="ti ti-plus" style="font-size:16px"></i> Nueva idea`;
+  addBtn.onclick = addStorm;
+  grid.appendChild(addBtn);
+}
+
+/* ════════════════════════════════════════
+   NAVEGACIÓN
+════════════════════════════════════════ */
+window.nav = function(binderEl, section) {
+  document.querySelectorAll('.bitem').forEach(i => i.classList.remove('active'));
+  if (binderEl) binderEl.classList.add('active');
+
+  if (chapters[section]) {
+    showEditor();
+    loadChapter(section);
+    document.getElementById('modePill').textContent = 'Escritura';
+    document.getElementById('modePill').className = 'mode-pill pill-write';
+  } else if (sectionMap[section]) {
+    saveCurrentChapter();
+    showAlt(sectionMap[section], section);
+    document.getElementById('modePill').textContent = 'Referencia';
+    document.getElementById('modePill').className = 'mode-pill pill-ref';
+  }
+}
+
+function showEditor() {
+  document.getElementById('editorView').style.display = 'flex';
+  document.querySelectorAll('.alt-view').forEach(v => v.classList.remove('visible'));
+}
+
+function showAlt(viewId, section) {
+  document.getElementById('editorView').style.display = 'none';
+  document.querySelectorAll('.alt-view').forEach(v => v.classList.remove('visible'));
+  document.getElementById(viewId).classList.add('visible');
+  // Renderizar la vista correcta
+  if (section === 'personajes') renderPersonajes();
+  else if (section === 'refs') renderRefs('refs-container', refs, 'refs');
+  else if (section === 'estilo') renderRefs('estilo-container', estilos, 'estilos');
+  else if (section === 'brainstorm') renderStorms();
+}
+
+/* ════════════════════════════════════════
+   CAPÍTULOS
+════════════════════════════════════════ */
+function loadChapter(id) {
+  currentChapterId = id;
+  const ch = chapters[id];
+  if (!ch) return;
+  document.getElementById('mainEditor').innerHTML = ch.content || '';
+  document.getElementById('chapterTitle').value = ch.title || '';
+  document.getElementById('composeTitle').value = ch.title || '';
+  document.getElementById('chStatus').value = ch.status || 'Borrador';
+  document.getElementById('chLabel').value = ch.label || 'Misterio';
+  document.getElementById('chPdv').value = ch.pdv || '3.ª persona';
+  document.getElementById('chSinopsis').value = ch.sinopsis || '';
+  document.getElementById('chKeywords').value = ch.keywords || '';
+  document.getElementById('chNotas').value = ch.notas || '';
+  document.getElementById('chTodos').value = ch.todos || '';
+  document.getElementById('chInclude').checked = ch.include !== false;
+  const w = ch.words || 0;
+  sesionStartWords = w;
+  updateWC(w);
+  // Corcho activo
+  document.querySelectorAll('.ccard').forEach(c => c.classList.remove('active'));
+  const cc = document.getElementById('cc-' + id);
+  if (cc) cc.classList.add('active');
+  document.querySelectorAll('.oitem').forEach(o => o.classList.remove('active'));
+}
+
+function saveCurrentChapter() {
+  if (!currentChapterId || !chapters[currentChapterId]) return;
+  const ch = chapters[currentChapterId];
+  ch.content = document.getElementById('mainEditor').innerHTML;
+  const txt = document.getElementById('mainEditor').innerText || '';
+  ch.words = txt.trim() ? txt.trim().split(/\s+/).length : 0;
+  ch.title = document.getElementById('chapterTitle').value;
+}
+
+window.saveCurrentChTitle = function() {
+  if (!currentChapterId) return;
+  const title = document.getElementById('chapterTitle').value;
+  if (chapters[currentChapterId]) chapters[currentChapterId].title = title;
+  updateDoc(doc(db, 'projects', currentProjectId, 'chapters', currentChapterId), { title });
+  renderBinder(); renderCork(); renderOutline();
+}
+
+window.saveChMeta = function() {
+  if (!currentChapterId) return;
+  const data = {
+    status: document.getElementById('chStatus').value,
+    label: document.getElementById('chLabel').value,
+    pdv: document.getElementById('chPdv').value,
+    sinopsis: document.getElementById('chSinopsis').value,
+    keywords: document.getElementById('chKeywords').value,
+    notas: document.getElementById('chNotas').value,
+    todos: document.getElementById('chTodos').value,
+    include: document.getElementById('chInclude').checked,
+  };
+  Object.assign(chapters[currentChapterId], data);
+  updateDoc(doc(db, 'projects', currentProjectId, 'chapters', currentChapterId), data);
+  renderCork(); renderOutline();
+}
+
+window.addChapter = async function() {
+  if (!currentProjectId) return;
+  const n = chapterOrder.length + 1;
+  const title = `Cap. ${n} — Nuevo capítulo`;
+  try {
+    const ref = await addDoc(collection(db, 'projects', currentProjectId, 'chapters'), {
+      title, content: '', words: 0, status: 'Borrador',
+      label: 'Sin etiqueta', pdv: '3.ª persona',
+      sinopsis: '', notas: '', todos: '', keywords: '', include: true,
+      order: n - 1, createdAt: serverTimestamp()
+    });
+    chapters[ref.id] = { id: ref.id, title, content: '', words: 0, status: 'Borrador', order: n-1 };
+    chapterOrder.push(ref.id);
+    renderBinder(); renderCork(); renderOutline();
+    nav(document.getElementById('b-' + ref.id), ref.id);
+    toast('Capítulo añadido');
+  } catch(e) { toast('Error: ' + e.message); }
+}
+
+/* ════════════════════════════════════════
+   PERSONAJES
+════════════════════════════════════════ */
+window.addCharacter = async function() {
+  if (!currentProjectId) return;
+  try {
+    const ref = await addDoc(collection(db, 'projects', currentProjectId, 'characters'), {
+      name: 'Nuevo personaje', age: '', physical: '', role: '',
+      desire: '', fear: '', object: '', firstlove: '', backstory: '', notes: '',
+      createdAt: serverTimestamp()
+    });
+    characters[ref.id] = { id: ref.id, name: 'Nuevo personaje' };
+    renderBinder();
+    nav(document.getElementById('b-personajes'), 'personajes');
+    toast('Personaje añadido');
+  } catch(e) { toast('Error: ' + e.message); }
+}
+
+window.saveCharField = async function(id, field, value) {
+  if (characters[id]) characters[id][field] = value;
+  try {
+    await updateDoc(doc(db, 'projects', currentProjectId, 'characters', id), { [field]: value });
+    if (field === 'name') renderBinder();
+  } catch(e) { toast('Error al guardar'); }
+}
+
+window.deleteCharacter = async function(id) {
+  if (!confirm('¿Eliminar este personaje?')) return;
+  delete characters[id];
+  await deleteDoc(doc(db, 'projects', currentProjectId, 'characters', id));
+  renderBinder();
+  renderPersonajes();
+  toast('Personaje eliminado');
+}
+
+/* ════════════════════════════════════════
+   REFERENCIAS Y ESTILOS
+════════════════════════════════════════ */
+window.addRef = async function() {
+  if (!currentProjectId) return;
+  try {
+    const r = await addDoc(collection(db, 'projects', currentProjectId, 'refs'), {
+      title: 'Nueva referencia', content: '', createdAt: serverTimestamp()
+    });
+    refs[r.id] = { id: r.id, title: 'Nueva referencia', content: '' };
+    nav(document.getElementById('b-refs'), 'refs');
+    toast('Referencia añadida');
+  } catch(e) { toast('Error: ' + e.message); }
+}
+
+window.addEstilo = async function() {
+  if (!currentProjectId) return;
+  try {
+    const r = await addDoc(collection(db, 'projects', currentProjectId, 'estilos'), {
+      title: 'Nueva nota de estilo', content: '', createdAt: serverTimestamp()
+    });
+    estilos[r.id] = { id: r.id, title: 'Nueva nota de estilo', content: '' };
+    nav(document.getElementById('b-estilo'), 'estilo');
+    toast('Nota añadida');
+  } catch(e) { toast('Error: ' + e.message); }
+}
+
+window.saveRefField = async function(type, id, field, value) {
+  const col = type === 'refs' ? refs : estilos;
+  if (col[id]) col[id][field] = value;
+  try {
+    await updateDoc(doc(db, 'projects', currentProjectId, type, id), { [field]: value });
+  } catch(e) { toast('Error al guardar'); }
+}
+
+window.deleteRef = async function(type, id) {
+  if (!confirm('¿Eliminar esta entrada?')) return;
+  const col = type === 'refs' ? refs : estilos;
+  delete col[id];
+  await deleteDoc(doc(db, 'projects', currentProjectId, type, id));
+  if (type === 'refs') renderRefs('refs-container', refs, 'refs');
+  else renderRefs('estilo-container', estilos, 'estilos');
+  toast('Eliminado');
+}
+
+/* ════════════════════════════════════════
+   BRAINSTORMING
+════════════════════════════════════════ */
+window.addStorm = async function() {
+  if (!currentProjectId) return;
+  const colors = ['#c0392b','#3D6B5E','#185FA5','#8B5E3C','#7a3b8c'];
+  const color = colors[Math.floor(Math.random() * colors.length)];
+  try {
+    const r = await addDoc(collection(db, 'projects', currentProjectId, 'storms'), {
+      content: '', color, createdAt: serverTimestamp()
+    });
+    storms[r.id] = { id: r.id, content: '', color };
+    renderStorms();
+    toast('Idea añadida');
+  } catch(e) { toast('Error: ' + e.message); }
+}
+
+window.saveStormField = async function(id, field, value) {
+  if (storms[id]) storms[id][field] = value;
+  try {
+    await updateDoc(doc(db, 'projects', currentProjectId, 'storms', id), { [field]: value });
+  } catch(e) {}
+}
 
 /* ════════════════════════════════════════
    EDITOR
 ════════════════════════════════════════ */
-function fmt(cmd){
-  const ed=document.getElementById('mainEditor');ed.focus();
-  if(cmd==='h2')document.execCommand('formatBlock',false,'h2');
-  else if(cmd==='h3')document.execCommand('formatBlock',false,'h3');
-  else if(cmd==='quote')document.execCommand('formatBlock',false,'blockquote');
-  else if(cmd==='ul')document.execCommand('insertUnorderedList');
-  else document.execCommand(cmd,false,null);
+window.fmt = function(cmd) {
+  const ed = document.getElementById('mainEditor'); ed.focus();
+  if (cmd === 'h2') document.execCommand('formatBlock', false, 'h2');
+  else if (cmd === 'h3') document.execCommand('formatBlock', false, 'h3');
+  else if (cmd === 'quote') document.execCommand('formatBlock', false, 'blockquote');
+  else if (cmd === 'ul') document.execCommand('insertUnorderedList');
+  else document.execCommand(cmd, false, null);
 }
-function addSep(){document.getElementById('mainEditor').focus();document.execCommand('insertHorizontalRule');}
+window.addSep = function() { document.getElementById('mainEditor').focus(); document.execCommand('insertHorizontalRule'); }
 
-function onInput(){
-  const txt=document.getElementById('mainEditor').innerText||'';
-  const w=txt.trim()?txt.trim().split(/\s+/).length:0;
+window.onInput = function() {
+  const txt = document.getElementById('mainEditor').innerText || '';
+  const w = txt.trim() ? txt.trim().split(/\s+/).length : 0;
   updateWC(w);
   triggerSave();
 }
 
-function updateWC(w){
-  const ch=chapters[currentChId];
-  const sesStart=ch?ch.sesStart:0;
-  const ses=Math.max(0,w-sesStart);
-  document.getElementById('sbWords').innerHTML=`Palabras: <strong>${w}</strong>`;
-  document.getElementById('sbSesion').innerHTML=`Sesión: <strong>+${ses}</strong>`;
-  document.getElementById('wc2').textContent=w;
-  const pct=Math.min(100,Math.round(w/400*100));
-  document.getElementById('progFill').style.width=pct+'%';
-  document.getElementById('pctLabel').textContent=pct+'%';
-  const bb=document.getElementById('bb-'+currentChId);
-  if(bb)bb.textContent=w;
-  const total=Object.values(chapters).reduce((a,c)=>a+(c.words||0),0)+(w-(ch?ch.words:0));
-  document.getElementById('totalWC').textContent=total;
-  updateObj(total);updateSes(ses);
+function updateWC(w) {
+  const ses = Math.max(0, w - sesionStartWords);
+  document.getElementById('sbWords').innerHTML = `Palabras: <strong>${w}</strong>`;
+  document.getElementById('sbSesion').innerHTML = `Sesión: <strong>+${ses}</strong>`;
+  document.getElementById('wc2').textContent = w;
+  const goal = parseInt(document.getElementById('wcGoal').textContent) || 400;
+  const pct = Math.min(100, Math.round(w / goal * 100));
+  document.getElementById('progFill').style.width = pct + '%';
+  document.getElementById('pctLabel').textContent = pct + '%';
+  const bb = document.getElementById('bb-' + currentChapterId);
+  if (bb) bb.textContent = w;
+  if (chapters[currentChapterId]) chapters[currentChapterId].words = w;
+  updateTotalWC();
+  updateObj(); updateSes(ses);
 }
 
-function triggerSave(){
-  document.getElementById('savedOk').innerHTML='Guardando… <i class="ti ti-loader" style="font-size:12px"></i>';
+function updateTotalWC() {
+  const total = Object.values(chapters).reduce((a, c) => a + (c.words || 0), 0);
+  document.getElementById('totalWC').textContent = total;
+}
+
+function triggerSave() {
+  document.getElementById('savedOk').innerHTML = 'Guardando… <i class="ti ti-loader" style="font-size:12px"></i>';
+  document.getElementById('modePill').className = 'mode-pill pill-sync';
   clearTimeout(saveTimer);
-  saveTimer=setTimeout(()=>{
-    saveCurrentCh();
-    document.getElementById('savedOk').innerHTML='Guardado <i class="ti ti-check" style="font-size:12px;color:var(--ok)"></i>';
-  },900);
+  saveTimer = setTimeout(async () => {
+    if (!currentChapterId || !currentProjectId) return;
+    saveCurrentChapter();
+    const ch = chapters[currentChapterId];
+    try {
+      await updateDoc(doc(db, 'projects', currentProjectId, 'chapters', currentChapterId), {
+        content: ch.content, words: ch.words
+      });
+      await updateDoc(doc(db, 'projects', currentProjectId), { updatedAt: serverTimestamp() });
+      document.getElementById('savedOk').innerHTML = 'Guardado <i class="ti ti-check" style="font-size:12px;color:var(--ok)"></i>';
+      document.getElementById('modePill').textContent = 'Escritura';
+      document.getElementById('modePill').className = 'mode-pill pill-write';
+    } catch(e) {
+      document.getElementById('savedOk').innerHTML = '<span style="color:#c0392b">Error al guardar</span>';
+    }
+  }, 1500);
 }
 
 /* ════════════════════════════════════════
    OBJETIVO
 ════════════════════════════════════════ */
-function updateObj(total){
-  const t=parseInt(document.getElementById('objTarget').value)||5000;
-  const tot=total||Object.values(chapters).reduce((a,c)=>a+(c.words||0),0);
-  const p=Math.min(100,Math.round(tot/t*100));
-  document.getElementById('objFill').style.width=p+'%';
-  document.getElementById('objPct').textContent=p+'%';
+window.updateObj = function() {
+  const target = parseInt(document.getElementById('objTarget').value) || 5000;
+  const total = Object.values(chapters).reduce((a, c) => a + (c.words || 0), 0);
+  const p = Math.min(100, Math.round(total / target * 100));
+  document.getElementById('objFill').style.width = p + '%';
+  document.getElementById('objPct').textContent = p + '%';
 }
-function updateSes(ses){
-  const t=parseInt(document.getElementById('sesTarget').value)||500;
-  const s=ses||0;
-  const p=Math.min(100,Math.round(s/t*100));
-  document.getElementById('sesFill').style.width=p+'%';
-  document.getElementById('sesPct').textContent=p+'%';
+window.updateSes = function(sw) {
+  const target = parseInt(document.getElementById('sesTarget').value) || 500;
+  const s = sw !== undefined ? sw : 0;
+  const p = Math.min(100, Math.round(s / target * 100));
+  document.getElementById('sesFill').style.width = p + '%';
+  document.getElementById('sesPct').textContent = p + '%';
+}
+
+/* ════════════════════════════════════════
+   META DEL PROYECTO
+════════════════════════════════════════ */
+window.saveProjectMeta = async function() {
+  if (!currentProjectId) return;
+  try {
+    await updateDoc(doc(db, 'projects', currentProjectId), {
+      name: document.getElementById('binderProjectName').value,
+      updatedAt: serverTimestamp()
+    });
+  } catch(e) {}
 }
 
 /* ════════════════════════════════════════
    IMÁGENES
 ════════════════════════════════════════ */
-function triggerImg(){document.getElementById('imgInput').click()}
-function handleImg(e){
-  const file=e.target.files[0];if(!file)return;
-  const reader=new FileReader();
-  reader.onload=ev=>{
-    const uid='img_'+Date.now();
-    const ph=document.getElementById('imgPh');
-    const w=document.createElement('div');w.className='img-wrap';w.id=uid;
-    w.innerHTML=`<img src="${ev.target.result}" alt="Ilustración"/><div class="img-acts"><button class="img-act-btn" onclick="removeImg('${uid}')"><i class="ti ti-trash" style="font-size:12px"></i></button></div><input class="img-cap" type="text" placeholder="Pie de imagen…"/>`;
-    ph.parentNode.insertBefore(w,ph);
-    imgCount++;document.getElementById('imgCount').textContent=imgCount;
+window.triggerImg = function() { document.getElementById('imgInput').click(); }
+window.handleImg = function(e) {
+  const file = e.target.files[0]; if (!file) return;
+  const reader = new FileReader();
+  reader.onload = ev => {
+    const uid = 'img_' + Date.now();
+    const ph = document.getElementById('imgPh');
+    const w = document.createElement('div'); w.className = 'img-wrap'; w.id = uid;
+    w.innerHTML = `<img src="${ev.target.result}" alt="Ilustración"/><div class="img-acts"><button class="img-act-btn" onclick="removeImg('${uid}')"><i class="ti ti-trash" style="font-size:12px"></i></button></div><input class="img-cap" type="text" placeholder="Pie de imagen…"/>`;
+    ph.parentNode.insertBefore(w, ph);
+    imgCount++; document.getElementById('imgCount').textContent = imgCount;
     toast('Imagen insertada');
-  };reader.readAsDataURL(file);e.target.value='';
+  };
+  reader.readAsDataURL(file); e.target.value = '';
 }
-function removeImg(id){
-  const el=document.getElementById(id);
-  if(el){el.remove();imgCount=Math.max(0,imgCount-1);document.getElementById('imgCount').textContent=imgCount;toast('Imagen eliminada');}
+window.removeImg = function(id) {
+  const el = document.getElementById(id);
+  if (el) { el.remove(); imgCount = Math.max(0, imgCount-1); document.getElementById('imgCount').textContent = imgCount; }
 }
 
 /* ════════════════════════════════════════
    SPLIT
 ════════════════════════════════════════ */
-function toggleSplit(){
-  isSplit=!isSplit;
-  document.getElementById('scrollB').style.display=isSplit?'block':'none';
-  document.getElementById('splitDiv').style.display=isSplit?'block':'none';
-  document.getElementById('splitBtn').classList.toggle('on',isSplit);
-  toast(isSplit?'Doble pantalla activada':'Desactivada');
+window.toggleSplit = function() {
+  isSplit = !isSplit;
+  document.getElementById('scrollB').style.display = isSplit ? 'block' : 'none';
+  document.getElementById('splitDiv').style.display = isSplit ? 'block' : 'none';
+  document.getElementById('splitBtn').classList.toggle('on', isSplit);
+  toast(isSplit ? 'Doble pantalla activada' : 'Doble pantalla desactivada');
 }
 
 /* ════════════════════════════════════════
    SNAPSHOT
 ════════════════════════════════════════ */
-function saveSnap(){
+window.saveSnap = function() {
   snapCount++;
-  const now=new Date();
-  const container=document.getElementById('snapsContainer');
-  const item=document.createElement('div');item.className='snap-item';
-  item.innerHTML=`<div class="snap-date">${now.toLocaleTimeString('es-ES',{hour:'2-digit',minute:'2-digit'})}</div><div class="snap-lbl">v${snapCount+1} — ${chapters[currentChId]?.title||''}</div>`;
-  container.insertBefore(item,container.firstChild);
-  switchNote('snaps',document.querySelectorAll('.ntab')[3]);
+  const now = new Date();
+  const container = document.getElementById('snapsContainer');
+  const item = document.createElement('div'); item.className = 'snap-item';
+  item.innerHTML = `<div class="snap-date">${now.toLocaleTimeString('es-ES',{hour:'2-digit',minute:'2-digit'})}</div><div class="snap-lbl">v${snapCount} — ${chapters[currentChapterId]?.title || ''}</div>`;
+  container.insertBefore(item, container.firstChild);
+  switchNote('snaps', document.querySelectorAll('.ntab')[3]);
   toast('Snapshot guardado');
+}
+
+/* ════════════════════════════════════════
+   PANEL CENTRAL
+════════════════════════════════════════ */
+window.switchMid = function(mode, tabEl) {
+  document.querySelectorAll('.ptab').forEach(t => t.classList.remove('active'));
+  tabEl.classList.add('active');
+  document.getElementById('cork').style.display = mode === 'cork' ? 'flex' : 'none';
+  document.getElementById('outline').style.display = mode === 'outline' ? 'block' : 'none';
+  document.getElementById('scriv').style.display = mode === 'scriv' ? 'block' : 'none';
+  if (mode === 'scriv') { saveCurrentChapter(); renderScriv(); }
 }
 
 /* ════════════════════════════════════════
    INSPECTOR TABS
 ════════════════════════════════════════ */
-function switchNote(tab,el){
-  document.querySelectorAll('.ntab').forEach(t=>t.classList.remove('active'));
+window.switchNote = function(tab, el) {
+  document.querySelectorAll('.ntab').forEach(t => t.classList.remove('active'));
   el.classList.add('active');
-  ['meta','sinopsis','notas','snaps','obj'].forEach(id=>{
-    const el=document.getElementById('tab-'+id);if(el)el.style.display=id===tab?'block':'none';
+  ['meta','sinopsis','notas','snaps','obj'].forEach(id => {
+    const el = document.getElementById('tab-' + id);
+    if (el) el.style.display = id === tab ? 'block' : 'none';
   });
 }
 
 /* ════════════════════════════════════════
+   LIBRETA
+════════════════════════════════════════ */
+window.saveNotepad = async function() {
+  if (!currentProjectId) return;
+  clearTimeout(window.notepadTimer);
+  window.notepadTimer = setTimeout(async () => {
+    try {
+      await updateDoc(doc(db, 'projects', currentProjectId), {
+        notepad: document.getElementById('notepadArea').value
+      });
+    } catch(e) {}
+  }, 1500);
+}
+window.toggleNotepad = function() { document.getElementById('notepad').classList.toggle('open'); }
+
+/* ════════════════════════════════════════
    MODO COMPOSICIÓN
 ════════════════════════════════════════ */
-function openCompose(){
-  document.getElementById('composeEd').innerHTML=document.getElementById('mainEditor').innerHTML;
+window.openCompose = function() {
+  document.getElementById('composeEd').innerHTML = document.getElementById('mainEditor').innerHTML;
   document.getElementById('compose').classList.add('open');
   document.getElementById('composeEd').focus();
-  const txt=document.getElementById('composeEd').innerText||'';
-  document.getElementById('composeWC').textContent=txt.trim()?txt.trim().split(/\s+/).length:0;
 }
-function closeCompose(){
-  document.getElementById('mainEditor').innerHTML=document.getElementById('composeEd').innerHTML;
+window.closeCompose = function() {
+  document.getElementById('mainEditor').innerHTML = document.getElementById('composeEd').innerHTML;
   document.getElementById('compose').classList.remove('open');
   onInput();
 }
-function onComposeInput(){
-  const txt=document.getElementById('composeEd').innerText||'';
-  document.getElementById('composeWC').textContent=txt.trim()?txt.trim().split(/\s+/).length:0;
+window.onComposeInput = function() {
+  const txt = document.getElementById('composeEd').innerText || '';
+  document.getElementById('composeWC').textContent = txt.trim() ? txt.trim().split(/\s+/).length : 0;
 }
 
 /* ════════════════════════════════════════
    MODAL COMPILAR
 ════════════════════════════════════════ */
-function openModal(){document.getElementById('modal').classList.add('open')}
-function closeModal(){document.getElementById('modal').classList.remove('open')}
-document.getElementById('modal').addEventListener('click',e=>{if(e.target===document.getElementById('modal'))closeModal()});
+window.openModal = function() { document.getElementById('modal').classList.add('open'); }
+window.closeModal = function() { document.getElementById('modal').classList.remove('open'); }
+document.getElementById('modal').addEventListener('click', e => { if (e.target === document.getElementById('modal')) closeModal(); });
 
-function compilar(fmt){
-  saveCurrentCh();
-  const title=document.querySelector('.binder-project').textContent.trim();
-  let blob,filename;
-  if(fmt==='txt'){
-    let txt=title+'\n'+'═'.repeat(40);
-    Object.values(chapters).forEach(ch=>{const d=document.createElement('div');d.innerHTML=ch.content;txt+='\n\n'+ch.title+'\n'+'─'.repeat(ch.title.length)+'\n\n'+d.innerText;});
-    blob=new Blob([txt],{type:'text/plain'});filename=title+'.txt';
-  } else if(fmt==='md'){
-    let md='# '+title+'\n';
-    Object.values(chapters).forEach(ch=>{const d=document.createElement('div');d.innerHTML=ch.content;md+='\n## '+ch.title+'\n\n'+d.innerText+'\n';});
-    blob=new Blob([md],{type:'text/markdown'});filename=title+'.md';
-  } else if(fmt==='html'){
-    let html=`<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8"><title>${title}</title><style>body{font-family:Georgia,serif;max-width:680px;margin:60px auto;line-height:1.85;color:#1a1208}h1{font-size:28px}h2{font-size:20px;margin:2em 0 .5em}img{max-width:100%;border-radius:6px;margin:20px 0}</style></head><body><h1>${title}</h1>`;
-    Object.values(chapters).forEach(ch=>{html+=`<h2>${ch.title}</h2><div>${ch.content}</div>`;});
-    html+='</body></html>';
-    blob=new Blob([html],{type:'text/html'});filename=title+'.html';
+window.compilar = function(fmt) {
+  saveCurrentChapter();
+  const title = document.getElementById('binderProjectName').value || 'Mi proyecto';
+  let blob, filename;
+  if (fmt === 'txt') {
+    let txt = title + '\n' + '═'.repeat(40);
+    Object.values(chapters).forEach(ch => { const d = document.createElement('div'); d.innerHTML = ch.content; txt += '\n\n' + ch.title + '\n' + '─'.repeat(ch.title.length) + '\n\n' + d.innerText; });
+    blob = new Blob([txt], {type:'text/plain'}); filename = title + '.txt';
+  } else if (fmt === 'md') {
+    let md = '# ' + title + '\n';
+    Object.values(chapters).forEach(ch => { const d = document.createElement('div'); d.innerHTML = ch.content; md += '\n## ' + ch.title + '\n\n' + d.innerText + '\n'; });
+    blob = new Blob([md], {type:'text/markdown'}); filename = title + '.md';
+  } else if (fmt === 'html') {
+    let html = `<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8"><title>${title}</title><style>body{font-family:Georgia,serif;max-width:680px;margin:60px auto;line-height:1.85;color:#1a1208}h1{font-size:28px}h2{font-size:20px;margin:2em 0 .5em}img{max-width:100%;border-radius:6px;margin:20px 0}</style></head><body><h1>${title}</h1>`;
+    Object.values(chapters).forEach(ch => { html += `<h2>${ch.title}</h2><div>${ch.content}</div>`; });
+    html += '</body></html>';
+    blob = new Blob([html], {type:'text/html'}); filename = title + '.html';
   } else {
-    blob=new Blob([JSON.stringify({proyecto:title,capitulos:chapters,fecha:new Date().toISOString()},null,2)],{type:'application/json'});filename=title+'.json';
+    blob = new Blob([JSON.stringify({proyecto: title, capitulos: chapters, personajes: characters, fecha: new Date().toISOString()}, null, 2)], {type:'application/json'});
+    filename = title + '.json';
   }
-  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=filename.replace(/[^\w\s.-]/g,'');a.click();
-  closeModal();toast('Compilado como '+fmt.toUpperCase());
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = filename.replace(/[^\w\s.-]/g,''); a.click();
+  closeModal(); toast('Compilado como ' + fmt.toUpperCase());
 }
-
-/* ════════════════════════════════════════
-   PERSONAJES Y BRAINSTORM
-════════════════════════════════════════ */
-function addPjCard(){
-  const c=document.createElement('div');c.className='pj-card';c.style.marginTop='12px';
-  c.innerHTML=`<div class="pj-head"><div class="pj-av" style="background:#888;color:#fff">NP</div><input type="text" placeholder="Nombre del personaje" style="flex:1;border:none;background:transparent;outline:none;font-size:13px;font-weight:500;color:var(--tx);font-family:'Inter',sans-serif"/></div><div class="pj-body"><div class="pj-campo"><label>Nombre completo</label><input type="text" placeholder="Nombre…"/></div><div class="pj-campo"><label>Edad</label><input type="text" placeholder="Edad…"/></div><div class="pj-campo"><label>Descripción física</label><textarea placeholder="Apariencia…"></textarea></div><div class="pj-campo"><label>Rol en la historia</label><input type="text" placeholder="Protagonista, antagonista…"/></div><div class="pj-campo"><label>Deseo principal</label><input type="text" placeholder="¿Qué quiere?"/></div><div class="pj-campo"><label>Mayor miedo</label><input type="text" placeholder="¿Qué teme?"/></div><div class="pj-campo full"><label>Notas</label><textarea placeholder="Ideas, conexiones…"></textarea></div></div>`;
-  document.getElementById('pj-container').appendChild(c);
-  toast('Personaje añadido');
-}
-
-function addStorm(){
-  const grid=document.getElementById('stormGrid');
-  const addBtn=grid.querySelector('.add-storm');
-  const colors=['#c0392b','#3D6B5E','#185FA5','#8B5E3C','#7a3b8c'];
-  const color=colors[Math.floor(Math.random()*colors.length)];
-  const card=document.createElement('div');card.className='storm-card';
-  card.innerHTML=`<div class="storm-pin" style="background:${color}"></div><textarea placeholder="Escribe tu idea…" autofocus></textarea>`;
-  grid.insertBefore(card,addBtn);
-  card.querySelector('textarea').focus();
-}
-
-/* ════════════════════════════════════════
-   NOTEPAD
-════════════════════════════════════════ */
-function toggleNotepad(){document.getElementById('notepad').classList.toggle('open')}
 
 /* ════════════════════════════════════════
    TECLADO
 ════════════════════════════════════════ */
-document.addEventListener('keydown',e=>{
-  if(e.key==='Escape'&&document.getElementById('compose').classList.contains('open'))closeCompose();
-  if((e.ctrlKey||e.metaKey)&&e.key==='s'){e.preventDefault();saveSnap();}
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape' && document.getElementById('compose').classList.contains('open')) closeCompose();
+  if ((e.ctrlKey || e.metaKey) && e.key === 's') { e.preventDefault(); saveSnap(); }
 });
 
 /* ════════════════════════════════════════
    INIT
 ════════════════════════════════════════ */
-// Guardar el contenido inicial del cap1 (el que está en el HTML)
-chapters.cap1.content = document.getElementById('mainEditor').innerHTML;
-updateObj();updateSes(0);
+showProjectsScreen();
+
 </script>
 </body>
 </html>
