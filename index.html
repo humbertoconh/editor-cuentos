@@ -1,0 +1,1060 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Editor de cuentos ilustrados</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Lora:ital,wght@0,400;0,500;1,400&family=Inter:wght@400;500&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.31.0/dist/tabler-icons.min.css" />
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --binder-bg: #1e150d;
+    --binder-border: #7a5230;
+    --binder-gold: #c9a96e;
+    --binder-gold-dim: rgba(201,169,110,0.45);
+    --binder-text: #e8d8b8;
+    --binder-spine: #5c3a1e;
+    --cork-bg: #ede0cc;
+    --cork-card: #fffbf4;
+    --accent-green: #3D6B5E;
+    --accent-green-dark: #2e5247;
+    --surface: #ffffff;
+    --surface-1: #f8f6f2;
+    --surface-2: #f2ede6;
+    --border: rgba(0,0,0,0.1);
+    --border-strong: rgba(0,0,0,0.18);
+    --text: #1a1208;
+    --text-2: #5a4a38;
+    --text-muted: #9a8a78;
+    --accent: #185FA5;
+    --accent-bg: #e6f1fb;
+    --accent-border: #85b7eb;
+    --success: #3b6d11;
+    --success-bg: #eaf3de;
+    --radius: 6px;
+  }
+
+  html, body {
+    height: 100%;
+    overflow: hidden;
+    font-family: 'Inter', sans-serif;
+    background: var(--surface-1);
+    color: var(--text);
+  }
+
+  .app {
+    display: flex;
+    height: 100vh;
+    overflow: hidden;
+  }
+
+  /* ── BINDER ── */
+  .binder {
+    width: 220px;
+    min-width: 220px;
+    background: var(--binder-bg);
+    display: flex;
+    flex-direction: column;
+    border-right: 3px solid var(--binder-border);
+    position: relative;
+    flex-shrink: 0;
+  }
+  .binder-spine {
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 7px;
+    background: repeating-linear-gradient(
+      180deg,
+      var(--binder-border) 0px,
+      #5c3a1e 2px,
+      #2e1a0a 4px,
+      var(--binder-border) 6px
+    );
+    opacity: 0.55;
+    pointer-events: none;
+  }
+
+  .binder-header {
+    padding: 18px 14px 14px 22px;
+    border-bottom: 1px solid rgba(139,94,60,0.35);
+    cursor: default;
+  }
+  .binder-project {
+    font-family: 'Playfair Display', serif;
+    font-size: 14px;
+    color: var(--binder-gold);
+    letter-spacing: 0.04em;
+    font-weight: 600;
+  }
+  .binder-sub {
+    font-size: 11px;
+    color: var(--binder-gold-dim);
+    margin-top: 3px;
+  }
+
+  .binder-body { flex: 1; overflow-y: auto; padding: 6px 0; }
+  .binder-body::-webkit-scrollbar { width: 4px; }
+  .binder-body::-webkit-scrollbar-track { background: transparent; }
+  .binder-body::-webkit-scrollbar-thumb { background: rgba(201,169,110,0.2); border-radius: 2px; }
+
+  .binder-section-label {
+    padding: 10px 12px 4px 22px;
+    font-size: 10px;
+    color: var(--binder-gold-dim);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    font-weight: 600;
+  }
+
+  .binder-item {
+    padding: 7px 10px 7px 22px;
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    cursor: pointer;
+    border-left: 3px solid transparent;
+    transition: background 0.12s;
+    user-select: none;
+  }
+  .binder-item:hover { background: rgba(201,169,110,0.07); }
+  .binder-item.active { background: rgba(201,169,110,0.13); border-left-color: var(--binder-gold); }
+  .binder-item .bi { font-size: 13px; color: var(--binder-gold); opacity: 0.8; flex-shrink: 0; }
+  .binder-item .bl { font-size: 13px; color: var(--binder-text); flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .binder-item .bb { font-size: 10px; background: rgba(201,169,110,0.18); color: var(--binder-gold); padding: 1px 5px; border-radius: 8px; flex-shrink: 0; }
+  .binder-item.sub { padding-left: 34px; }
+  .binder-item.sub .bl { font-size: 12px; }
+
+  .binder-divider { height: 1px; background: rgba(139,94,60,0.22); margin: 6px 14px 6px 22px; }
+
+  .binder-add-btn {
+    margin: 5px 12px 5px 22px;
+    padding: 6px 10px;
+    background: rgba(201,169,110,0.08);
+    border: 1px dashed rgba(201,169,110,0.28);
+    border-radius: var(--radius);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: rgba(201,169,110,0.55);
+    font-size: 12px;
+    font-family: 'Inter', sans-serif;
+    transition: all 0.14s;
+  }
+  .binder-add-btn:hover { background: rgba(201,169,110,0.16); color: var(--binder-gold); border-color: rgba(201,169,110,0.5); }
+
+  .compile-btn {
+    margin: 8px 12px;
+    padding: 9px;
+    background: var(--accent-green);
+    color: #fff;
+    border: none;
+    border-radius: var(--radius);
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    font-family: 'Inter', sans-serif;
+    transition: background 0.14s;
+  }
+  .compile-btn:hover { background: var(--accent-green-dark); }
+
+  /* ── MIDDLE PANEL ── */
+  .middle-panel {
+    width: 210px;
+    min-width: 190px;
+    flex-shrink: 0;
+    background: var(--surface-1);
+    border-right: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  .ptabs {
+    display: flex;
+    border-bottom: 1px solid var(--border);
+    background: var(--surface);
+  }
+  .ptab {
+    flex: 1;
+    padding: 10px 6px;
+    font-size: 12px;
+    color: var(--text-muted);
+    cursor: pointer;
+    text-align: center;
+    border-bottom: 2px solid transparent;
+    transition: all 0.13s;
+    user-select: none;
+  }
+  .ptab.active { color: var(--accent); border-bottom-color: var(--accent); }
+  .ptab:hover:not(.active) { background: var(--surface-1); }
+
+  /* CORKBOARD */
+  .corkboard {
+    flex: 1;
+    overflow-y: auto;
+    padding: 12px;
+    background: var(--cork-bg);
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .corkboard::-webkit-scrollbar { width: 4px; }
+  .corkboard::-webkit-scrollbar-thumb { background: rgba(139,94,60,0.25); border-radius: 2px; }
+
+  .cork-card {
+    background: var(--cork-card);
+    border-radius: 3px;
+    padding: 11px 11px 9px;
+    cursor: pointer;
+    border-top: 4px solid var(--binder-gold);
+    box-shadow: 0 2px 6px rgba(0,0,0,0.12);
+    transition: transform 0.14s, box-shadow 0.14s;
+    position: relative;
+  }
+  .cork-card:hover { transform: translateY(-2px); box-shadow: 0 5px 12px rgba(0,0,0,0.16); }
+  .cork-card.active { border-top-color: var(--accent-green); }
+  .cork-pin {
+    position: absolute;
+    top: -7px; left: 50%;
+    transform: translateX(-50%);
+    width: 11px; height: 11px;
+    border-radius: 50%;
+    background: #c0392b;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.35);
+  }
+  .cork-card .ct { font-family: 'Playfair Display', serif; font-size: 13px; font-weight: 600; color: #2a1a0a; margin-bottom: 5px; }
+  .cork-card .cs { font-size: 11px; color: #7a6a58; line-height: 1.5; }
+  .cork-card .cst { display: inline-block; font-size: 10px; padding: 2px 7px; border-radius: 8px; margin-top: 7px; }
+  .st-borrador { background: #fde8cc; color: #7a4a18; }
+  .st-revision { background: #ddf0e8; color: var(--accent-green); }
+  .st-final { background: #d4eaff; color: var(--accent); }
+
+  /* OUTLINER */
+  .outliner { flex: 1; overflow-y: auto; display: none; }
+  .ol-item {
+    padding: 9px 12px 9px 14px;
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    cursor: pointer;
+    font-size: 13px;
+    color: var(--text);
+    border-bottom: 1px solid var(--border);
+    transition: background 0.12s;
+  }
+  .ol-item:hover { background: var(--surface-2); }
+  .ol-item.active { background: var(--accent-bg); color: var(--accent); }
+  .ol-item .oi { font-size: 13px; color: var(--text-muted); }
+  .ol-item .ow { margin-left: auto; font-size: 11px; color: var(--text-muted); }
+  .ol-item.active .oi, .ol-item.active .ow { color: var(--accent); }
+
+  /* ── EDITOR ── */
+  .editor-area {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    background: var(--surface);
+  }
+
+  .editor-toolbar {
+    padding: 7px 16px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    background: var(--surface-1);
+    flex-wrap: wrap;
+    flex-shrink: 0;
+  }
+  .tg { display: flex; gap: 1px; }
+  .tg + .tg { margin-left: 6px; padding-left: 6px; border-left: 1px solid var(--border-strong); }
+  .tbtn {
+    padding: 5px 9px;
+    border: none;
+    background: transparent;
+    border-radius: 4px;
+    cursor: pointer;
+    color: var(--text-2);
+    font-size: 13px;
+    font-family: 'Inter', sans-serif;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    transition: background 0.1s, color 0.1s;
+  }
+  .tbtn:hover { background: var(--surface-2); color: var(--text); }
+  .tbtn.on { background: var(--accent-bg); color: var(--accent); }
+  .tbtn i { font-size: 16px; }
+  .tbtn-label { font-size: 12px; }
+
+  .editor-title-bar {
+    padding: 14px 24px 0;
+    background: var(--surface);
+    flex-shrink: 0;
+  }
+  .chapter-title {
+    width: 100%;
+    font-family: 'Playfair Display', serif;
+    font-size: 26px;
+    font-weight: 600;
+    color: var(--text);
+    border: none;
+    background: transparent;
+    outline: none;
+    padding-bottom: 10px;
+    border-bottom: 2px solid var(--accent-border);
+  }
+
+  .editor-scroll {
+    flex: 1;
+    overflow-y: auto;
+    padding: 24px;
+    background: var(--surface);
+  }
+  .editor-scroll::-webkit-scrollbar { width: 6px; }
+  .editor-scroll::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 3px; }
+
+  .editor-content { max-width: 640px; margin: 0 auto; }
+
+  .text-editor {
+    width: 100%;
+    min-height: 200px;
+    font-family: 'Lora', serif;
+    font-size: 17px;
+    line-height: 1.85;
+    color: var(--text);
+    border: none;
+    background: transparent;
+    resize: none;
+    outline: none;
+  }
+  .text-editor p { margin-bottom: 0.4em; }
+  .text-editor h2 { font-family: 'Playfair Display', serif; font-size: 20px; margin: 1em 0 0.4em; color: var(--text); }
+  .text-editor h3 { font-family: 'Playfair Display', serif; font-size: 17px; margin: 0.8em 0 0.3em; }
+  .text-editor blockquote {
+    border-left: 3px solid var(--binder-gold);
+    padding-left: 16px;
+    color: var(--text-2);
+    font-style: italic;
+    margin: 1em 0;
+  }
+
+  /* IMAGE BLOCKS */
+  .img-placeholder {
+    width: 100%;
+    background: var(--surface-1);
+    border: 1.5px dashed var(--border-strong);
+    border-radius: 8px;
+    padding: 28px 20px;
+    text-align: center;
+    cursor: pointer;
+    margin: 20px 0;
+    transition: all 0.14s;
+  }
+  .img-placeholder:hover { border-color: var(--accent-border); background: var(--accent-bg); }
+  .img-placeholder i { font-size: 30px; color: var(--text-muted); display: block; margin-bottom: 8px; }
+  .img-placeholder span { font-size: 13px; color: var(--text-muted); }
+
+  .img-wrapper {
+    margin: 20px 0;
+    position: relative;
+  }
+  .img-wrapper img { width: 100%; border-radius: 8px; display: block; }
+  .img-actions {
+    position: absolute;
+    top: 8px; right: 8px;
+    display: none;
+    gap: 5px;
+  }
+  .img-wrapper:hover .img-actions { display: flex; }
+  .img-act-btn {
+    width: 30px; height: 30px;
+    background: rgba(0,0,0,0.62);
+    border: none; border-radius: 5px;
+    cursor: pointer;
+    color: white;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px;
+    transition: background 0.12s;
+  }
+  .img-act-btn:hover { background: rgba(0,0,0,0.82); }
+  .img-caption {
+    width: 100%;
+    font-family: 'Lora', serif;
+    font-style: italic;
+    font-size: 13px;
+    color: var(--text-2);
+    border: none;
+    background: transparent;
+    text-align: center;
+    padding: 7px 0;
+    outline: none;
+    border-bottom: 1px solid transparent;
+    transition: border-color 0.13s;
+  }
+  .img-caption:focus { border-bottom-color: var(--border-strong); }
+
+  input[type="file"] { display: none; }
+
+  /* STATUS BAR */
+  .status-bar {
+    padding: 5px 20px;
+    background: var(--surface-1);
+    border-top: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    font-size: 12px;
+    color: var(--text-muted);
+    flex-shrink: 0;
+  }
+  .mode-pill {
+    background: var(--success-bg);
+    color: var(--success);
+    padding: 2px 9px;
+    border-radius: 10px;
+    font-size: 11px;
+    font-weight: 500;
+  }
+  .saved-indicator { margin-left: auto; display: flex; align-items: center; gap: 4px; }
+  .saved-indicator i { font-size: 13px; color: var(--success); }
+
+  /* ── NOTES PANEL ── */
+  .notes-panel {
+    width: 230px;
+    min-width: 210px;
+    flex-shrink: 0;
+    background: var(--surface-1);
+    border-left: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  .notes-header {
+    padding: 13px 14px;
+    border-bottom: 1px solid var(--border);
+    background: var(--surface);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .notes-header-title { font-size: 13px; font-weight: 500; color: var(--text); }
+
+  .ntabs { display: flex; gap: 4px; padding: 8px 10px; border-bottom: 1px solid var(--border); background: var(--surface); }
+  .ntab {
+    padding: 4px 10px;
+    font-size: 12px;
+    border-radius: var(--radius);
+    cursor: pointer;
+    color: var(--text-muted);
+    border: 1px solid transparent;
+    transition: all 0.12s;
+    font-family: 'Inter', sans-serif;
+    user-select: none;
+  }
+  .ntab.active { background: var(--accent-bg); color: var(--accent); border-color: var(--accent-border); }
+  .ntab:hover:not(.active) { background: var(--surface-2); }
+
+  .notes-scroll { flex: 1; overflow-y: auto; padding: 12px; }
+  .notes-scroll::-webkit-scrollbar { width: 4px; }
+  .notes-scroll::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 2px; }
+
+  .meta-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 7px 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .meta-label { font-size: 11px; color: var(--text-muted); }
+  .meta-select {
+    font-size: 12px;
+    background: var(--surface);
+    border: 1px solid var(--border-strong);
+    border-radius: 4px;
+    padding: 2px 6px;
+    color: var(--text);
+    font-family: 'Inter', sans-serif;
+    cursor: pointer;
+  }
+  .meta-val { font-size: 12px; color: var(--text); font-weight: 500; }
+
+  .ntextarea {
+    width: 100%;
+    resize: none;
+    font-size: 12px;
+    line-height: 1.65;
+    color: var(--text);
+    background: var(--surface);
+    border: 1px solid var(--border-strong);
+    border-radius: var(--radius);
+    padding: 8px 10px;
+    outline: none;
+    font-family: 'Inter', sans-serif;
+    margin: 8px 0;
+    transition: border-color 0.13s;
+  }
+  .ntextarea:focus { border-color: var(--accent-border); }
+
+  .section-label { font-size: 11px; color: var(--text-muted); margin: 10px 0 5px; }
+
+  .snap-item {
+    padding: 9px 10px;
+    background: var(--surface);
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
+    margin-bottom: 7px;
+    cursor: pointer;
+    transition: border-color 0.12s;
+  }
+  .snap-item:hover { border-color: var(--border-strong); }
+  .snap-date { font-size: 11px; color: var(--text-muted); }
+  .snap-label { font-size: 12px; color: var(--text); margin-top: 2px; font-weight: 500; }
+
+  .progress-wrap {
+    margin-top: 12px;
+    padding: 10px;
+    background: var(--surface);
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
+  }
+  .progress-label { font-size: 11px; color: var(--text-muted); margin-bottom: 7px; display: flex; justify-content: space-between; }
+  .progress-track { background: var(--surface-2); border-radius: 6px; height: 7px; overflow: hidden; }
+  .progress-fill { height: 100%; background: var(--accent); border-radius: 6px; transition: width 0.3s; }
+
+  .wc-footer {
+    padding: 9px 14px;
+    background: var(--surface);
+    border-top: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-shrink: 0;
+  }
+  .wc-label { font-size: 11px; color: var(--text-muted); }
+  .wc-val { font-size: 12px; color: var(--text); font-weight: 500; }
+
+  /* TOAST */
+  .toast {
+    position: fixed;
+    bottom: 28px;
+    left: 50%;
+    transform: translateX(-50%) translateY(60px);
+    background: #1a1208;
+    color: #e8d8b8;
+    padding: 9px 18px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-family: 'Inter', sans-serif;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.2s, transform 0.2s;
+    z-index: 1000;
+    white-space: nowrap;
+  }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+  /* FOCUS MODE */
+  .focus-mode .binder,
+  .focus-mode .middle-panel,
+  .focus-mode .notes-panel { display: none; }
+  .focus-mode .editor-area { background: #fffdf9; }
+  .focus-mode .editor-scroll { padding: 48px; }
+  .focus-mode .editor-content { max-width: 680px; }
+</style>
+</head>
+<body>
+
+<div class="app" id="app">
+
+  <!-- ════ BINDER ════ -->
+  <div class="binder">
+    <div class="binder-spine"></div>
+    <div class="binder-header">
+      <div class="binder-project" id="projectName" contenteditable="true" spellcheck="false">Mi proyecto</div>
+      <div class="binder-sub">Cuentos ilustrados</div>
+    </div>
+
+    <div class="binder-body" id="binderBody">
+      <div class="binder-section-label">Manuscrito</div>
+
+      <div class="binder-item active" data-section="root" onclick="selectBinder(this,'El bosque encantado')">
+        <i class="ti ti-book bi"></i>
+        <span class="bl">El bosque encantado</span>
+      </div>
+      <div class="binder-item sub" data-section="cap1" onclick="selectBinder(this,'Cap. 1 — La llegada')">
+        <i class="ti ti-file-text bi" style="font-size:12px"></i>
+        <span class="bl">Cap. 1 — La llegada</span>
+        <span class="bb" id="badge-cap1">320</span>
+      </div>
+      <div class="binder-item sub" data-section="cap2" onclick="selectBinder(this,'Cap. 2 — La criatura')">
+        <i class="ti ti-file-text bi" style="font-size:12px"></i>
+        <span class="bl">Cap. 2 — La criatura</span>
+        <span class="bb" id="badge-cap2">215</span>
+      </div>
+      <div class="binder-item sub" data-section="cap3" onclick="selectBinder(this,'Cap. 3 — El regreso')">
+        <i class="ti ti-file-text bi" style="font-size:12px"></i>
+        <span class="bl">Cap. 3 — El regreso</span>
+        <span class="bb" id="badge-cap3">0</span>
+      </div>
+
+      <button class="binder-add-btn" onclick="addChapter()">
+        <i class="ti ti-plus" style="font-size:13px"></i> Añadir capítulo
+      </button>
+
+      <div class="binder-divider"></div>
+      <div class="binder-section-label">Personajes</div>
+      <div class="binder-item" onclick="selectBinder(this,'Lía — protagonista')">
+        <i class="ti ti-user bi"></i><span class="bl">Lía — protagonista</span>
+      </div>
+      <div class="binder-item" onclick="selectBinder(this,'El guardián del bosque')">
+        <i class="ti ti-ghost bi"></i><span class="bl">El guardián</span>
+      </div>
+
+      <div class="binder-divider"></div>
+      <div class="binder-section-label">Referencias</div>
+      <div class="binder-item" onclick="selectBinder(this,'Paleta visual')">
+        <i class="ti ti-palette bi"></i><span class="bl">Paleta visual</span>
+      </div>
+      <div class="binder-item" onclick="selectBinder(this,'Notas de estilo')">
+        <i class="ti ti-notes bi"></i><span class="bl">Notas de estilo</span>
+      </div>
+    </div>
+
+    <button class="compile-btn" onclick="compileProject()">
+      <i class="ti ti-download"></i> Compilar proyecto
+    </button>
+  </div>
+
+  <!-- ════ MIDDLE PANEL ════ -->
+  <div class="middle-panel">
+    <div class="ptabs">
+      <div class="ptab active" onclick="switchMiddle('cork',this)">Corcho</div>
+      <div class="ptab" onclick="switchMiddle('outline',this)">Esquema</div>
+    </div>
+
+    <div class="corkboard" id="corkboard">
+      <div class="cork-card active" onclick="activateCard(this,'Cap. 1 — La llegada','cap1')">
+        <div class="cork-pin"></div>
+        <div class="ct">La llegada</div>
+        <div class="cs">Lía llega al borde del bosque con su linterna. Algo la llama desde adentro.</div>
+        <div class="cst st-revision">En revisión</div>
+      </div>
+      <div class="cork-card" onclick="activateCard(this,'Cap. 2 — La criatura','cap2')">
+        <div class="cork-pin" style="background:#3D6B5E"></div>
+        <div class="ct">La criatura</div>
+        <div class="cs">Descubre al guardián: un ser hecho de musgo y luciérnagas.</div>
+        <div class="cst st-borrador">Borrador</div>
+      </div>
+      <div class="cork-card" onclick="activateCard(this,'Cap. 3 — El regreso','cap3')">
+        <div class="cork-pin" style="background:#9a9a9a"></div>
+        <div class="ct">El regreso</div>
+        <div class="cs">Sin escribir aún.</div>
+        <div class="cst st-borrador">Borrador</div>
+      </div>
+    </div>
+
+    <div class="outliner" id="outliner">
+      <div class="ol-item active" onclick="activateCard(null,'Cap. 1 — La llegada','cap1')">
+        <i class="ti ti-file-text oi"></i><span>La llegada</span><span class="ow">320p</span>
+      </div>
+      <div class="ol-item" onclick="activateCard(null,'Cap. 2 — La criatura','cap2')">
+        <i class="ti ti-file-text oi"></i><span>La criatura</span><span class="ow">215p</span>
+      </div>
+      <div class="ol-item" onclick="activateCard(null,'Cap. 3 — El regreso','cap3')">
+        <i class="ti ti-file-text oi"></i><span>El regreso</span><span class="ow">0p</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════ EDITOR ════ -->
+  <div class="editor-area">
+    <div class="editor-toolbar">
+      <div class="tg">
+        <button class="tbtn" onclick="fmt('bold')" title="Negrita (Ctrl+B)"><i class="ti ti-bold"></i></button>
+        <button class="tbtn" onclick="fmt('italic')" title="Cursiva (Ctrl+I)"><i class="ti ti-italic"></i></button>
+        <button class="tbtn" onclick="fmt('underline')" title="Subrayado (Ctrl+U)"><i class="ti ti-underline"></i></button>
+        <button class="tbtn" onclick="fmt('strikeThrough')" title="Tachado"><i class="ti ti-strikethrough"></i></button>
+      </div>
+      <div class="tg">
+        <button class="tbtn" onclick="fmt('h1')" title="Título"><i class="ti ti-h-1"></i></button>
+        <button class="tbtn" onclick="fmt('h2')" title="Subtítulo"><i class="ti ti-h-2"></i></button>
+        <button class="tbtn" onclick="fmt('quote')" title="Cita"><i class="ti ti-quote"></i></button>
+        <button class="tbtn" onclick="fmt('insertUnorderedList')" title="Lista"><i class="ti ti-list"></i></button>
+      </div>
+      <div class="tg">
+        <button class="tbtn" onclick="triggerImg()" title="Insertar imagen">
+          <i class="ti ti-photo"></i><span class="tbtn-label">Imagen</span>
+        </button>
+        <button class="tbtn" onclick="addSeparator()" title="Separador de sección">
+          <i class="ti ti-minus"></i><span class="tbtn-label">Separador</span>
+        </button>
+      </div>
+      <div class="tg">
+        <button class="tbtn" onclick="saveSnapshot()" title="Guardar versión">
+          <i class="ti ti-camera"></i><span class="tbtn-label">Snapshot</span>
+        </button>
+        <button class="tbtn" id="focusBtn" onclick="toggleFocus()" title="Modo escritura a pantalla completa">
+          <i class="ti ti-eye"></i><span class="tbtn-label">Foco</span>
+        </button>
+        <button class="tbtn" onclick="exportText()" title="Exportar texto">
+          <i class="ti ti-file-export"></i><span class="tbtn-label">Exportar</span>
+        </button>
+      </div>
+    </div>
+
+    <div class="editor-title-bar">
+      <input type="text" class="chapter-title" id="chapterTitle" value="Cap. 1 — La llegada" />
+    </div>
+
+    <div class="editor-scroll">
+      <div class="editor-content" id="editorContent">
+
+        <div class="img-wrapper" id="imgDemo">
+          <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='640' height='220' viewBox='0 0 640 220'%3E%3Crect width='640' height='220' fill='%23c8dfc0'/%3E%3Crect y='140' width='640' height='80' fill='%23a5c799'/%3E%3Cellipse cx='100' cy='60' rx='70' ry='110' fill='%23386b44'/%3E%3Cellipse cx='210' cy='40' rx='80' ry='120' fill='%234a7c54'/%3E%3Cellipse cx='430' cy='50' rx='85' ry='115' fill='%23386b44'/%3E%3Cellipse cx='550' cy='65' rx='72' ry='108' fill='%234a7c54'/%3E%3Cellipse cx='640' cy='80' rx='60' ry='100' fill='%23386b44'/%3E%3Ccircle cx='320' cy='90' r='22' fill='%23f9e04a' opacity='0.95'/%3E%3Ccircle cx='320' cy='90' r='14' fill='%23fdf3a0'/%3E%3Cellipse cx='320' cy='104' rx='38' ry='26' fill='%23f5c842' opacity='0.25'/%3E%3Crect x='312' y='112' width='16' height='60' fill='%23b8763a'/%3E%3C/svg%3E" alt="El bosque de noche" />
+          <div class="img-actions">
+            <button class="img-act-btn" onclick="removeImg('imgDemo')" title="Quitar"><i class="ti ti-trash" style="font-size:13px"></i></button>
+          </div>
+          <input class="img-caption" type="text" value="El bosque brillaba bajo la luna, como si los árboles respiraran luz." />
+        </div>
+
+        <div id="mainEditor" contenteditable="true" class="text-editor" oninput="onEditorInput()" spellcheck="true">
+          <p>Lía nunca había visto el bosque de noche. Su linterna parpadeaba como un corazón nervioso mientras los árboles cerraban el cielo sobre su cabeza.</p>
+          <p><br></p>
+          <p>—Aquí hay algo —susurró, aunque nadie la escuchaba.</p>
+          <p><br></p>
+          <p>Y entonces lo oyó: un sonido suave, como hojas que aprenden a hablar.</p>
+        </div>
+
+        <div class="img-placeholder" id="imgPlaceholder" onclick="triggerImg()">
+          <i class="ti ti-photo-plus" aria-hidden="true"></i>
+          <span>Haz clic aquí para insertar una ilustración</span>
+        </div>
+
+        <input type="file" id="imgInput" accept="image/*" onchange="handleImg(event)" />
+      </div>
+    </div>
+
+    <div class="status-bar">
+      <span class="mode-pill" id="modePill">Escritura</span>
+      <span id="sbWords">Palabras: <strong>47</strong></span>
+      <span id="sbChapter">Capítulo 1 de 3</span>
+      <span class="saved-indicator" id="savedIndicator">
+        Guardado <i class="ti ti-check"></i>
+      </span>
+    </div>
+  </div>
+
+  <!-- ════ NOTES PANEL ════ -->
+  <div class="notes-panel">
+    <div class="notes-header">
+      <span class="notes-header-title">Notas</span>
+      <i class="ti ti-layout-sidebar-right" style="font-size:15px; color:var(--text-muted); cursor:pointer" onclick="toggleNotesPanel()" title="Ocultar panel"></i>
+    </div>
+
+    <div class="ntabs">
+      <div class="ntab active" onclick="switchNote('meta',this)">Info</div>
+      <div class="ntab" onclick="switchNote('notes',this)">Notas</div>
+      <div class="ntab" onclick="switchNote('snaps',this)">Snaps</div>
+    </div>
+
+    <div class="notes-scroll">
+
+      <!-- INFO TAB -->
+      <div id="tab-meta">
+        <div class="meta-row">
+          <span class="meta-label">Estado</span>
+          <select class="meta-select" onchange="updateStatus(this.value)">
+            <option>Borrador</option>
+            <option selected>En revisión</option>
+            <option>Final</option>
+          </select>
+        </div>
+        <div class="meta-row">
+          <span class="meta-label">Punto de vista</span>
+          <select class="meta-select">
+            <option>1.ª persona</option>
+            <option selected>3.ª persona</option>
+            <option>2.ª persona</option>
+          </select>
+        </div>
+        <div class="meta-row">
+          <span class="meta-label">Palabras</span>
+          <span class="meta-val"><span id="wc2">47</span> / 400</span>
+        </div>
+        <div class="meta-row">
+          <span class="meta-label">Imágenes</span>
+          <span class="meta-val" id="imgCount">1</span>
+        </div>
+        <div class="meta-row" style="border:none">
+          <span class="meta-label">Etiqueta</span>
+          <select class="meta-select">
+            <option>Acción</option>
+            <option selected>Misterio</option>
+            <option>Emoción</option>
+            <option>Comedia</option>
+          </select>
+        </div>
+
+        <div class="section-label" style="margin-top:12px">Sinopsis de la escena</div>
+        <textarea class="ntextarea" style="min-height:72px">Lía llega al bosque con su linterna. Oye algo en la oscuridad.</textarea>
+
+        <div class="progress-wrap">
+          <div class="progress-label">
+            <span>Progreso</span>
+            <span id="pctLabel">12%</span>
+          </div>
+          <div class="progress-track">
+            <div class="progress-fill" id="progressFill" style="width:12%"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- NOTES TAB -->
+      <div id="tab-notes" style="display:none">
+        <div class="section-label">Notas del autor</div>
+        <textarea class="ntextarea" style="min-height:110px">Recordar: la linterna es un símbolo. La luz = el coraje de Lía.
+
+¿Añadir sonido de búhos en el cap. 2?</textarea>
+        <div class="section-label">Referencias visuales</div>
+        <textarea class="ntextarea" style="min-height:80px">Paleta: verdes oscuros + amarillo linterna.
+Inspiración: ilustradores nórdicos de los años 70.</textarea>
+        <div class="section-label">Lista de pendientes</div>
+        <textarea class="ntextarea" style="min-height:70px">☐ Revisar diálogos cap. 1
+☐ Añadir ilustración de la criatura
+☐ Corrección ortográfica final</textarea>
+      </div>
+
+      <!-- SNAPSHOTS TAB -->
+      <div id="tab-snaps" style="display:none">
+        <div class="section-label">Versiones guardadas</div>
+        <div class="snap-item">
+          <div class="snap-date">Hoy, 10:42</div>
+          <div class="snap-label">Primera versión</div>
+        </div>
+        <div id="snapsContainer"></div>
+        <div style="font-size:11px; color:var(--text-muted); margin-top:10px; text-align:center; line-height:1.5">Usa el botón "Snapshot" en la barra para guardar la versión actual</div>
+      </div>
+    </div>
+
+    <div class="wc-footer">
+      <span class="wc-label">Total proyecto</span>
+      <span class="wc-val"><span id="totalWC">535</span> palabras</span>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+  /* ── STATE ── */
+  let snapCount = 0;
+  let imgCount = 1;
+  let isFocusMode = false;
+  let isNotesPanelHidden = false;
+  let autoSaveTimer = null;
+
+  /* ── TOAST ── */
+  function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 2200);
+  }
+
+  /* ── BINDER ── */
+  function selectBinder(el, title) {
+    document.querySelectorAll('.binder-item').forEach(i => i.classList.remove('active'));
+    el.classList.add('active');
+    document.getElementById('chapterTitle').value = title;
+  }
+
+  function addChapter() {
+    const num = document.querySelectorAll('.binder-item.sub').length + 1;
+    const title = `Cap. ${num} — Nuevo capítulo`;
+    const binderBody = document.getElementById('binderBody');
+    const addBtn = binderBody.querySelector('.binder-add-btn');
+    const item = document.createElement('div');
+    item.className = 'binder-item sub';
+    item.innerHTML = `<i class="ti ti-file-text bi" style="font-size:12px"></i><span class="bl">${title}</span><span class="bb">0</span>`;
+    item.onclick = () => { selectBinder(item, title); };
+    binderBody.insertBefore(item, addBtn);
+    selectBinder(item, title);
+    addCorkCard(title);
+    showToast('Capítulo añadido');
+  }
+
+  /* ── MIDDLE PANEL ── */
+  function switchMiddle(mode, tabEl) {
+    document.querySelectorAll('.ptab').forEach(t => t.classList.remove('active'));
+    tabEl.classList.add('active');
+    document.getElementById('corkboard').style.display = mode === 'cork' ? 'flex' : 'none';
+    document.getElementById('outliner').style.display = mode === 'outline' ? 'block' : 'none';
+  }
+
+  function activateCard(card, title, section) {
+    if (card) {
+      document.querySelectorAll('.cork-card').forEach(c => c.classList.remove('active'));
+      card.classList.add('active');
+    }
+    document.querySelectorAll('.ol-item').forEach(i => i.classList.remove('active'));
+    document.getElementById('chapterTitle').value = title;
+  }
+
+  function addCorkCard(title) {
+    const cork = document.getElementById('corkboard');
+    const card = document.createElement('div');
+    card.className = 'cork-card';
+    card.innerHTML = `<div class="cork-pin" style="background:#9a9a9a"></div>
+      <div class="ct">${title.replace(/Cap\. \d+ — /, '')}</div>
+      <div class="cs">Sin escribir aún.</div>
+      <div class="cst st-borrador">Borrador</div>`;
+    card.onclick = () => activateCard(card, title);
+    cork.appendChild(card);
+  }
+
+  /* ── EDITOR ── */
+  function fmt(cmd) {
+    const editor = document.getElementById('mainEditor');
+    editor.focus();
+    if (cmd === 'h1') { document.execCommand('formatBlock', false, 'h2'); }
+    else if (cmd === 'h2') { document.execCommand('formatBlock', false, 'h3'); }
+    else if (cmd === 'quote') { document.execCommand('formatBlock', false, 'blockquote'); }
+    else { document.execCommand(cmd, false, null); }
+  }
+
+  function onEditorInput() {
+    const text = document.getElementById('mainEditor').innerText || '';
+    const words = text.trim() ? text.trim().split(/\s+/).length : 0;
+    document.getElementById('sbWords').innerHTML = `Palabras: <strong>${words}</strong>`;
+    document.getElementById('wc2').textContent = words;
+    const pct = Math.min(100, Math.round(words / 400 * 100));
+    document.getElementById('progressFill').style.width = pct + '%';
+    document.getElementById('pctLabel').textContent = pct + '%';
+    triggerAutoSave();
+  }
+
+  function triggerAutoSave() {
+    document.getElementById('savedIndicator').innerHTML = 'Guardando… <i class="ti ti-loader" style="font-size:13px"></i>';
+    clearTimeout(autoSaveTimer);
+    autoSaveTimer = setTimeout(() => {
+      document.getElementById('savedIndicator').innerHTML = 'Guardado <i class="ti ti-check" style="font-size:13px; color:var(--success)"></i>';
+    }, 1200);
+  }
+
+  /* ── IMAGES ── */
+  function triggerImg() { document.getElementById('imgInput').click(); }
+
+  function handleImg(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      const uid = 'img_' + Date.now();
+      const placeholder = document.getElementById('imgPlaceholder');
+      const wrapper = document.createElement('div');
+      wrapper.className = 'img-wrapper';
+      wrapper.id = uid;
+      wrapper.innerHTML = `
+        <img src="${ev.target.result}" alt="Ilustración" />
+        <div class="img-actions">
+          <button class="img-act-btn" onclick="removeImg('${uid}')" title="Quitar imagen"><i class="ti ti-trash" style="font-size:13px"></i></button>
+        </div>
+        <input class="img-caption" type="text" placeholder="Pie de imagen…" />
+      `;
+      placeholder.parentNode.insertBefore(wrapper, placeholder);
+      imgCount++;
+      document.getElementById('imgCount').textContent = imgCount;
+      showToast('Imagen insertada');
+    };
+    reader.readAsDataURL(file);
+    e.target.value = '';
+  }
+
+  function removeImg(id) {
+    const el = document.getElementById(id);
+    if (el) { el.remove(); imgCount = Math.max(0, imgCount - 1); document.getElementById('imgCount').textContent = imgCount; showToast('Imagen eliminada'); }
+  }
+
+  function addSeparator() {
+    const editor = document.getElementById('mainEditor');
+    editor.focus();
+    document.execCommand('insertHorizontalRule');
+  }
+
+  /* ── SNAPSHOT ── */
+  function saveSnapshot() {
+    snapCount++;
+    const now = new Date();
+    const label = document.getElementById('chapterTitle').value;
+    const container = document.getElementById('snapsContainer');
+    const item = document.createElement('div');
+    item.className = 'snap-item';
+    item.innerHTML = `<div class="snap-date">${now.toLocaleTimeString('es-ES', {hour:'2-digit', minute:'2-digit'})}</div>
+      <div class="snap-label">Versión ${snapCount + 1} — ${label}</div>`;
+    container.insertBefore(item, container.firstChild);
+    switchNote('snaps', document.querySelectorAll('.ntab')[2]);
+    showToast('Snapshot guardado');
+  }
+
+  /* ── NOTES PANEL ── */
+  function switchNote(tab, el) {
+    document.querySelectorAll('.ntab').forEach(t => t.classList.remove('active'));
+    el.classList.add('active');
+    ['meta','notes','snaps'].forEach(id => {
+      document.getElementById('tab-' + id).style.display = id === tab ? 'block' : 'none';
+    });
+  }
+
+  function toggleNotesPanel() {
+    const panel = document.querySelector('.notes-panel');
+    isNotesPanelHidden = !isNotesPanelHidden;
+    panel.style.display = isNotesPanelHidden ? 'none' : 'flex';
+  }
+
+  /* ── FOCUS MODE ── */
+  function toggleFocus() {
+    isFocusMode = !isFocusMode;
+    const app = document.getElementById('app');
+    const btn = document.getElementById('focusBtn');
+    app.classList.toggle('focus-mode', isFocusMode);
+    btn.classList.toggle('on', isFocusMode);
+    document.getElementById('modePill').textContent = isFocusMode ? 'Foco' : 'Escritura';
+    showToast(isFocusMode ? 'Modo foco activado (Esc para salir)' : 'Modo foco desactivado');
+  }
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && isFocusMode) toggleFocus();
+  });
+
+  /* ── COMPILE / EXPORT ── */
+  function compileProject() {
+    showToast('Preparando compilación…');
+  }
+
+  function exportText() {
+    const title = document.getElementById('chapterTitle').value;
+    const content = document.getElementById('mainEditor').innerText;
+    const blob = new Blob([`${title}\n${'─'.repeat(title.length)}\n\n${content}`], {type: 'text/plain'});
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = title.replace(/[^a-zA-ZáéíóúñÁÉÍÓÚÑ0-9 ]/g, '') + '.txt';
+    a.click();
+    showToast('Texto exportado');
+  }
+
+  function updateStatus(val) { /* para expansión futura */ }
+</script>
+</body>
+</html>
