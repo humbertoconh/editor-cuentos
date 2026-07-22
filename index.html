@@ -593,220 +593,449 @@ La criatura podría hablar en forma de poemas.</textarea>
 <div class="toast" id="toast"></div>
 
 <script>
-/* ── STATE ── */
-let snapCount=0,imgCount=1,isSplit=false,sesionWords=0,startWords=47,autoSaveT=null;
-const totalProjectWords=535;
+/* ══════════════════════════════════════════
+   ESTADO GLOBAL
+══════════════════════════════════════════ */
+let snapCount = 0;
+let isSplit = false;
+let autoSaveT = null;
+let sesionStartWords = 0;
 
-/* ── TOAST ── */
-function showToast(m){const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2200)}
+// Base de datos de capítulos — cada uno tiene su propio contenido
+const chapters = {
+  cap1: {
+    title: 'Cap. 1 — La llegada',
+    content: `<p>Lía nunca había visto el bosque de noche. Su linterna parpadeaba como un corazón nervioso mientras los árboles cerraban el cielo sobre su cabeza.</p><p><br></p><p>—Aquí hay algo —susurró, aunque nadie la escuchaba.</p><p><br></p><p>Y entonces lo oyó: un sonido suave, como hojas que aprenden a hablar.</p>`,
+    words: 47, status: 'revision', label: 'Misterio', pdv: '3a', incluir: true,
+    sinopsis: 'Lía llega al bosque con su linterna. Oye algo en la oscuridad.',
+    notas: 'La linterna = símbolo del coraje de Lía. Revisar ritmo del diálogo.',
+    snaps: [], objetivo: 400
+  },
+  cap2: {
+    title: 'Cap. 2 — La criatura',
+    content: `<p>El guardián emergió entre los helechos. Era alto como tres hombres juntos, hecho de musgo y luciérnagas que parpadeaban en lugar de latidos.</p>`,
+    words: 28, status: 'borrador', label: 'Misterio', pdv: '3a', incluir: true,
+    sinopsis: 'Lía descubre al guardián del bosque.',
+    notas: '', snaps: [], objetivo: 400
+  },
+  cap3: {
+    title: 'Cap. 3 — El regreso',
+    content: ``,
+    words: 0, status: 'borrador', label: 'Emoción', pdv: '3a', incluir: true,
+    sinopsis: '', notas: '', snaps: [], objetivo: 400
+  }
+};
 
-/* ── BINDER ── */
-function selectBinder(el,title,section){
-  document.querySelectorAll('.binder-item').forEach(i=>i.classList.remove('active'));
-  el.classList.add('active');
-  document.getElementById('chapterTitle').value=title;
-  document.getElementById('composeTitleInput').value=title;
+let currentChapterId = 'cap1';
+let imgCount = 1;
+
+/* ══════════════════════════════════════════
+   TOAST
+══════════════════════════════════════════ */
+function showToast(m) {
+  const t = document.getElementById('toast');
+  t.textContent = m;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2200);
 }
-function addChapter(){
-  const n=document.querySelectorAll('.binder-item.sub').length+1;
-  const title=`Cap. ${n} — Nuevo capítulo`;
-  const body=document.getElementById('binderBody');
-  const btn=body.querySelector('.binder-add-btn');
-  const item=document.createElement('div');
-  item.className='binder-item sub';
-  item.innerHTML=`<i class="ti ti-file-text bi" style="font-size:12px"></i><span class="bl">${title}</span><span class="bb">0</span>`;
-  item.onclick=()=>{selectBinder(item,title,'new');};
-  body.insertBefore(item,btn);
-  addCorkCard(title);
+
+/* ══════════════════════════════════════════
+   GUARDAR CAPÍTULO ACTUAL ANTES DE CAMBIAR
+══════════════════════════════════════════ */
+function saveCurrentChapter() {
+  if (!currentChapterId) return;
+  const ch = chapters[currentChapterId];
+  if (!ch) return;
+  ch.content = document.getElementById('mainEditor').innerHTML;
+  ch.title = document.getElementById('chapterTitle').value;
+  const text = document.getElementById('mainEditor').innerText || '';
+  ch.words = text.trim() ? text.trim().split(/\s+/).length : 0;
+  // Guardar sinopsis y notas
+  const sinEl = document.querySelector('#tab-sinopsis textarea');
+  if (sinEl) ch.sinopsis = sinEl.value;
+  const notEl = document.querySelector('#tab-notas textarea');
+  if (notEl) ch.notas = notEl.value;
+}
+
+/* ══════════════════════════════════════════
+   CARGAR UN CAPÍTULO EN EL EDITOR
+══════════════════════════════════════════ */
+function loadChapter(id) {
+  saveCurrentChapter();
+  currentChapterId = id;
+  const ch = chapters[id];
+  if (!ch) return;
+
+  // Título
+  document.getElementById('chapterTitle').value = ch.title;
+  document.getElementById('composeTitleInput').value = ch.title;
+
+  // Contenido del editor
+  const editor = document.getElementById('mainEditor');
+  editor.innerHTML = ch.content || '';
+
+  // Inspector — info
+  const statusSel = document.querySelector('#tab-meta select:nth-of-type(1)');
+  if (statusSel) {
+    statusSel.value = ch.status === 'revision' ? 'En revisión' : ch.status === 'final' ? 'Final' : 'Borrador';
+  }
+
+  // Sinopsis
+  const sinEl = document.querySelector('#tab-sinopsis textarea');
+  if (sinEl) sinEl.value = ch.sinopsis || '';
+
+  // Notas
+  const notEl = document.querySelector('#tab-notas textarea');
+  if (notEl) notEl.value = ch.notas || '';
+
+  // Contar palabras
+  const text = editor.innerText || '';
+  const words = text.trim() ? text.trim().split(/\s+/).length : 0;
+  updateWordCountUI(words);
+
+  // Reset sesion start
+  sesionStartWords = words;
+
+  // Actualizar scrivenings
+  updateScrivenings();
+
+  showToast('Cargado: ' + ch.title);
+}
+
+/* ══════════════════════════════════════════
+   BINDER
+══════════════════════════════════════════ */
+function selectBinder(el, title, section) {
+  document.querySelectorAll('.binder-item').forEach(i => i.classList.remove('active'));
+  el.classList.add('active');
+
+  // Si es un capítulo del manuscrito, cargarlo
+  if (chapters[section]) {
+    loadChapter(section);
+  } else {
+    // Para personajes, referencias, etc. solo cambia el título
+    document.getElementById('chapterTitle').value = title;
+  }
+}
+
+function addChapter() {
+  const ids = Object.keys(chapters).filter(k => k.startsWith('cap'));
+  const n = ids.length + 1;
+  const newId = 'cap' + n;
+  const title = `Cap. ${n} — Nuevo capítulo`;
+
+  chapters[newId] = {
+    title, content: '', words: 0, status: 'borrador',
+    label: 'Sin etiqueta', pdv: '3a', incluir: true,
+    sinopsis: '', notas: '', snaps: [], objetivo: 400
+  };
+
+  const body = document.getElementById('binderBody');
+  const btn = body.querySelector('.binder-add-btn');
+  const item = document.createElement('div');
+  item.className = 'binder-item sub';
+  item.id = 'binder-' + newId;
+  item.innerHTML = `<i class="ti ti-file-text bi" style="font-size:12px"></i><span class="bl">${title}</span><span class="bb" id="badge-${newId}">0</span>`;
+  item.onclick = () => selectBinder(item, title, newId);
+  body.insertBefore(item, btn);
+
+  addCorkCard(title, newId);
+  loadChapter(newId);
+
+  // Seleccionar en binder
+  document.querySelectorAll('.binder-item').forEach(i => i.classList.remove('active'));
+  item.classList.add('active');
+
   showToast('Capítulo añadido');
 }
-function addPersonaje(){showToast('Personaje añadido')}
-function addRef(){showToast('Referencia añadida')}
 
-/* ── MIDDLE ── */
-function switchMiddle(mode,tabEl){
-  document.querySelectorAll('.ptab').forEach(t=>t.classList.remove('active'));
+function addPersonaje() { showToast('Personaje añadido'); }
+function addRef() { showToast('Referencia añadida'); }
+
+/* ══════════════════════════════════════════
+   PANEL CENTRAL
+══════════════════════════════════════════ */
+function switchMiddle(mode, tabEl) {
+  document.querySelectorAll('.ptab').forEach(t => t.classList.remove('active'));
   tabEl.classList.add('active');
-  document.getElementById('corkboard').style.display=mode==='cork'?'flex':'none';
-  document.getElementById('outliner').style.display=mode==='outline'?'block':'none';
-  document.getElementById('scriveningsView').style.display=mode==='scrivenings'?'block':'none';
+  document.getElementById('corkboard').style.display = mode === 'cork' ? 'flex' : 'none';
+  document.getElementById('outliner').style.display = mode === 'outline' ? 'block' : 'none';
+  document.getElementById('scriveningsView').style.display = mode === 'scrivenings' ? 'block' : 'none';
+  if (mode === 'scrivenings') updateScrivenings();
 }
-function activateCard(card,title,section){
-  if(card){document.querySelectorAll('.cork-card').forEach(c=>c.classList.remove('active'));card.classList.add('active');}
-  document.querySelectorAll('.ol-item').forEach(i=>i.classList.remove('active'));
-  document.getElementById('chapterTitle').value=title;
-  document.getElementById('composeTitleInput').value=title;
+
+function activateCard(card, title, section) {
+  if (card) {
+    document.querySelectorAll('.cork-card').forEach(c => c.classList.remove('active'));
+    card.classList.add('active');
+  }
+  document.querySelectorAll('.ol-item').forEach(i => i.classList.remove('active'));
+  if (chapters[section]) {
+    loadChapter(section);
+    // Marcar en binder
+    const binderItem = document.getElementById('binder-' + section) ||
+      document.querySelector(`.binder-item[data-id="${section}"]`);
+    if (binderItem) {
+      document.querySelectorAll('.binder-item').forEach(i => i.classList.remove('active'));
+      binderItem.classList.add('active');
+    }
+  }
 }
-function addCorkCard(title){
-  const cork=document.getElementById('corkboard');
-  const card=document.createElement('div');
-  card.className='cork-card';
-  card.innerHTML=`<div class="cork-pin" style="background:#9a9a9a"></div><div class="ct">${title.replace(/Cap\. \d+ — /,'')}</div><div class="cs">Sin escribir aún.</div><div class="cst st-borrador">Borrador</div>`;
-  card.onclick=()=>activateCard(card,title);
+
+function addCorkCard(title, id) {
+  const cork = document.getElementById('corkboard');
+  const card = document.createElement('div');
+  card.className = 'cork-card';
+  card.id = 'cork-' + id;
+  card.innerHTML = `<div class="cork-pin" style="background:#9a9a9a"></div><div class="ct">${title.replace(/Cap\. \d+ — /, '')}</div><div class="cs">Sin escribir aún.</div><div class="cst st-borrador">Borrador</div>`;
+  card.onclick = () => activateCard(card, title, id);
   cork.appendChild(card);
 }
 
-/* ── EDITOR ── */
-function fmt(cmd){
-  const ed=document.getElementById('mainEditor');ed.focus();
-  if(cmd==='h2')document.execCommand('formatBlock',false,'h2');
-  else if(cmd==='h3')document.execCommand('formatBlock',false,'h3');
-  else if(cmd==='quote')document.execCommand('formatBlock',false,'blockquote');
-  else if(cmd==='ul')document.execCommand('insertUnorderedList');
-  else document.execCommand(cmd,false,null);
-}
-function addSep(){const ed=document.getElementById('mainEditor');ed.focus();document.execCommand('insertHorizontalRule');}
-
-function onEditorInput(){
-  const text=document.getElementById('mainEditor').innerText||'';
-  const words=text.trim()?text.trim().split(/\s+/).length:0;
-  const diff=Math.max(0,words-startWords);
-  sesionWords=diff;
-  document.getElementById('sbWords').innerHTML=`Palabras: <strong>${words}</strong>`;
-  document.getElementById('sbSesion').innerHTML=`Sesión: <strong>+${diff}</strong>`;
-  document.getElementById('wc2').textContent=words;
-  const pct=Math.min(100,Math.round(words/400*100));
-  document.getElementById('progressFill').style.width=pct+'%';
-  document.getElementById('pctLabel').textContent=pct+'%';
-  updateObjetivo(words);updateSesion(diff);
-  triggerAutoSave();
-}
-function triggerAutoSave(){
-  document.getElementById('savedOk').innerHTML='Guardando… <i class="ti ti-loader" style="font-size:12px"></i>';
-  clearTimeout(autoSaveT);
-  autoSaveT=setTimeout(()=>{document.getElementById('savedOk').innerHTML='Guardado <i class="ti ti-check" style="font-size:12px;color:var(--success)"></i>';},1200);
-}
-
-/* ── OBJETIVO ── */
-function updateObjetivo(currentWords){
-  const target=parseInt(document.getElementById('objTarget').value)||5000;
-  const total=parseInt(document.getElementById('totalWC').textContent)||535;
-  const w=currentWords||total;
-  const pct=Math.min(100,Math.round(w/target*100));
-  document.getElementById('objFill').style.width=pct+'%';
-  document.getElementById('objPct').textContent=pct+'%';
-}
-function updateSesion(sw){
-  const target=parseInt(document.getElementById('sesionTarget').value)||500;
-  const s=sw||sesionWords;
-  const pct=Math.min(100,Math.round(s/target*100));
-  document.getElementById('sesionFill').style.width=pct+'%';
-  document.getElementById('sesionPct').textContent=pct+'%';
-  document.getElementById('sbSesion').innerHTML=`Sesión: <strong>+${s}</strong>`;
-}
-
-/* ── IMÁGENES ── */
-function triggerImg(){document.getElementById('imgInput').click()}
-function handleImg(e){
-  const file=e.target.files[0];if(!file)return;
-  const reader=new FileReader();
-  reader.onload=ev=>{
-    const uid='img_'+Date.now();
-    const ph=document.getElementById('imgPlaceholder');
-    const w=document.createElement('div');w.className='img-wrapper';w.id=uid;
-    w.innerHTML=`<img src="${ev.target.result}" alt="Ilustración"/><div class="img-actions"><button class="img-act-btn" onclick="removeImg('${uid}')" title="Quitar"><i class="ti ti-trash" style="font-size:12px"></i></button></div><input class="img-caption" type="text" placeholder="Pie de imagen…"/>`;
-    ph.parentNode.insertBefore(w,ph);
-    imgCount++;document.getElementById('imgCount').textContent=imgCount;
-    showToast('Imagen insertada');
-  };reader.readAsDataURL(file);e.target.value='';
-}
-function removeImg(id){const el=document.getElementById(id);if(el){el.remove();imgCount=Math.max(0,imgCount-1);document.getElementById('imgCount').textContent=imgCount;showToast('Imagen eliminada');}}
-
-/* ── SPLIT ── */
-function toggleSplit(){
-  isSplit=!isSplit;
-  document.getElementById('editorScrollB').style.display=isSplit?'block':'none';
-  document.getElementById('splitDivider').style.display=isSplit?'block':'none';
-  document.getElementById('splitBtn').classList.toggle('on',isSplit);
-  showToast(isSplit?'Doble pantalla activada':'Doble pantalla desactivada');
-}
-
-/* ── SNAPSHOT ── */
-function saveSnapshot(){
-  snapCount++;
-  const now=new Date();
-  const label=document.getElementById('chapterTitle').value;
-  const container=document.getElementById('snapsContainer');
-  const item=document.createElement('div');item.className='snap-item';
-  item.innerHTML=`<div class="snap-date">${now.toLocaleTimeString('es-ES',{hour:'2-digit',minute:'2-digit'})}</div><div class="snap-label">v${snapCount+1} — ${label}</div>`;
-  container.insertBefore(item,container.firstChild);
-  switchNote('snaps',document.querySelectorAll('.ntab')[3]);
-  showToast('Snapshot guardado');
-}
-
-/* ── NOTES ── */
-function switchNote(tab,el){
-  document.querySelectorAll('.ntab').forEach(t=>t.classList.remove('active'));
-  el.classList.add('active');
-  ['meta','sinopsis','notas','snaps','objetivo'].forEach(id=>{
-    const el=document.getElementById('tab-'+id);if(el)el.style.display=id===tab?'block':'none';
+function updateScrivenings() {
+  saveCurrentChapter();
+  const view = document.getElementById('scriveningsView');
+  view.innerHTML = '';
+  Object.entries(chapters).forEach(([id, ch]) => {
+    const sec = document.createElement('div');
+    sec.className = 'scrivenings-section';
+    const bodyText = ch.content
+      ? `<div style="font-family:'Lora',serif;font-size:14px;line-height:1.8;color:var(--text)">${ch.content}</div>`
+      : `<div style="color:var(--text-muted);font-style:italic;font-size:13px">Sin contenido aún.</div>`;
+    sec.innerHTML = `<div class="scrivenings-section-title" style="cursor:pointer" onclick="loadChapter('${id}')">${ch.title}</div><div class="scrivenings-section-body">${bodyText}</div>`;
+    view.appendChild(sec);
   });
 }
 
-/* ── PANELS ── */
-function toggleBinder(){const b=document.getElementById('binder');b.classList.toggle('collapsed')}
-function toggleNotes(){const n=document.getElementById('notesPanel');n.classList.toggle('collapsed')}
-function toggleMiddle(){const m=document.getElementById('middlePanel');m.classList.toggle('collapsed')}
-function toggleNotepad(){document.getElementById('notepadPanel').classList.toggle('open')}
+/* ══════════════════════════════════════════
+   EDITOR
+══════════════════════════════════════════ */
+function fmt(cmd) {
+  const ed = document.getElementById('mainEditor');
+  ed.focus();
+  if (cmd === 'h2') document.execCommand('formatBlock', false, 'h2');
+  else if (cmd === 'h3') document.execCommand('formatBlock', false, 'h3');
+  else if (cmd === 'quote') document.execCommand('formatBlock', false, 'blockquote');
+  else if (cmd === 'ul') document.execCommand('insertUnorderedList');
+  else document.execCommand(cmd, false, null);
+}
 
-/* ── COMPOSE MODE ── */
-function openCompose(){
-  const ed=document.getElementById('mainEditor');
-  document.getElementById('composeEditor').innerHTML=ed.innerHTML;
+function addSep() {
+  const ed = document.getElementById('mainEditor');
+  ed.focus();
+  document.execCommand('insertHorizontalRule');
+}
+
+function updateWordCountUI(words) {
+  const sesion = Math.max(0, words - sesionStartWords);
+  document.getElementById('sbWords').innerHTML = `Palabras: <strong>${words}</strong>`;
+  document.getElementById('sbSesion').innerHTML = `Sesión: <strong>+${sesion}</strong>`;
+  document.getElementById('wc2').textContent = words;
+  const pct = Math.min(100, Math.round(words / (chapters[currentChapterId]?.objetivo || 400) * 100));
+  document.getElementById('progressFill').style.width = pct + '%';
+  document.getElementById('pctLabel').textContent = pct + '%';
+  // Total proyecto
+  const total = Object.values(chapters).reduce((a, c) => a + (c.words || 0), 0);
+  document.getElementById('totalWC').textContent = total;
+  // Badge en binder
+  const badge = document.getElementById('badge-' + currentChapterId);
+  if (badge) badge.textContent = words;
+  updateObjetivo(total);
+  updateSesion(sesion);
+}
+
+function onEditorInput() {
+  const text = document.getElementById('mainEditor').innerText || '';
+  const words = text.trim() ? text.trim().split(/\s+/).length : 0;
+  updateWordCountUI(words);
+  triggerAutoSave();
+}
+
+function triggerAutoSave() {
+  document.getElementById('savedOk').innerHTML = 'Guardando… <i class="ti ti-loader" style="font-size:12px"></i>';
+  clearTimeout(autoSaveT);
+  autoSaveT = setTimeout(() => {
+    saveCurrentChapter();
+    document.getElementById('savedOk').innerHTML = 'Guardado <i class="ti ti-check" style="font-size:12px;color:var(--success)"></i>';
+  }, 1000);
+}
+
+/* ══════════════════════════════════════════
+   OBJETIVO
+══════════════════════════════════════════ */
+function updateObjetivo(currentTotal) {
+  const target = parseInt(document.getElementById('objTarget').value) || 5000;
+  const total = currentTotal || Object.values(chapters).reduce((a, c) => a + (c.words || 0), 0);
+  const pct = Math.min(100, Math.round(total / target * 100));
+  document.getElementById('objFill').style.width = pct + '%';
+  document.getElementById('objPct').textContent = pct + '%';
+}
+function updateSesion(sw) {
+  const target = parseInt(document.getElementById('sesionTarget').value) || 500;
+  const s = sw !== undefined ? sw : Math.max(0, (parseInt(document.getElementById('wc2').textContent) || 0) - sesionStartWords);
+  const pct = Math.min(100, Math.round(s / target * 100));
+  document.getElementById('sesionFill').style.width = pct + '%';
+  document.getElementById('sesionPct').textContent = pct + '%';
+}
+
+/* ══════════════════════════════════════════
+   IMÁGENES
+══════════════════════════════════════════ */
+function triggerImg() { document.getElementById('imgInput').click(); }
+function handleImg(e) {
+  const file = e.target.files[0]; if (!file) return;
+  const reader = new FileReader();
+  reader.onload = ev => {
+    const uid = 'img_' + Date.now();
+    const ph = document.getElementById('imgPlaceholder');
+    const w = document.createElement('div');
+    w.className = 'img-wrapper'; w.id = uid;
+    w.innerHTML = `<img src="${ev.target.result}" alt="Ilustración"/><div class="img-actions"><button class="img-act-btn" onclick="removeImg('${uid}')" title="Quitar"><i class="ti ti-trash" style="font-size:12px"></i></button></div><input class="img-caption" type="text" placeholder="Pie de imagen…"/>`;
+    ph.parentNode.insertBefore(w, ph);
+    imgCount++; document.getElementById('imgCount').textContent = imgCount;
+    showToast('Imagen insertada');
+  };
+  reader.readAsDataURL(file); e.target.value = '';
+}
+function removeImg(id) {
+  const el = document.getElementById(id);
+  if (el) { el.remove(); imgCount = Math.max(0, imgCount - 1); document.getElementById('imgCount').textContent = imgCount; showToast('Imagen eliminada'); }
+}
+
+/* ══════════════════════════════════════════
+   SPLIT / DOBLE PANTALLA
+══════════════════════════════════════════ */
+function toggleSplit() {
+  isSplit = !isSplit;
+  document.getElementById('editorScrollB').style.display = isSplit ? 'block' : 'none';
+  document.getElementById('splitDivider').style.display = isSplit ? 'block' : 'none';
+  document.getElementById('splitBtn').classList.toggle('on', isSplit);
+  showToast(isSplit ? 'Doble pantalla activada' : 'Doble pantalla desactivada');
+}
+
+/* ══════════════════════════════════════════
+   SNAPSHOT
+══════════════════════════════════════════ */
+function saveSnapshot() {
+  snapCount++;
+  const now = new Date();
+  const ch = chapters[currentChapterId];
+  if (ch) ch.snaps.push({ date: now.toISOString(), content: document.getElementById('mainEditor').innerHTML });
+  const container = document.getElementById('snapsContainer');
+  const item = document.createElement('div');
+  item.className = 'snap-item';
+  item.innerHTML = `<div class="snap-date">${now.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })}</div><div class="snap-label">v${snapCount + 1} — ${chapters[currentChapterId]?.title || ''}</div>`;
+  container.insertBefore(item, container.firstChild);
+  switchNote('snaps', document.querySelectorAll('.ntab')[3]);
+  showToast('Snapshot guardado');
+}
+
+/* ══════════════════════════════════════════
+   NOTAS / INSPECTOR
+══════════════════════════════════════════ */
+function switchNote(tab, el) {
+  document.querySelectorAll('.ntab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  ['meta', 'sinopsis', 'notas', 'snaps', 'objetivo'].forEach(id => {
+    const el = document.getElementById('tab-' + id);
+    if (el) el.style.display = id === tab ? 'block' : 'none';
+  });
+}
+
+/* ══════════════════════════════════════════
+   PANELES
+══════════════════════════════════════════ */
+function toggleBinder() { document.getElementById('binder').classList.toggle('collapsed'); }
+function toggleNotes() { document.getElementById('notesPanel').classList.toggle('collapsed'); }
+function toggleNotepad() { document.getElementById('notepadPanel').classList.toggle('open'); }
+
+/* ══════════════════════════════════════════
+   MODO COMPOSICIÓN
+══════════════════════════════════════════ */
+function openCompose() {
+  document.getElementById('composeEditor').innerHTML = document.getElementById('mainEditor').innerHTML;
   document.getElementById('composeMode').classList.add('open');
-  document.getElementById('modePill').textContent='Foco';
+  document.getElementById('modePill').textContent = 'Foco';
   document.getElementById('composeEditor').focus();
 }
-function closeCompose(){
-  const ced=document.getElementById('composeEditor');
-  document.getElementById('mainEditor').innerHTML=ced.innerHTML;
+function closeCompose() {
+  document.getElementById('mainEditor').innerHTML = document.getElementById('composeEditor').innerHTML;
   document.getElementById('composeMode').classList.remove('open');
-  document.getElementById('modePill').textContent='Escritura';
+  document.getElementById('modePill').textContent = 'Escritura';
   onEditorInput();
 }
-function onComposeInput(){
-  const text=document.getElementById('composeEditor').innerText||'';
-  const words=text.trim()?text.trim().split(/\s+/).length:0;
-  const diff=Math.max(0,words-startWords);
-  document.getElementById('composeWC').textContent=words;
-  document.getElementById('composeSesWC').textContent='+'+diff;
+function onComposeInput() {
+  const text = document.getElementById('composeEditor').innerText || '';
+  const words = text.trim() ? text.trim().split(/\s+/).length : 0;
+  const sesion = Math.max(0, words - sesionStartWords);
+  document.getElementById('composeWC').textContent = words;
+  document.getElementById('composeSesWC').textContent = '+' + sesion;
 }
-document.addEventListener('keydown',e=>{
-  if(e.key==='Escape'&&document.getElementById('composeMode').classList.contains('open'))closeCompose();
-  if((e.ctrlKey||e.metaKey)&&e.key==='s'){e.preventDefault();saveSnapshot();}
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape' && document.getElementById('composeMode').classList.contains('open')) closeCompose();
+  if ((e.ctrlKey || e.metaKey) && e.key === 's') { e.preventDefault(); saveSnapshot(); }
 });
 
-/* ── MODAL ── */
-function openModal(id){document.getElementById('modal-'+id).classList.add('open')}
-function closeModal(id){document.getElementById('modal-'+id).classList.remove('open')}
-document.querySelectorAll('.modal-overlay').forEach(m=>m.addEventListener('click',e=>{if(e.target===m)m.classList.remove('open')}));
+/* ══════════════════════════════════════════
+   MODAL COMPILAR
+══════════════════════════════════════════ */
+function openModal(id) { document.getElementById('modal-' + id).classList.add('open'); }
+function closeModal(id) { document.getElementById('modal-' + id).classList.remove('open'); }
+document.querySelectorAll('.modal-overlay').forEach(m => m.addEventListener('click', e => { if (e.target === m) m.classList.remove('open'); }));
 
-/* ── COMPILAR ── */
-function compilar(format){
-  const title=document.getElementById('projectName').textContent;
-  const content=document.getElementById('mainEditor').innerText;
-  const chTitle=document.getElementById('chapterTitle').value;
-  let blob,filename;
-  if(format==='txt'){
-    blob=new Blob([`${title}\n${'═'.repeat(40)}\n\n${chTitle}\n${'-'.repeat(chTitle.length)}\n\n${content}`],{type:'text/plain'});
-    filename=title.replace(/[^\w\s]/g,'')+'.txt';
-  }else if(format==='md'){
-    blob=new Blob([`# ${title}\n\n## ${chTitle}\n\n${content}`],{type:'text/markdown'});
-    filename=title.replace(/[^\w\s]/g,'')+'.md';
-  }else if(format==='html'){
-    blob=new Blob([`<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8"><title>${title}</title><style>body{font-family:'Georgia',serif;max-width:680px;margin:60px auto;line-height:1.85;color:#1a1208}h1{font-size:28px;margin-bottom:8px}h2{font-size:20px;margin:2em 0 0.5em}img{max-width:100%;border-radius:6px;margin:20px 0}</style></head><body><h1>${title}</h1><h2>${chTitle}</h2><div>${document.getElementById('mainEditor').innerHTML}</div></body></html>`],{type:'text/html'});
-    filename=title.replace(/[^\w\s]/g,'')+'.html';
-  }else if(format==='json'){
-    const data={proyecto:title,capitulo:chTitle,contenido:content,palabras:parseInt(document.getElementById('wc2').textContent),fecha:new Date().toISOString()};
-    blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
-    filename=title.replace(/[^\w\s]/g,'')+'.json';
+function compilar(format) {
+  saveCurrentChapter();
+  const title = document.getElementById('projectName').textContent;
+  let fullContent = '';
+  Object.values(chapters).forEach(ch => {
+    if (ch.incluir) {
+      const tmp = document.createElement('div');
+      tmp.innerHTML = ch.content;
+      fullContent += `\n\n${ch.title}\n${'─'.repeat(ch.title.length)}\n\n${tmp.innerText}`;
+    }
+  });
+  let blob, filename;
+  if (format === 'txt') {
+    blob = new Blob([`${title}\n${'═'.repeat(40)}${fullContent}`], { type: 'text/plain' });
+    filename = title.replace(/[^\w\s]/g, '') + '.txt';
+  } else if (format === 'md') {
+    let md = `# ${title}\n`;
+    Object.values(chapters).forEach(ch => {
+      if (ch.incluir) {
+        const tmp = document.createElement('div'); tmp.innerHTML = ch.content;
+        md += `\n## ${ch.title}\n\n${tmp.innerText}\n`;
+      }
+    });
+    blob = new Blob([md], { type: 'text/markdown' });
+    filename = title.replace(/[^\w\s]/g, '') + '.md';
+  } else if (format === 'html') {
+    let html = `<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8"><title>${title}</title><style>body{font-family:Georgia,serif;max-width:680px;margin:60px auto;line-height:1.85;color:#1a1208}h1{font-size:28px}h2{font-size:20px;margin:2em 0 0.5em}img{max-width:100%;border-radius:6px;margin:20px 0}</style></head><body><h1>${title}</h1>`;
+    Object.values(chapters).forEach(ch => { if (ch.incluir) html += `<h2>${ch.title}</h2><div>${ch.content}</div>`; });
+    html += '</body></html>';
+    blob = new Blob([html], { type: 'text/html' });
+    filename = title.replace(/[^\w\s]/g, '') + '.html';
+  } else if (format === 'json') {
+    blob = new Blob([JSON.stringify({ proyecto: title, capitulos: chapters, fecha: new Date().toISOString() }, null, 2)], { type: 'application/json' });
+    filename = title.replace(/[^\w\s]/g, '') + '.json';
   }
-  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=filename;a.click();
-  closeModal('compilar');showToast('Proyecto compilado como '+format.toUpperCase());
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = filename; a.click();
+  closeModal('compilar');
+  showToast('Compilado como ' + format.toUpperCase());
 }
 
-/* ── INIT ── */
-updateObjetivo();updateSesion();
+/* ══════════════════════════════════════════
+   INIT
+══════════════════════════════════════════ */
+// Marcar data-id en los items del binder al cargar
+document.addEventListener('DOMContentLoaded', () => {
+  const items = document.querySelectorAll('.binder-item.sub');
+  const ids = ['cap1', 'cap2', 'cap3'];
+  items.forEach((item, i) => { if (ids[i]) item.id = 'binder-' + ids[i]; });
+  updateObjetivo();
+  updateSesion(0);
+  sesionStartWords = 47;
+});
 </script>
 </body>
 </html>
