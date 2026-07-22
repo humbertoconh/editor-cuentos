@@ -23,8 +23,8 @@
 }
 html,body{height:100%;overflow:hidden;font-family:'Inter',sans-serif;background:var(--s1);color:var(--tx)}
 
-/* ── PANTALLA DE PROYECTOS ── */
-#projectsScreen{position:fixed;inset:0;background:var(--bb);z-index:500;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;padding:60px 24px 40px;overflow-y:auto}
+/* ── PROYECTOS ── */
+#projectsScreen{position:fixed;inset:0;background:var(--bb);z-index:500;display:flex;flex-direction:column;align-items:center;padding:60px 24px 40px;overflow-y:auto}
 #projectsScreen.hidden{display:none}
 .ps-logo{font-family:'Playfair Display',serif;font-size:32px;color:var(--gold);font-weight:600;margin-bottom:8px;text-align:center}
 .ps-sub{font-size:14px;color:var(--gold-dim);margin-bottom:48px;text-align:center}
@@ -37,7 +37,7 @@ html,body{height:100%;overflow:hidden;font-family:'Inter',sans-serif;background:
 .ps-card.new-card:hover i,.ps-card.new-card:hover span{color:var(--gold)}
 .ps-card-title{font-family:'Playfair Display',serif;font-size:16px;color:var(--gold);font-weight:600;margin-bottom:6px}
 .ps-card-desc{font-size:12px;color:var(--gold-dim);line-height:1.5;margin-bottom:10px}
-.ps-card-meta{font-size:11px;color:rgba(201,169,110,0.35);display:flex;gap:10px}
+.ps-card-meta{font-size:11px;color:rgba(201,169,110,0.35)}
 .ps-card-del{position:absolute;top:10px;right:10px;background:none;border:none;cursor:pointer;color:rgba(201,169,110,0.3);font-size:16px;padding:2px;transition:color .12s}
 .ps-card-del:hover{color:#c0392b}
 .ps-new-form{width:100%;max-width:400px;margin-top:40px;background:rgba(201,169,110,0.06);border:1px solid rgba(201,169,110,0.2);border-radius:10px;padding:24px;display:none}
@@ -49,10 +49,8 @@ html,body{height:100%;overflow:hidden;font-family:'Inter',sans-serif;background:
 .ps-btn-row{display:flex;gap:8px;margin-top:4px}
 .ps-btn{padding:8px 16px;border-radius:var(--r);font-size:13px;font-family:'Inter',sans-serif;cursor:pointer;font-weight:500;border:none}
 .ps-btn-ok{background:var(--gr);color:#fff}
-.ps-btn-ok:hover{background:var(--gr-dark)}
 .ps-btn-cancel{background:transparent;color:var(--gold-dim);border:1px solid rgba(201,169,110,0.2)}
-.ps-btn-cancel:hover{color:var(--gold)}
-.ps-loading{color:var(--gold-dim);font-size:14px;text-align:center;margin-top:20px}
+.ps-loading{color:var(--gold-dim);font-size:14px;text-align:center;margin-top:20px;grid-column:1/-1}
 
 /* ── APP ── */
 .app{display:flex;height:100vh;overflow:hidden}
@@ -61,8 +59,7 @@ html,body{height:100%;overflow:hidden;font-family:'Inter',sans-serif;background:
 .binder{width:230px;min-width:230px;background:var(--bb);display:flex;flex-direction:column;border-right:3px solid var(--bb-border);flex-shrink:0;position:relative}
 .binder-spine{position:absolute;left:0;top:0;bottom:0;width:7px;background:repeating-linear-gradient(180deg,var(--bb-border) 0,#5c3a1e 2px,#2e1a0a 4px,var(--bb-border) 6px);opacity:.5;pointer-events:none}
 .binder-head{padding:14px 12px 10px 22px;border-bottom:1px solid rgba(139,94,60,.3);flex-shrink:0}
-.binder-project{font-family:'Playfair Display',serif;font-size:14px;color:var(--gold);letter-spacing:.04em;font-weight:600;background:transparent;border:none;outline:none;width:100%;cursor:text}
-.binder-project:focus{border-bottom:1px solid var(--gold-dim)}
+.binder-project{font-family:'Playfair Display',serif;font-size:14px;color:var(--gold);letter-spacing:.04em;font-weight:600;background:transparent;border:none;outline:none;width:100%}
 .binder-sub{font-size:10px;color:var(--gold-dim);margin-top:2px}
 .back-btn{display:flex;align-items:center;gap:5px;font-size:11px;color:rgba(201,169,110,0.5);cursor:pointer;margin-top:6px;background:none;border:none;font-family:'Inter',sans-serif;padding:0;transition:color .12s}
 .back-btn:hover{color:var(--gold)}
@@ -113,7 +110,7 @@ html,body{height:100%;overflow:hidden;font-family:'Inter',sans-serif;background:
 .ssec{background:var(--s0);border-radius:var(--r);border:1px solid var(--bd);margin-bottom:8px;overflow:hidden}
 .ssec-title{padding:8px 12px;background:var(--s2);border-bottom:1px solid var(--bd);font-family:'Playfair Display',serif;font-size:13px;font-weight:600;color:var(--tx2);cursor:pointer}
 .ssec-title:hover{background:var(--ac-bg);color:var(--ac)}
-.ssec-body{padding:12px;font-family:'Lora',serif;font-size:13px;line-height:1.8;color:var(--tx)}
+.ssec-body{padding:12px;font-family:'Lora',serif;font-size:13px;line-height:1.8;color:var(--tx);max-height:150px;overflow:hidden}
 
 /* ── MAIN ── */
 .main{flex:1;display:flex;flex-direction:column;overflow:hidden;background:var(--s0)}
@@ -124,9 +121,9 @@ html,body{height:100%;overflow:hidden;font-family:'Inter',sans-serif;background:
 .tbtn:hover{background:var(--s2);color:var(--tx)}
 .tbtn.on{background:var(--ac-bg);color:var(--ac)}
 .tbtn i{font-size:15px}
-.content-area{flex:1;display:flex;overflow:hidden;position:relative}
+.content-area{flex:1;display:flex;overflow:hidden}
 
-/* ── EDITOR VIEW ── */
+/* ── EDITOR ── */
 .editor-view{flex:1;display:flex;flex-direction:column;overflow:hidden}
 .editor-title-bar{padding:14px 24px 0;background:var(--s0);flex-shrink:0}
 .chapter-title{width:100%;font-family:'Playfair Display',serif;font-size:24px;font-weight:600;color:var(--tx);border:none;background:transparent;outline:none;padding-bottom:10px;border-bottom:2px solid var(--ac-bd)}
@@ -145,18 +142,31 @@ html,body{height:100%;overflow:hidden;font-family:'Inter',sans-serif;background:
 .split-div{width:4px;background:var(--bd);cursor:col-resize;flex-shrink:0}
 .split-div:hover{background:var(--ac-bd)}
 .editor-scroll-b{flex:1;overflow-y:auto;padding:20px 24px;background:var(--s1);display:none}
+
+/* ── BLOQUE DE IMAGEN EN EDITOR ── */
+.img-block{margin:20px 0;position:relative;border-radius:8px;overflow:hidden;background:var(--s2);border:1px solid var(--bd)}
+.img-block img{width:100%;display:block}
+.img-block.bg-mode{min-height:280px;display:flex;flex-direction:column}
+.img-block.bg-mode img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.35}
+.img-block.bg-mode .img-text-overlay{position:relative;z-index:1;flex:1;padding:24px;font-family:'Lora',serif;font-size:17px;line-height:1.85;color:#1a1208;outline:none;min-height:200px}
+.img-block.bg-mode.dark-bg img{opacity:.6}
+.img-block.bg-mode.dark-bg .img-text-overlay{color:#ffffff}
+.img-toolbar{position:absolute;top:8px;right:8px;display:none;gap:4px;z-index:10;flex-wrap:wrap;max-width:200px;justify-content:flex-end}
+.img-block:hover .img-toolbar{display:flex}
+.img-tbtn{padding:4px 7px;background:rgba(0,0,0,0.7);border:none;border-radius:4px;cursor:pointer;color:#fff;font-size:11px;font-family:'Inter',sans-serif;display:flex;align-items:center;gap:3px;transition:background .1s;white-space:nowrap}
+.img-tbtn:hover{background:rgba(0,0,0,0.9)}
+.img-tbtn i{font-size:12px}
+.img-cap-input{width:100%;font-family:'Lora',serif;font-style:italic;font-size:13px;color:var(--tx2);border:none;background:transparent;text-align:center;padding:6px 0;outline:none;border-bottom:1px solid transparent;transition:border-color .12s}
+.img-cap-input:focus{border-bottom-color:var(--bd2)}
+.img-size-controls{display:none;padding:6px 10px;background:var(--s2);border-top:1px solid var(--bd);align-items:center;gap:8px}
+.img-block:hover .img-size-controls{display:flex}
+.img-size-label{font-size:11px;color:var(--txm)}
+.img-size-slider{flex:1;cursor:pointer}
 .img-ph{width:100%;background:var(--s1);border:1.5px dashed var(--bd2);border-radius:8px;padding:24px 16px;text-align:center;cursor:pointer;margin:18px 0;transition:all .12s}
 .img-ph:hover{border-color:var(--ac-bd);background:var(--ac-bg)}
 .img-ph i{font-size:28px;color:var(--txm);display:block;margin-bottom:6px}
 .img-ph span{font-size:13px;color:var(--txm)}
-.img-wrap{margin:18px 0;position:relative}
-.img-wrap img{width:100%;border-radius:8px;display:block}
-.img-acts{position:absolute;top:8px;right:8px;display:none;gap:4px}
-.img-wrap:hover .img-acts{display:flex}
-.img-act-btn{width:28px;height:28px;background:rgba(0,0,0,.6);border:none;border-radius:4px;cursor:pointer;color:#fff;display:flex;align-items:center;justify-content:center;font-size:13px}
-.img-act-btn:hover{background:rgba(0,0,0,.85)}
-.img-cap{width:100%;font-family:'Lora',serif;font-style:italic;font-size:13px;color:var(--tx2);border:none;background:transparent;text-align:center;padding:6px 0;outline:none;border-bottom:1px solid transparent;transition:border-color .12s}
-.img-cap:focus{border-bottom-color:var(--bd2)}
+.img-uploading{width:100%;background:var(--s1);border:1px solid var(--bd);border-radius:8px;padding:20px;text-align:center;margin:18px 0;font-size:13px;color:var(--txm)}
 input[type="file"]{display:none}
 
 /* ── ALT VIEWS ── */
@@ -176,8 +186,8 @@ input[type="file"]{display:none}
 .pj-campo textarea{resize:vertical;min-height:52px;line-height:1.5}
 .pj-campo input:focus,.pj-campo textarea:focus{border-color:var(--ac-bd)}
 .pj-campo.full{grid-column:1/-1}
-.add-pj-btn{padding:12px;border:1.5px dashed var(--bd2);border-radius:8px;background:transparent;cursor:pointer;font-size:13px;color:var(--txm);font-family:'Inter',sans-serif;display:flex;align-items:center;justify-content:center;gap:6px;transition:all .12s;width:100%}
-.add-pj-btn:hover{border-color:var(--ac-bd);color:var(--ac);background:var(--ac-bg)}
+.add-btn-full{padding:12px;border:1.5px dashed var(--bd2);border-radius:8px;background:transparent;cursor:pointer;font-size:13px;color:var(--txm);font-family:'Inter',sans-serif;display:flex;align-items:center;justify-content:center;gap:6px;transition:all .12s;width:100%}
+.add-btn-full:hover{border-color:var(--ac-bd);color:var(--ac);background:var(--ac-bg)}
 .ref-card{background:var(--s1);border:1px solid var(--bd);border-radius:8px;padding:14px;margin-bottom:12px}
 .ref-title{font-size:13px;font-weight:500;color:var(--tx);margin-bottom:8px;display:flex;align-items:center;gap:6px}
 .ref-del{margin-left:auto;background:none;border:none;cursor:pointer;color:var(--txm);font-size:14px;padding:0;transition:color .12s}
@@ -188,8 +198,8 @@ input[type="file"]{display:none}
 .storm-card{background:#fffdf6;border-radius:3px;padding:10px;border-top:3px solid var(--gold);box-shadow:0 2px 6px rgba(0,0,0,.1);position:relative}
 .storm-card textarea{width:100%;border:none;background:transparent;resize:none;font-size:12px;font-family:'Lora',serif;color:#2a1a0a;line-height:1.6;outline:none;min-height:72px}
 .storm-pin{position:absolute;top:-6px;left:50%;transform:translateX(-50%);width:10px;height:10px;border-radius:50%;background:#c0392b;box-shadow:0 1px 3px rgba(0,0,0,.3)}
-.add-storm{background:rgba(201,169,110,.1);border:1.5px dashed rgba(201,169,110,.4);border-radius:6px;display:flex;align-items:center;justify-content:center;gap:6px;color:rgba(201,169,110,.7);font-size:12px;font-family:'Inter',sans-serif;cursor:pointer;padding:20px;transition:all .12s;min-height:96px}
-.add-storm:hover{background:rgba(201,169,110,.18);color:var(--gold)}
+.add-storm-btn{background:rgba(201,169,110,.1);border:1.5px dashed rgba(201,169,110,.4);border-radius:6px;display:flex;align-items:center;justify-content:center;gap:6px;color:rgba(201,169,110,.7);font-size:12px;font-family:'Inter',sans-serif;cursor:pointer;padding:20px;transition:all .12s;min-height:96px}
+.add-storm-btn:hover{background:rgba(201,169,110,.18);color:var(--gold)}
 
 /* ── STATUS ── */
 .status-bar{padding:5px 18px;background:var(--s1);border-top:1px solid var(--bd);display:flex;align-items:center;gap:12px;font-size:11px;color:var(--txm);flex-shrink:0}
@@ -198,7 +208,6 @@ input[type="file"]{display:none}
 .pill-ref{background:var(--ac-bg);color:var(--ac)}
 .pill-sync{background:#fde8cc;color:#7a4a18}
 .saved-ok{display:flex;align-items:center;gap:3px;margin-left:auto}
-.saved-ok i{font-size:12px;color:var(--ok)}
 
 /* ── INSPECTOR ── */
 .inspector{width:235px;min-width:210px;flex-shrink:0;background:var(--s1);border-left:1px solid var(--bd);display:flex;flex-direction:column;overflow:hidden}
@@ -219,7 +228,8 @@ input[type="file"]{display:none}
 .ntarea{width:100%;resize:none;font-size:12px;line-height:1.65;color:var(--tx);background:var(--s0);border:1px solid var(--bd2);border-radius:var(--r);padding:7px 9px;outline:none;font-family:'Inter',sans-serif;margin:7px 0;transition:border-color .12s}
 .ntarea:focus{border-color:var(--ac-bd)}
 .slabel{font-size:11px;color:var(--txm);margin:10px 0 4px}
-.snap-item{padding:8px 9px;background:var(--s0);border-radius:var(--r);border:1px solid var(--bd);margin-bottom:6px}
+.snap-item{padding:8px 9px;background:var(--s0);border-radius:var(--r);border:1px solid var(--bd);margin-bottom:6px;cursor:pointer;transition:border-color .12s}
+.snap-item:hover{border-color:var(--bd2)}
 .snap-date{font-size:10px;color:var(--txm)}
 .snap-lbl{font-size:12px;color:var(--tx);margin-top:2px;font-weight:500}
 .prog-wrap{margin-top:10px;padding:9px;background:var(--s0);border-radius:var(--r);border:1px solid var(--bd)}
@@ -233,6 +243,7 @@ input[type="file"]{display:none}
 .obj-row{display:flex;gap:6px;margin-top:8px}
 .obj-input{flex:1;padding:4px 6px;border:1px solid rgba(201,169,110,.4);border-radius:4px;font-size:11px;background:var(--s0);font-family:'Inter',sans-serif;color:var(--tx);outline:none}
 .obj-btn{padding:4px 8px;background:var(--gold);color:var(--bb);border:none;border-radius:4px;font-size:11px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif}
+.deadline-info{font-size:11px;color:var(--txm);margin-top:6px;padding:6px 8px;background:var(--s0);border-radius:4px;border:1px solid var(--bd)}
 .insp-footer{padding:8px 12px;background:var(--s0);border-top:1px solid var(--bd);display:flex;justify-content:space-between;align-items:center;flex-shrink:0}
 .insp-footer-label{font-size:11px;color:var(--txm)}
 .insp-footer-val{font-size:12px;color:var(--tx);font-weight:500}
@@ -240,7 +251,7 @@ input[type="file"]{display:none}
 /* ── COMPOSE ── */
 .compose{position:fixed;inset:0;background:#1a1a18;z-index:200;display:none;flex-direction:column;align-items:center;overflow-y:auto}
 .compose.open{display:flex}
-.compose-inner{width:100%;max-width:680px;padding:60px 40px;flex:1}
+.compose-inner{width:100%;max-width:680px;padding:60px 40px 100px;flex:1}
 .compose-title{font-family:'Playfair Display',serif;font-size:28px;font-weight:600;color:#e8e0d0;border:none;background:transparent;outline:none;width:100%;margin-bottom:24px;padding-bottom:12px;border-bottom:1px solid rgba(255,255,255,.1)}
 .compose-ed{font-family:'Lora',serif;font-size:18px;line-height:2;color:#d0c8b8;min-height:400px;outline:none;width:100%}
 .compose-ed p{margin-bottom:.3em}
@@ -250,9 +261,9 @@ input[type="file"]{display:none}
 .compose-exit:hover{color:#e8e0d0}
 
 /* ── MODAL ── */
-.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.45);display:none;align-items:center;justify-content:center;z-index:100}
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.45);display:none;align-items:center;justify-content:center;z-index:300}
 .modal-overlay.open{display:flex}
-.modal{background:var(--s0);border-radius:10px;padding:24px;width:400px;max-width:90vw;border:1px solid var(--bd)}
+.modal{background:var(--s0);border-radius:10px;padding:24px;width:420px;max-width:90vw;border:1px solid var(--bd)}
 .modal-title{font-family:'Playfair Display',serif;font-size:18px;font-weight:600;color:var(--tx);margin-bottom:4px}
 .modal-sub{font-size:12px;color:var(--txm);margin-bottom:18px}
 .fmt-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:8px}
@@ -277,13 +288,11 @@ input[type="file"]{display:none}
 </head>
 <body>
 
-<!-- ══ PANTALLA DE PROYECTOS ══ -->
+<!-- PROYECTOS -->
 <div id="projectsScreen">
   <div class="ps-logo">Editor de cuentos ilustrados</div>
   <div class="ps-sub">Selecciona un proyecto o crea uno nuevo</div>
-  <div class="ps-grid" id="psGrid">
-    <div class="ps-loading" id="psLoading">Cargando proyectos…</div>
-  </div>
+  <div class="ps-grid" id="psGrid"><div class="ps-loading">Cargando proyectos…</div></div>
   <div class="ps-new-form" id="psNewForm">
     <h3>Nuevo proyecto</h3>
     <input class="ps-input" id="psNewName" placeholder="Título del proyecto" maxlength="60"/>
@@ -295,25 +304,24 @@ input[type="file"]{display:none}
   </div>
 </div>
 
-<!-- ══ APP ══ -->
+<!-- APP -->
 <div class="app">
-
 <!-- BINDER -->
 <div class="binder">
   <div class="binder-spine"></div>
   <div class="binder-head">
-    <input class="binder-project" id="binderProjectName" value="Mi proyecto" onchange="saveProjectMeta()"/>
+    <input class="binder-project" id="binderProjectName" value="" onchange="saveProjectMeta()"/>
     <div class="binder-sub">Cuentos ilustrados</div>
     <button class="back-btn" onclick="goToProjects()"><i class="ti ti-arrow-left" style="font-size:11px"></i> Mis proyectos</button>
   </div>
-  <div class="binder-body" id="binderBody">
+  <div class="binder-body">
     <div class="bsec">Manuscrito</div>
     <div id="chaptersInBinder"></div>
     <button class="badd" onclick="addChapter()"><i class="ti ti-plus" style="font-size:12px"></i> Añadir capítulo</button>
     <div class="bdiv"></div>
     <div class="bsec">Personajes</div>
     <div class="bitem" id="b-personajes" onclick="nav(this,'personajes')"><i class="ti ti-users"></i><span class="bl">Fichas de personajes</span></div>
-    <div id="charactersInBinder"></div>
+    <div id="charsInBinder"></div>
     <button class="badd" onclick="addCharacter()"><i class="ti ti-plus" style="font-size:12px"></i> Añadir personaje</button>
     <div class="bdiv"></div>
     <div class="bsec">Investigación</div>
@@ -374,12 +382,12 @@ input[type="file"]{display:none}
       </div>
       <div class="editor-body">
         <div class="editor-scroll" id="scrollA">
-          <div class="editor-content">
+          <div class="editor-content" id="editorContent">
             <div id="mainEditor" contenteditable="true" class="texted" oninput="onInput()" spellcheck="true"></div>
             <div class="img-ph" id="imgPh" onclick="triggerImg()">
               <i class="ti ti-photo-plus"></i><span>Insertar ilustración aquí</span>
             </div>
-            <input type="file" id="imgInput" accept="image/*" onchange="handleImg(event)"/>
+            <input type="file" id="imgInput" accept="image/*" onchange="handleImgUpload(event)"/>
           </div>
         </div>
         <div class="split-div" id="splitDiv" style="display:none"></div>
@@ -394,28 +402,28 @@ input[type="file"]{display:none}
       <div class="av-title">Fichas de personajes</div>
       <div class="av-sub">Boceto detallado de cada personaje del proyecto</div>
       <div id="pj-container"></div>
-      <button class="add-pj-btn" onclick="addCharacter()"><i class="ti ti-plus"></i> Añadir personaje</button>
+      <button class="add-btn-full" onclick="addCharacter()"><i class="ti ti-plus"></i> Añadir personaje</button>
     </div>
 
     <!-- ALT: REFERENCIAS -->
     <div class="alt-view" id="view-refs">
       <div class="av-title">Referencias visuales</div>
       <div id="refs-container"></div>
-      <button class="add-pj-btn" onclick="addRef()"><i class="ti ti-plus"></i> Añadir referencia</button>
+      <button class="add-btn-full" onclick="addRef()"><i class="ti ti-plus"></i> Añadir referencia</button>
     </div>
 
     <!-- ALT: ESTILO -->
     <div class="alt-view" id="view-estilo">
       <div class="av-title">Notas de estilo</div>
       <div id="estilo-container"></div>
-      <button class="add-pj-btn" onclick="addEstilo()"><i class="ti ti-plus"></i> Añadir nota</button>
+      <button class="add-btn-full" onclick="addEstilo()"><i class="ti ti-plus"></i> Añadir nota</button>
     </div>
 
     <!-- ALT: BRAINSTORM -->
     <div class="alt-view" id="view-brainstorm">
       <div class="av-title">Brainstorming</div>
       <div class="storm-bg" id="stormGrid">
-        <div class="add-storm" onclick="addStorm()"><i class="ti ti-plus" style="font-size:16px"></i> Nueva idea</div>
+        <div class="add-storm-btn" onclick="addStorm()"><i class="ti ti-plus" style="font-size:16px"></i> Nueva idea</div>
       </div>
     </div>
   </div>
@@ -424,15 +432,13 @@ input[type="file"]{display:none}
     <span class="mode-pill pill-write" id="modePill">Escritura</span>
     <span id="sbWords">Palabras: <strong>0</strong></span>
     <span id="sbSesion">Sesión: <strong>+0</strong></span>
-    <span class="saved-ok" id="savedOk">Guardado <i class="ti ti-check"></i></span>
+    <span class="saved-ok" id="savedOk">Guardado <i class="ti ti-check" style="font-size:12px;color:var(--ok)"></i></span>
   </div>
 </div>
 
 <!-- INSPECTOR -->
 <div class="inspector">
-  <div class="insp-head">
-    <span class="insp-head-title">Inspector</span>
-  </div>
+  <div class="insp-head"><span class="insp-head-title">Inspector</span></div>
   <div class="ntabs">
     <div class="ntab active" onclick="switchNote('meta',this)">Info</div>
     <div class="ntab" onclick="switchNote('sinopsis',this)">Sinopsis</div>
@@ -443,7 +449,7 @@ input[type="file"]{display:none}
   <div class="insp-scroll">
     <div id="tab-meta">
       <div class="mrow"><span class="mlabel">Estado</span><select class="msel" id="chStatus" onchange="saveChMeta()"><option>Borrador</option><option>En revisión</option><option>Final</option></select></div>
-      <div class="mrow"><span class="mlabel">Etiqueta</span><select class="msel" id="chLabel" onchange="saveChMeta()"><option>Misterio</option><option>Acción</option><option>Emoción</option><option>Comedia</option></select></div>
+      <div class="mrow"><span class="mlabel">Etiqueta</span><select class="msel" id="chLabel" onchange="saveChMeta()"><option>Misterio</option><option>Acción</option><option>Emoción</option><option>Comedia</option><option>Sin etiqueta</option></select></div>
       <div class="mrow"><span class="mlabel">PDV</span><select class="msel" id="chPdv" onchange="saveChMeta()"><option>1.ª persona</option><option>3.ª persona</option><option>2.ª persona</option></select></div>
       <div class="mrow"><span class="mlabel">Palabras</span><span class="mval"><span id="wc2">0</span> / <span id="wcGoal">400</span></span></div>
       <div class="mrow"><span class="mlabel">Imágenes</span><span class="mval" id="imgCount">0</span></div>
@@ -461,9 +467,9 @@ input[type="file"]{display:none}
     </div>
     <div id="tab-notas" style="display:none">
       <div class="slabel">Notas del autor</div>
-      <textarea class="ntarea" id="chNotas" style="min-height:100px" onchange="saveChMeta()" placeholder="Notas, ideas, recordatorios…"></textarea>
+      <textarea class="ntarea" id="chNotas" style="min-height:100px" onchange="saveChMeta()" placeholder="Ideas, recordatorios…"></textarea>
       <div class="slabel">Pendientes</div>
-      <textarea class="ntarea" id="chTodos" style="min-height:80px" onchange="saveChMeta()" placeholder="☐ Revisar diálogos&#10;☐ Añadir ilustración"></textarea>
+      <textarea class="ntarea" id="chTodos" style="min-height:80px" onchange="saveChMeta()" placeholder="☐ Revisar diálogos"></textarea>
     </div>
     <div id="tab-snaps" style="display:none">
       <div class="slabel">Versiones guardadas</div>
@@ -484,7 +490,8 @@ input[type="file"]{display:none}
         <div class="obj-row"><input class="obj-input" type="number" id="sesTarget" value="500" min="1" onchange="updateSes()"/><button class="obj-btn" onclick="updateSes()">OK</button></div>
       </div>
       <div class="slabel" style="margin-top:12px">Fecha límite</div>
-      <input type="date" class="ntarea" id="projDeadline" style="padding:5px 8px;min-height:auto" onchange="saveProjectMeta()"/>
+      <input type="date" class="ntarea" id="projDeadline" style="padding:5px 8px;min-height:auto" onchange="updateDeadline()"/>
+      <div class="deadline-info" id="deadlineInfo" style="display:none"></div>
     </div>
   </div>
   <div class="insp-footer">
@@ -492,7 +499,6 @@ input[type="file"]{display:none}
     <span class="insp-footer-val"><span id="totalWC">0</span> palabras</span>
   </div>
 </div>
-
 </div><!-- /app -->
 
 <!-- COMPOSE -->
@@ -535,805 +541,690 @@ input[type="file"]{display:none}
 
 <div class="toast" id="toast"></div>
 
-<!-- FIREBASE SDK -->
+<!-- CLOUDINARY + FIREBASE -->
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import { getFirestore, collection, doc, addDoc, setDoc, getDoc, getDocs, deleteDoc, updateDoc, query, orderBy, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-const firebaseConfig = {
+const CLOUDINARY_CLOUD = 'p3dzneaf';
+const CLOUDINARY_PRESET = 'editor_cuentos';
+
+const fbApp = initializeApp({
   apiKey: "AIzaSyAE1lXAUW5NoJozoiWetWN7ClrsNVNhRh0",
   authDomain: "editor-cuentos.firebaseapp.com",
   projectId: "editor-cuentos",
   storageBucket: "editor-cuentos.firebasestorage.app",
   messagingSenderId: "893556128016",
   appId: "1:893556128016:web:7690cf9749e88455f18d95"
-};
-
-const fbApp = initializeApp(firebaseConfig);
+});
 const db = getFirestore(fbApp);
 
-/* ════════════════════════════════════════
-   ESTADO GLOBAL
-════════════════════════════════════════ */
+/* ── ESTADO ── */
 let currentProjectId = null;
 let currentChapterId = null;
-let chapters = {}; // { id: {title, content, words, status, sinopsis, notas, ...} }
-let characters = {}; // { id: {name, fields} }
-let refs = {}; // { id: {title, content} }
-let estilos = {}; // { id: {title, content} }
-let storms = {}; // { id: {content, color} }
-let isSplit = false;
-let snapCount = 0;
-let imgCount = 0;
-let saveTimer = null;
-let sesionStartWords = 0;
+let chapters = {}, characters = {}, refs = {}, estilos = {}, storms = {};
 let chapterOrder = [];
+let isSplit = false, snapCount = 0, saveTimer = null, notepadTimer = null;
+let sesionStartWords = 0;
 
-const sectionMap = {
-  personajes: 'view-personajes',
-  refs: 'view-refs',
-  estilo: 'view-estilo',
-  brainstorm: 'view-brainstorm',
-};
+const sectionMap = { personajes:'view-personajes', refs:'view-refs', estilo:'view-estilo', brainstorm:'view-brainstorm' };
 
-/* ════════════════════════════════════════
-   TOAST
-════════════════════════════════════════ */
-window.toast = function(m) {
-  const t = document.getElementById('toast');
-  t.textContent = m;
-  t.classList.add('show');
-  setTimeout(() => t.classList.remove('show'), 2200);
-}
+/* ── TOAST ── */
+window.toast = m => { const t=document.getElementById('toast'); t.textContent=m; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),2200); };
 
-/* ════════════════════════════════════════
-   PANTALLA DE PROYECTOS
-════════════════════════════════════════ */
-window.showProjectsScreen = function() {
-  document.getElementById('projectsScreen').classList.remove('hidden');
-  loadProjects();
-}
+/* ── PROYECTOS ── */
+window.showProjectsScreen = () => { document.getElementById('projectsScreen').classList.remove('hidden'); loadProjects(); };
 
 async function loadProjects() {
   const grid = document.getElementById('psGrid');
   grid.innerHTML = '<div class="ps-loading">Cargando proyectos…</div>';
   try {
-    const q = query(collection(db, 'projects'), orderBy('updatedAt', 'desc'));
+    const q = query(collection(db,'projects'), orderBy('updatedAt','desc'));
     const snap = await getDocs(q);
     grid.innerHTML = '';
     snap.forEach(d => {
       const p = d.data();
       const card = document.createElement('div');
       card.className = 'ps-card';
-      card.innerHTML = `
-        <button class="ps-card-del" onclick="deleteProject(event,'${d.id}')" title="Eliminar proyecto"><i class="ti ti-trash" style="font-size:13px"></i></button>
-        <div class="ps-card-title">${p.name || 'Sin título'}</div>
-        <div class="ps-card-desc">${p.description || 'Sin descripción'}</div>
-        <div class="ps-card-meta">
-          <span><i class="ti ti-calendar" style="font-size:11px"></i> ${p.updatedAt?.toDate ? p.updatedAt.toDate().toLocaleDateString('es-ES') : 'Hoy'}</span>
-        </div>`;
-      card.onclick = (e) => { if (!e.target.closest('.ps-card-del')) openProject(d.id, p); };
+      const date = p.updatedAt?.toDate ? p.updatedAt.toDate().toLocaleDateString('es-ES') : 'Hoy';
+      card.innerHTML = `<button class="ps-card-del" onclick="event.stopPropagation();deleteProject('${d.id}')" title="Eliminar"><i class="ti ti-trash" style="font-size:13px"></i></button><div class="ps-card-title">${p.name||'Sin título'}</div><div class="ps-card-desc">${p.description||'Sin descripción'}</div><div class="ps-card-meta">${date}</div>`;
+      card.onclick = () => openProject(d.id, p);
       grid.appendChild(card);
     });
-    // Botón nuevo
-    const newCard = document.createElement('div');
-    newCard.className = 'ps-card new-card';
-    newCard.innerHTML = `<i class="ti ti-plus"></i><span>Nuevo proyecto</span>`;
-    newCard.onclick = () => showNewForm();
-    grid.appendChild(newCard);
-  } catch(e) {
-    grid.innerHTML = `<div class="ps-loading" style="color:#c0392b">Error al cargar: ${e.message}</div>`;
-  }
+    const nc = document.createElement('div');
+    nc.className = 'ps-card new-card';
+    nc.innerHTML = `<i class="ti ti-plus"></i><span>Nuevo proyecto</span>`;
+    nc.onclick = showNewForm;
+    grid.appendChild(nc);
+  } catch(e) { grid.innerHTML = `<div class="ps-loading" style="color:#c0392b">Error: ${e.message}</div>`; }
 }
 
-window.showNewForm = function() {
-  document.getElementById('psNewForm').classList.add('visible');
-  document.getElementById('psNewName').focus();
-}
-window.hideNewForm = function() {
-  document.getElementById('psNewForm').classList.remove('visible');
-  document.getElementById('psNewName').value = '';
-  document.getElementById('psNewDesc').value = '';
-}
+window.showNewForm = () => { document.getElementById('psNewForm').classList.add('visible'); document.getElementById('psNewName').focus(); };
+window.hideNewForm = () => { document.getElementById('psNewForm').classList.remove('visible'); document.getElementById('psNewName').value=''; document.getElementById('psNewDesc').value=''; };
 
-window.createProject = async function() {
+window.createProject = async () => {
   const name = document.getElementById('psNewName').value.trim();
-  if (!name) { toast('Escribe un nombre para el proyecto'); return; }
+  if (!name) { toast('Escribe un nombre'); return; }
   try {
-    const ref = await addDoc(collection(db, 'projects'), {
-      name, description: document.getElementById('psNewDesc').value.trim(),
-      createdAt: serverTimestamp(), updatedAt: serverTimestamp()
-    });
-    // Crear primer capítulo
-    await addDoc(collection(db, 'projects', ref.id, 'chapters'), {
-      title: 'Cap. 1 — Primer capítulo', content: '', words: 0,
-      status: 'Borrador', label: 'Sin etiqueta', pdv: '3.ª persona',
-      sinopsis: '', notas: '', todos: '', keywords: '', include: true,
-      order: 0, createdAt: serverTimestamp()
-    });
+    const ref = await addDoc(collection(db,'projects'), { name, description: document.getElementById('psNewDesc').value.trim(), createdAt: serverTimestamp(), updatedAt: serverTimestamp(), notepad: '' });
+    await addDoc(collection(db,'projects',ref.id,'chapters'), { title:'Cap. 1 — Primer capítulo', content:'', words:0, status:'Borrador', label:'Sin etiqueta', pdv:'3.ª persona', sinopsis:'', notas:'', todos:'', keywords:'', include:true, order:0, createdAt:serverTimestamp() });
     hideNewForm();
-    openProject(ref.id, { name, description: '' });
-  } catch(e) { toast('Error: ' + e.message); }
-}
+    openProject(ref.id, { name, description:'' });
+  } catch(e) { toast('Error: '+e.message); }
+};
 
-window.deleteProject = async function(e, id) {
-  e.stopPropagation();
-  if (!confirm('¿Eliminar este proyecto? Esta acción no se puede deshacer.')) return;
-  try {
-    await deleteDoc(doc(db, 'projects', id));
-    loadProjects();
-    toast('Proyecto eliminado');
-  } catch(err) { toast('Error: ' + err.message); }
-}
+window.deleteProject = async (id) => {
+  if (!confirm('¿Eliminar este proyecto? No se puede deshacer.')) return;
+  await deleteDoc(doc(db,'projects',id));
+  loadProjects(); toast('Proyecto eliminado');
+};
 
 async function openProject(id, data) {
   currentProjectId = id;
-  chapters = {}; characters = {}; refs = {}; estilos = {}; storms = {};
-  chapterOrder = [];
-  document.getElementById('binderProjectName').value = data.name || 'Mi proyecto';
+  chapters={}; characters={}; refs={}; estilos={}; storms={}; chapterOrder=[];
+  document.getElementById('binderProjectName').value = data.name||'Mi proyecto';
   document.getElementById('projectsScreen').classList.add('hidden');
   await loadAllData();
 }
 
-window.goToProjects = function() {
-  saveCurrentChapter();
-  currentProjectId = null;
-  currentChapterId = null;
-  document.getElementById('projectsScreen').classList.remove('hidden');
-  loadProjects();
-}
+window.goToProjects = () => { saveCurrentChapter(); currentProjectId=null; currentChapterId=null; document.getElementById('projectsScreen').classList.remove('hidden'); loadProjects(); };
 
-/* ════════════════════════════════════════
-   CARGAR DATOS DEL PROYECTO
-════════════════════════════════════════ */
+/* ── CARGAR DATOS ── */
 async function loadAllData() {
   try {
-    // Capítulos
-    const chSnap = await getDocs(query(collection(db, 'projects', currentProjectId, 'chapters'), orderBy('order')));
-    chapters = {};
-    chapterOrder = [];
-    chSnap.forEach(d => {
-      chapters[d.id] = { ...d.data(), id: d.id };
-      chapterOrder.push(d.id);
-    });
-    // Personajes
-    const pjSnap = await getDocs(collection(db, 'projects', currentProjectId, 'characters'));
-    characters = {};
-    pjSnap.forEach(d => { characters[d.id] = { ...d.data(), id: d.id }; });
-    // Referencias
-    const rfSnap = await getDocs(collection(db, 'projects', currentProjectId, 'refs'));
-    refs = {};
-    rfSnap.forEach(d => { refs[d.id] = { ...d.data(), id: d.id }; });
-    // Estilos
-    const esSnap = await getDocs(collection(db, 'projects', currentProjectId, 'estilos'));
-    estilos = {};
-    esSnap.forEach(d => { estilos[d.id] = { ...d.data(), id: d.id }; });
-    // Brainstorm
-    const stSnap = await getDocs(collection(db, 'projects', currentProjectId, 'storms'));
-    storms = {};
-    stSnap.forEach(d => { storms[d.id] = { ...d.data(), id: d.id }; });
-    // Libreta
-    const projDoc = await getDoc(doc(db, 'projects', currentProjectId));
-    if (projDoc.exists()) {
-      document.getElementById('notepadArea').value = projDoc.data().notepad || '';
-    }
-
-    renderBinder();
-    renderCork();
-    renderOutline();
-    // Cargar primer capítulo
-    if (chapterOrder.length > 0) {
-      loadChapter(chapterOrder[0]);
-    }
+    const [chSnap,pjSnap,rfSnap,esSnap,stSnap,projDoc] = await Promise.all([
+      getDocs(query(collection(db,'projects',currentProjectId,'chapters'), orderBy('order'))),
+      getDocs(collection(db,'projects',currentProjectId,'characters')),
+      getDocs(collection(db,'projects',currentProjectId,'refs')),
+      getDocs(collection(db,'projects',currentProjectId,'estilos')),
+      getDocs(collection(db,'projects',currentProjectId,'storms')),
+      getDoc(doc(db,'projects',currentProjectId))
+    ]);
+    chapters={}; chapterOrder=[];
+    chSnap.forEach(d => { chapters[d.id]={...d.data(),id:d.id}; chapterOrder.push(d.id); });
+    characters={}; pjSnap.forEach(d => { characters[d.id]={...d.data(),id:d.id}; });
+    refs={}; rfSnap.forEach(d => { refs[d.id]={...d.data(),id:d.id}; });
+    estilos={}; esSnap.forEach(d => { estilos[d.id]={...d.data(),id:d.id}; });
+    storms={}; stSnap.forEach(d => { storms[d.id]={...d.data(),id:d.id}; });
+    if (projDoc.exists()) document.getElementById('notepadArea').value = projDoc.data().notepad||'';
+    renderBinder(); renderCork(); renderOutline();
+    if (chapterOrder.length > 0) { showEditor(); loadChapter(chapterOrder[0]); }
     updateTotalWC();
-  } catch(e) { toast('Error al cargar datos: ' + e.message); }
+  } catch(e) { toast('Error al cargar: '+e.message); }
 }
 
-/* ════════════════════════════════════════
-   RENDERIZAR BINDER
-════════════════════════════════════════ */
+/* ── RENDER ── */
 function renderBinder() {
-  const cont = document.getElementById('chaptersInBinder');
-  cont.innerHTML = '';
+  const cc = document.getElementById('chaptersInBinder');
+  cc.innerHTML = '';
   chapterOrder.forEach(id => {
-    const ch = chapters[id];
-    if (!ch) return;
+    const ch = chapters[id]; if(!ch) return;
     const item = document.createElement('div');
-    item.className = 'bitem sub';
-    item.id = 'b-' + id;
-    item.innerHTML = `<i class="ti ti-file-text" style="font-size:12px"></i><span class="bl">${ch.title}</span><span class="bb" id="bb-${id}">${ch.words || 0}</span>`;
-    item.onclick = () => nav(item, id);
-    cont.appendChild(item);
+    item.className='bitem sub'; item.id='b-'+id;
+    item.innerHTML=`<i class="ti ti-file-text" style="font-size:12px"></i><span class="bl">${ch.title}</span><span class="bb" id="bb-${id}">${ch.words||0}</span>`;
+    item.onclick=()=>nav(item,id);
+    cc.appendChild(item);
   });
-
-  const charCont = document.getElementById('charactersInBinder');
-  charCont.innerHTML = '';
+  const pc = document.getElementById('charsInBinder');
+  pc.innerHTML='';
   Object.values(characters).forEach(ch => {
-    const item = document.createElement('div');
-    item.className = 'bitem sub';
-    item.id = 'b-char-' + ch.id;
-    item.innerHTML = `<i class="ti ti-user" style="font-size:12px"></i><span class="bl">${ch.name || 'Personaje'}</span>`;
-    item.onclick = () => nav(item, 'personajes');
-    charCont.appendChild(item);
+    const item=document.createElement('div'); item.className='bitem sub'; item.id='b-char-'+ch.id;
+    item.innerHTML=`<i class="ti ti-user" style="font-size:12px"></i><span class="bl">${ch.name||'Personaje'}</span>`;
+    item.onclick=()=>nav(document.getElementById('b-personajes'),'personajes');
+    pc.appendChild(item);
   });
 }
 
-/* ════════════════════════════════════════
-   RENDERIZAR CORCHO Y ESQUEMA
-════════════════════════════════════════ */
 function renderCork() {
-  const cork = document.getElementById('cork');
-  cork.innerHTML = '';
+  const cork=document.getElementById('cork'); cork.innerHTML='';
   chapterOrder.forEach(id => {
-    const ch = chapters[id];
-    if (!ch) return;
-    const stClass = ch.status === 'Final' ? 'st-f' : ch.status === 'En revisión' ? 'st-r' : 'st-b';
-    const card = document.createElement('div');
-    card.className = 'ccard';
-    card.id = 'cc-' + id;
-    card.innerHTML = `<div class="cpin"></div><div class="ct">${ch.title.replace(/Cap\. \d+ — /, '')}</div><div class="cs">${ch.sinopsis || 'Sin sinopsis aún.'}</div><div class="cst ${stClass}">${ch.status || 'Borrador'}</div>`;
-    card.onclick = () => nav(document.getElementById('b-' + id), id);
+    const ch=chapters[id]; if(!ch) return;
+    const sc=ch.status==='Final'?'st-f':ch.status==='En revisión'?'st-r':'st-b';
+    const card=document.createElement('div'); card.className='ccard'; card.id='cc-'+id;
+    card.innerHTML=`<div class="cpin"></div><div class="ct">${ch.title.replace(/Cap\. \d+ — /,'')}</div><div class="cs">${ch.sinopsis||'Sin sinopsis aún.'}</div><div class="cst ${sc}">${ch.status||'Borrador'}</div>`;
+    card.onclick=()=>nav(document.getElementById('b-'+id),id);
     cork.appendChild(card);
   });
 }
 
 function renderOutline() {
-  const ol = document.getElementById('outline');
-  ol.innerHTML = '';
+  const ol=document.getElementById('outline'); ol.innerHTML='';
   chapterOrder.forEach(id => {
-    const ch = chapters[id];
-    if (!ch) return;
-    const stClass = ch.status === 'Final' ? 'st-f' : ch.status === 'En revisión' ? 'st-r' : 'st-b';
-    const item = document.createElement('div');
-    item.className = 'oitem';
-    item.innerHTML = `<i class="ti ti-file-text"></i><span>${ch.title.replace(/Cap\. \d+ — /, '')}</span><span class="os ${stClass}">${(ch.status || 'Bor.').substring(0,3)}.</span><span class="ow">${ch.words || 0}p</span>`;
-    item.onclick = () => nav(document.getElementById('b-' + id), id);
+    const ch=chapters[id]; if(!ch) return;
+    const sc=ch.status==='Final'?'st-f':ch.status==='En revisión'?'st-r':'st-b';
+    const item=document.createElement('div'); item.className='oitem';
+    item.innerHTML=`<i class="ti ti-file-text"></i><span>${ch.title.replace(/Cap\. \d+ — /,'')}</span><span class="os ${sc}">${(ch.status||'Bor.').substring(0,3)}.</span><span class="ow">${ch.words||0}p</span>`;
+    item.onclick=()=>nav(document.getElementById('b-'+id),id);
     ol.appendChild(item);
   });
 }
 
 function renderScriv() {
-  const s = document.getElementById('scriv');
-  s.innerHTML = '';
+  saveCurrentChapter();
+  const s=document.getElementById('scriv'); s.innerHTML='';
   chapterOrder.forEach(id => {
-    const ch = chapters[id];
-    if (!ch) return;
-    const sec = document.createElement('div');
-    sec.className = 'ssec';
-    sec.innerHTML = `<div class="ssec-title" onclick="nav(document.getElementById('b-${id}'),'${id}')">${ch.title}</div><div class="ssec-body">${ch.content || '<span style="color:var(--txm);font-style:italic">Sin contenido aún.</span>'}</div>`;
+    const ch=chapters[id]; if(!ch) return;
+    const sec=document.createElement('div'); sec.className='ssec';
+    sec.innerHTML=`<div class="ssec-title" onclick="nav(document.getElementById('b-${id}'),'${id}')">${ch.title}</div><div class="ssec-body">${ch.content||'<span style="color:var(--txm);font-style:italic">Sin contenido aún.</span>'}</div>`;
     s.appendChild(sec);
   });
 }
 
 function renderPersonajes() {
-  const cont = document.getElementById('pj-container');
-  cont.innerHTML = '';
+  const cont=document.getElementById('pj-container'); cont.innerHTML='';
   Object.values(characters).forEach(ch => {
-    const initials = (ch.name || 'NP').split(' ').map(w => w[0]).join('').substring(0, 2).toUpperCase();
-    const card = document.createElement('div');
-    card.className = 'pj-card';
-    card.innerHTML = `
-      <div class="pj-head">
-        <div class="pj-av">${initials}</div>
-        <span class="pj-name">${ch.name || 'Personaje sin nombre'}</span>
-        <button class="pj-del" onclick="deleteCharacter('${ch.id}')" title="Eliminar"><i class="ti ti-trash" style="font-size:13px"></i></button>
-      </div>
-      <div class="pj-body">
-        <div class="pj-campo"><label>Nombre completo</label><input type="text" value="${ch.name || ''}" onchange="saveCharField('${ch.id}','name',this.value)"/></div>
-        <div class="pj-campo"><label>Edad</label><input type="text" value="${ch.age || ''}" onchange="saveCharField('${ch.id}','age',this.value)"/></div>
-        <div class="pj-campo"><label>Descripción física</label><textarea onchange="saveCharField('${ch.id}','physical',this.value)">${ch.physical || ''}</textarea></div>
-        <div class="pj-campo"><label>Rol en la historia</label><input type="text" value="${ch.role || ''}" onchange="saveCharField('${ch.id}','role',this.value)"/></div>
-        <div class="pj-campo"><label>Deseo principal</label><input type="text" value="${ch.desire || ''}" onchange="saveCharField('${ch.id}','desire',this.value)"/></div>
-        <div class="pj-campo"><label>Mayor miedo</label><input type="text" value="${ch.fear || ''}" onchange="saveCharField('${ch.id}','fear',this.value)"/></div>
-        <div class="pj-campo"><label>Perfume / objeto favorito</label><input type="text" value="${ch.object || ''}" onchange="saveCharField('${ch.id}','object',this.value)"/></div>
-        <div class="pj-campo"><label>Primer amor</label><input type="text" value="${ch.firstlove || ''}" onchange="saveCharField('${ch.id}','firstlove',this.value)"/></div>
-        <div class="pj-campo full"><label>Historia personal</label><textarea style="min-height:72px" onchange="saveCharField('${ch.id}','backstory',this.value)">${ch.backstory || ''}</textarea></div>
-        <div class="pj-campo full"><label>Notas del autor</label><textarea onchange="saveCharField('${ch.id}','notes',this.value)">${ch.notes || ''}</textarea></div>
-      </div>`;
+    const initials=(ch.name||'NP').split(' ').map(w=>w[0]).join('').substring(0,2).toUpperCase();
+    const card=document.createElement('div'); card.className='pj-card';
+    card.innerHTML=`<div class="pj-head"><div class="pj-av">${initials}</div><span class="pj-name">${ch.name||'Sin nombre'}</span><button class="pj-del" onclick="deleteCharacter('${ch.id}')"><i class="ti ti-trash" style="font-size:13px"></i></button></div>
+    <div class="pj-body">
+      <div class="pj-campo"><label>Nombre completo</label><input type="text" value="${ch.name||''}" onchange="saveCharField('${ch.id}','name',this.value)"/></div>
+      <div class="pj-campo"><label>Edad</label><input type="text" value="${ch.age||''}" onchange="saveCharField('${ch.id}','age',this.value)"/></div>
+      <div class="pj-campo"><label>Descripción física</label><textarea onchange="saveCharField('${ch.id}','physical',this.value)">${ch.physical||''}</textarea></div>
+      <div class="pj-campo"><label>Rol en la historia</label><input type="text" value="${ch.role||''}" onchange="saveCharField('${ch.id}','role',this.value)"/></div>
+      <div class="pj-campo"><label>Deseo principal</label><input type="text" value="${ch.desire||''}" onchange="saveCharField('${ch.id}','desire',this.value)"/></div>
+      <div class="pj-campo"><label>Mayor miedo</label><input type="text" value="${ch.fear||''}" onchange="saveCharField('${ch.id}','fear',this.value)"/></div>
+      <div class="pj-campo"><label>Objeto / perfume favorito</label><input type="text" value="${ch.object||''}" onchange="saveCharField('${ch.id}','object',this.value)"/></div>
+      <div class="pj-campo"><label>Primer amor</label><input type="text" value="${ch.firstlove||''}" onchange="saveCharField('${ch.id}','firstlove',this.value)"/></div>
+      <div class="pj-campo full"><label>Historia personal</label><textarea style="min-height:72px" onchange="saveCharField('${ch.id}','backstory',this.value)">${ch.backstory||''}</textarea></div>
+      <div class="pj-campo full"><label>Notas del autor</label><textarea onchange="saveCharField('${ch.id}','notes',this.value)">${ch.notes||''}</textarea></div>
+    </div>`;
     cont.appendChild(card);
   });
 }
 
-function renderRefs(container, data, type) {
-  const cont = document.getElementById(container);
-  cont.innerHTML = '';
+function renderRefs(containerId, data, type) {
+  const cont=document.getElementById(containerId); cont.innerHTML='';
   Object.values(data).forEach(r => {
-    const card = document.createElement('div');
-    card.className = 'ref-card';
-    card.innerHTML = `
-      <div class="ref-title">
-        <i class="ti ti-file-text" style="font-size:14px;color:var(--gold)"></i>
-        <input type="text" value="${r.title || ''}" placeholder="Título…" style="flex:1;border:none;background:transparent;outline:none;font-size:13px;font-weight:500;color:var(--tx);font-family:'Inter',sans-serif" onchange="saveRefField('${type}','${r.id}','title',this.value)"/>
-        <button class="ref-del" onclick="deleteRef('${type}','${r.id}')" title="Eliminar"><i class="ti ti-trash" style="font-size:13px"></i></button>
-      </div>
-      <textarea placeholder="Contenido…" onchange="saveRefField('${type}','${r.id}','content',this.value)">${r.content || ''}</textarea>`;
+    const card=document.createElement('div'); card.className='ref-card';
+    card.innerHTML=`<div class="ref-title"><i class="ti ti-file-text" style="font-size:14px;color:var(--gold)"></i><input type="text" value="${r.title||''}" placeholder="Título…" style="flex:1;border:none;background:transparent;outline:none;font-size:13px;font-weight:500;color:var(--tx);font-family:'Inter',sans-serif" onchange="saveRefField('${type}','${r.id}','title',this.value)"/><button class="ref-del" onclick="deleteRef('${type}','${r.id}')"><i class="ti ti-trash" style="font-size:13px"></i></button></div><textarea placeholder="Contenido…" onchange="saveRefField('${type}','${r.id}','content',this.value)">${r.content||''}</textarea>`;
     cont.appendChild(card);
   });
 }
 
 function renderStorms() {
-  const grid = document.getElementById('stormGrid');
-  grid.innerHTML = '';
-  const colors = ['#c0392b','#3D6B5E','#185FA5','#8B5E3C','#7a3b8c'];
+  const grid=document.getElementById('stormGrid'); grid.innerHTML='';
+  const colors=['#c0392b','#3D6B5E','#185FA5','#8B5E3C','#7a3b8c'];
   Object.values(storms).forEach(s => {
-    const card = document.createElement('div');
-    card.className = 'storm-card';
-    card.innerHTML = `<div class="storm-pin" style="background:${s.color || colors[0]}"></div><textarea onchange="saveStormField('${s.id}','content',this.value)">${s.content || ''}</textarea>`;
+    const card=document.createElement('div'); card.className='storm-card';
+    card.innerHTML=`<div class="storm-pin" style="background:${s.color||colors[0]}"></div><textarea onchange="saveStormField('${s.id}','content',this.value)">${s.content||''}</textarea>`;
     grid.appendChild(card);
   });
-  const addBtn = document.createElement('div');
-  addBtn.className = 'add-storm';
-  addBtn.innerHTML = `<i class="ti ti-plus" style="font-size:16px"></i> Nueva idea`;
-  addBtn.onclick = addStorm;
-  grid.appendChild(addBtn);
+  const btn=document.createElement('div'); btn.className='add-storm-btn';
+  btn.innerHTML=`<i class="ti ti-plus" style="font-size:16px"></i> Nueva idea`;
+  btn.onclick=addStorm; grid.appendChild(btn);
 }
 
-/* ════════════════════════════════════════
-   NAVEGACIÓN
-════════════════════════════════════════ */
-window.nav = function(binderEl, section) {
-  document.querySelectorAll('.bitem').forEach(i => i.classList.remove('active'));
-  if (binderEl) binderEl.classList.add('active');
-
-  if (chapters[section]) {
-    showEditor();
-    loadChapter(section);
-    document.getElementById('modePill').textContent = 'Escritura';
-    document.getElementById('modePill').className = 'mode-pill pill-write';
-  } else if (sectionMap[section]) {
+/* ── NAVEGACIÓN ── */
+window.nav = (binderEl, section) => {
+  document.querySelectorAll('.bitem').forEach(i=>i.classList.remove('active'));
+  if(binderEl) binderEl.classList.add('active');
+  if(chapters[section]) {
+    showEditor(); loadChapter(section);
+    document.getElementById('modePill').textContent='Escritura';
+    document.getElementById('modePill').className='mode-pill pill-write';
+  } else if(sectionMap[section]) {
     saveCurrentChapter();
     showAlt(sectionMap[section], section);
-    document.getElementById('modePill').textContent = 'Referencia';
-    document.getElementById('modePill').className = 'mode-pill pill-ref';
+    document.getElementById('modePill').textContent='Referencia';
+    document.getElementById('modePill').className='mode-pill pill-ref';
   }
-}
+};
 
 function showEditor() {
-  document.getElementById('editorView').style.display = 'flex';
-  document.querySelectorAll('.alt-view').forEach(v => v.classList.remove('visible'));
+  document.getElementById('editorView').style.display='flex';
+  document.querySelectorAll('.alt-view').forEach(v=>v.classList.remove('visible'));
 }
 
 function showAlt(viewId, section) {
-  document.getElementById('editorView').style.display = 'none';
-  document.querySelectorAll('.alt-view').forEach(v => v.classList.remove('visible'));
+  document.getElementById('editorView').style.display='none';
+  document.querySelectorAll('.alt-view').forEach(v=>v.classList.remove('visible'));
   document.getElementById(viewId).classList.add('visible');
-  // Renderizar la vista correcta
-  if (section === 'personajes') renderPersonajes();
-  else if (section === 'refs') renderRefs('refs-container', refs, 'refs');
-  else if (section === 'estilo') renderRefs('estilo-container', estilos, 'estilos');
-  else if (section === 'brainstorm') renderStorms();
+  if(section==='personajes') renderPersonajes();
+  else if(section==='refs') renderRefs('refs-container',refs,'refs');
+  else if(section==='estilo') renderRefs('estilo-container',estilos,'estilos');
+  else if(section==='brainstorm') renderStorms();
 }
 
-/* ════════════════════════════════════════
-   CAPÍTULOS
-════════════════════════════════════════ */
+/* ── CAPÍTULOS ── */
 function loadChapter(id) {
-  currentChapterId = id;
-  const ch = chapters[id];
-  if (!ch) return;
-  document.getElementById('mainEditor').innerHTML = ch.content || '';
-  document.getElementById('chapterTitle').value = ch.title || '';
-  document.getElementById('composeTitle').value = ch.title || '';
-  document.getElementById('chStatus').value = ch.status || 'Borrador';
-  document.getElementById('chLabel').value = ch.label || 'Misterio';
-  document.getElementById('chPdv').value = ch.pdv || '3.ª persona';
-  document.getElementById('chSinopsis').value = ch.sinopsis || '';
-  document.getElementById('chKeywords').value = ch.keywords || '';
-  document.getElementById('chNotas').value = ch.notas || '';
-  document.getElementById('chTodos').value = ch.todos || '';
-  document.getElementById('chInclude').checked = ch.include !== false;
-  const w = ch.words || 0;
-  sesionStartWords = w;
-  updateWC(w);
-  // Corcho activo
-  document.querySelectorAll('.ccard').forEach(c => c.classList.remove('active'));
-  const cc = document.getElementById('cc-' + id);
-  if (cc) cc.classList.add('active');
-  document.querySelectorAll('.oitem').forEach(o => o.classList.remove('active'));
+  currentChapterId=id;
+  const ch=chapters[id]; if(!ch) return;
+  document.getElementById('mainEditor').innerHTML = ch.content||'';
+  document.getElementById('chapterTitle').value = ch.title||'';
+  document.getElementById('composeTitle').value = ch.title||'';
+  document.getElementById('chStatus').value = ch.status||'Borrador';
+  document.getElementById('chLabel').value = ch.label||'Sin etiqueta';
+  document.getElementById('chPdv').value = ch.pdv||'3.ª persona';
+  document.getElementById('chSinopsis').value = ch.sinopsis||'';
+  document.getElementById('chKeywords').value = ch.keywords||'';
+  document.getElementById('chNotas').value = ch.notas||'';
+  document.getElementById('chTodos').value = ch.todos||'';
+  document.getElementById('chInclude').checked = ch.include!==false;
+  sesionStartWords = ch.words||0;
+  updateWC(ch.words||0);
+  countImagesInEditor();
+  document.querySelectorAll('.ccard').forEach(c=>c.classList.remove('active'));
+  const cc=document.getElementById('cc-'+id); if(cc) cc.classList.add('active');
 }
 
 function saveCurrentChapter() {
-  if (!currentChapterId || !chapters[currentChapterId]) return;
-  const ch = chapters[currentChapterId];
-  ch.content = document.getElementById('mainEditor').innerHTML;
-  const txt = document.getElementById('mainEditor').innerText || '';
-  ch.words = txt.trim() ? txt.trim().split(/\s+/).length : 0;
-  ch.title = document.getElementById('chapterTitle').value;
+  if(!currentChapterId||!chapters[currentChapterId]) return;
+  const ch=chapters[currentChapterId];
+  ch.content=document.getElementById('mainEditor').innerHTML;
+  const txt=document.getElementById('mainEditor').innerText||'';
+  ch.words=txt.trim()?txt.trim().split(/\s+/).length:0;
+  ch.title=document.getElementById('chapterTitle').value;
 }
 
-window.saveCurrentChTitle = function() {
-  if (!currentChapterId) return;
-  const title = document.getElementById('chapterTitle').value;
-  if (chapters[currentChapterId]) chapters[currentChapterId].title = title;
-  updateDoc(doc(db, 'projects', currentProjectId, 'chapters', currentChapterId), { title });
+window.saveCurrentChTitle = () => {
+  if(!currentChapterId) return;
+  const title=document.getElementById('chapterTitle').value;
+  if(chapters[currentChapterId]) chapters[currentChapterId].title=title;
+  updateDoc(doc(db,'projects',currentProjectId,'chapters',currentChapterId),{title});
   renderBinder(); renderCork(); renderOutline();
-}
+};
 
-window.saveChMeta = function() {
-  if (!currentChapterId) return;
-  const data = {
-    status: document.getElementById('chStatus').value,
-    label: document.getElementById('chLabel').value,
-    pdv: document.getElementById('chPdv').value,
-    sinopsis: document.getElementById('chSinopsis').value,
-    keywords: document.getElementById('chKeywords').value,
-    notas: document.getElementById('chNotas').value,
-    todos: document.getElementById('chTodos').value,
-    include: document.getElementById('chInclude').checked,
-  };
-  Object.assign(chapters[currentChapterId], data);
-  updateDoc(doc(db, 'projects', currentProjectId, 'chapters', currentChapterId), data);
+window.saveChMeta = () => {
+  if(!currentChapterId) return;
+  const data={status:document.getElementById('chStatus').value,label:document.getElementById('chLabel').value,pdv:document.getElementById('chPdv').value,sinopsis:document.getElementById('chSinopsis').value,keywords:document.getElementById('chKeywords').value,notas:document.getElementById('chNotas').value,todos:document.getElementById('chTodos').value,include:document.getElementById('chInclude').checked};
+  Object.assign(chapters[currentChapterId],data);
+  updateDoc(doc(db,'projects',currentProjectId,'chapters',currentChapterId),data);
   renderCork(); renderOutline();
-}
+};
 
-window.addChapter = async function() {
-  if (!currentProjectId) return;
-  const n = chapterOrder.length + 1;
-  const title = `Cap. ${n} — Nuevo capítulo`;
+window.addChapter = async () => {
+  if(!currentProjectId) return;
+  const n=chapterOrder.length+1;
+  const title=`Cap. ${n} — Nuevo capítulo`;
   try {
-    const ref = await addDoc(collection(db, 'projects', currentProjectId, 'chapters'), {
-      title, content: '', words: 0, status: 'Borrador',
-      label: 'Sin etiqueta', pdv: '3.ª persona',
-      sinopsis: '', notas: '', todos: '', keywords: '', include: true,
-      order: n - 1, createdAt: serverTimestamp()
-    });
-    chapters[ref.id] = { id: ref.id, title, content: '', words: 0, status: 'Borrador', order: n-1 };
+    const ref=await addDoc(collection(db,'projects',currentProjectId,'chapters'),{title,content:'',words:0,status:'Borrador',label:'Sin etiqueta',pdv:'3.ª persona',sinopsis:'',notas:'',todos:'',keywords:'',include:true,order:n-1,createdAt:serverTimestamp()});
+    chapters[ref.id]={id:ref.id,title,content:'',words:0,status:'Borrador',order:n-1};
     chapterOrder.push(ref.id);
     renderBinder(); renderCork(); renderOutline();
-    nav(document.getElementById('b-' + ref.id), ref.id);
+    nav(document.getElementById('b-'+ref.id), ref.id);
     toast('Capítulo añadido');
-  } catch(e) { toast('Error: ' + e.message); }
-}
+  } catch(e){ toast('Error: '+e.message); }
+};
 
-/* ════════════════════════════════════════
-   PERSONAJES
-════════════════════════════════════════ */
-window.addCharacter = async function() {
-  if (!currentProjectId) return;
+/* ── PERSONAJES ── */
+window.addCharacter = async () => {
+  if(!currentProjectId) return;
   try {
-    const ref = await addDoc(collection(db, 'projects', currentProjectId, 'characters'), {
-      name: 'Nuevo personaje', age: '', physical: '', role: '',
-      desire: '', fear: '', object: '', firstlove: '', backstory: '', notes: '',
-      createdAt: serverTimestamp()
-    });
-    characters[ref.id] = { id: ref.id, name: 'Nuevo personaje' };
+    const ref=await addDoc(collection(db,'projects',currentProjectId,'characters'),{name:'Nuevo personaje',age:'',physical:'',role:'',desire:'',fear:'',object:'',firstlove:'',backstory:'',notes:'',createdAt:serverTimestamp()});
+    characters[ref.id]={id:ref.id,name:'Nuevo personaje'};
     renderBinder();
-    nav(document.getElementById('b-personajes'), 'personajes');
+    nav(document.getElementById('b-personajes'),'personajes');
     toast('Personaje añadido');
-  } catch(e) { toast('Error: ' + e.message); }
-}
+  } catch(e){ toast('Error: '+e.message); }
+};
 
-window.saveCharField = async function(id, field, value) {
-  if (characters[id]) characters[id][field] = value;
-  try {
-    await updateDoc(doc(db, 'projects', currentProjectId, 'characters', id), { [field]: value });
-    if (field === 'name') renderBinder();
-  } catch(e) { toast('Error al guardar'); }
-}
+window.saveCharField = async (id,field,value) => {
+  if(characters[id]) characters[id][field]=value;
+  try { await updateDoc(doc(db,'projects',currentProjectId,'characters',id),{[field]:value}); if(field==='name') renderBinder(); } catch(e){}
+};
 
-window.deleteCharacter = async function(id) {
-  if (!confirm('¿Eliminar este personaje?')) return;
+window.deleteCharacter = async (id) => {
+  if(!confirm('¿Eliminar este personaje?')) return;
   delete characters[id];
-  await deleteDoc(doc(db, 'projects', currentProjectId, 'characters', id));
-  renderBinder();
-  renderPersonajes();
-  toast('Personaje eliminado');
-}
+  await deleteDoc(doc(db,'projects',currentProjectId,'characters',id));
+  renderBinder(); renderPersonajes(); toast('Personaje eliminado');
+};
 
-/* ════════════════════════════════════════
-   REFERENCIAS Y ESTILOS
-════════════════════════════════════════ */
-window.addRef = async function() {
-  if (!currentProjectId) return;
+/* ── REFERENCIAS ── */
+window.addRef = async () => {
+  if(!currentProjectId) return;
   try {
-    const r = await addDoc(collection(db, 'projects', currentProjectId, 'refs'), {
-      title: 'Nueva referencia', content: '', createdAt: serverTimestamp()
-    });
-    refs[r.id] = { id: r.id, title: 'Nueva referencia', content: '' };
-    nav(document.getElementById('b-refs'), 'refs');
+    const r=await addDoc(collection(db,'projects',currentProjectId,'refs'),{title:'Nueva referencia',content:'',createdAt:serverTimestamp()});
+    refs[r.id]={id:r.id,title:'Nueva referencia',content:''};
+    nav(document.getElementById('b-refs'),'refs');
     toast('Referencia añadida');
-  } catch(e) { toast('Error: ' + e.message); }
-}
+  } catch(e){ toast('Error: '+e.message); }
+};
 
-window.addEstilo = async function() {
-  if (!currentProjectId) return;
+window.addEstilo = async () => {
+  if(!currentProjectId) return;
   try {
-    const r = await addDoc(collection(db, 'projects', currentProjectId, 'estilos'), {
-      title: 'Nueva nota de estilo', content: '', createdAt: serverTimestamp()
-    });
-    estilos[r.id] = { id: r.id, title: 'Nueva nota de estilo', content: '' };
-    nav(document.getElementById('b-estilo'), 'estilo');
+    const r=await addDoc(collection(db,'projects',currentProjectId,'estilos'),{title:'Nueva nota de estilo',content:'',createdAt:serverTimestamp()});
+    estilos[r.id]={id:r.id,title:'Nueva nota de estilo',content:''};
+    nav(document.getElementById('b-estilo'),'estilo');
     toast('Nota añadida');
-  } catch(e) { toast('Error: ' + e.message); }
-}
+  } catch(e){ toast('Error: '+e.message); }
+};
 
-window.saveRefField = async function(type, id, field, value) {
-  const col = type === 'refs' ? refs : estilos;
-  if (col[id]) col[id][field] = value;
-  try {
-    await updateDoc(doc(db, 'projects', currentProjectId, type, id), { [field]: value });
-  } catch(e) { toast('Error al guardar'); }
-}
+window.saveRefField = async (type,id,field,value) => {
+  const col=type==='refs'?refs:estilos;
+  if(col[id]) col[id][field]=value;
+  try { await updateDoc(doc(db,'projects',currentProjectId,type,id),{[field]:value}); } catch(e){}
+};
 
-window.deleteRef = async function(type, id) {
-  if (!confirm('¿Eliminar esta entrada?')) return;
-  const col = type === 'refs' ? refs : estilos;
+window.deleteRef = async (type,id) => {
+  if(!confirm('¿Eliminar esta entrada?')) return;
+  const col=type==='refs'?refs:estilos;
   delete col[id];
-  await deleteDoc(doc(db, 'projects', currentProjectId, type, id));
-  if (type === 'refs') renderRefs('refs-container', refs, 'refs');
-  else renderRefs('estilo-container', estilos, 'estilos');
+  await deleteDoc(doc(db,'projects',currentProjectId,type,id));
+  if(type==='refs') renderRefs('refs-container',refs,'refs');
+  else renderRefs('estilo-container',estilos,'estilos');
   toast('Eliminado');
-}
+};
 
-/* ════════════════════════════════════════
-   BRAINSTORMING
-════════════════════════════════════════ */
-window.addStorm = async function() {
-  if (!currentProjectId) return;
-  const colors = ['#c0392b','#3D6B5E','#185FA5','#8B5E3C','#7a3b8c'];
-  const color = colors[Math.floor(Math.random() * colors.length)];
+/* ── BRAINSTORM ── */
+window.addStorm = async () => {
+  if(!currentProjectId) return;
+  const colors=['#c0392b','#3D6B5E','#185FA5','#8B5E3C','#7a3b8c'];
+  const color=colors[Math.floor(Math.random()*colors.length)];
   try {
-    const r = await addDoc(collection(db, 'projects', currentProjectId, 'storms'), {
-      content: '', color, createdAt: serverTimestamp()
-    });
-    storms[r.id] = { id: r.id, content: '', color };
-    renderStorms();
-    toast('Idea añadida');
-  } catch(e) { toast('Error: ' + e.message); }
-}
+    const r=await addDoc(collection(db,'projects',currentProjectId,'storms'),{content:'',color,createdAt:serverTimestamp()});
+    storms[r.id]={id:r.id,content:'',color};
+    renderStorms(); toast('Idea añadida');
+  } catch(e){ toast('Error: '+e.message); }
+};
 
-window.saveStormField = async function(id, field, value) {
-  if (storms[id]) storms[id][field] = value;
-  try {
-    await updateDoc(doc(db, 'projects', currentProjectId, 'storms', id), { [field]: value });
-  } catch(e) {}
-}
+window.saveStormField = async (id,field,value) => {
+  if(storms[id]) storms[id][field]=value;
+  try { await updateDoc(doc(db,'projects',currentProjectId,'storms',id),{[field]:value}); } catch(e){}
+};
 
-/* ════════════════════════════════════════
-   EDITOR
-════════════════════════════════════════ */
-window.fmt = function(cmd) {
-  const ed = document.getElementById('mainEditor'); ed.focus();
-  if (cmd === 'h2') document.execCommand('formatBlock', false, 'h2');
-  else if (cmd === 'h3') document.execCommand('formatBlock', false, 'h3');
-  else if (cmd === 'quote') document.execCommand('formatBlock', false, 'blockquote');
-  else if (cmd === 'ul') document.execCommand('insertUnorderedList');
-  else document.execCommand(cmd, false, null);
-}
-window.addSep = function() { document.getElementById('mainEditor').focus(); document.execCommand('insertHorizontalRule'); }
+/* ── EDITOR ── */
+window.fmt = (cmd) => {
+  const ed=document.getElementById('mainEditor'); ed.focus();
+  if(cmd==='h2') document.execCommand('formatBlock',false,'h2');
+  else if(cmd==='h3') document.execCommand('formatBlock',false,'h3');
+  else if(cmd==='quote') document.execCommand('formatBlock',false,'blockquote');
+  else if(cmd==='ul') document.execCommand('insertUnorderedList');
+  else document.execCommand(cmd,false,null);
+};
+window.addSep = () => { document.getElementById('mainEditor').focus(); document.execCommand('insertHorizontalRule'); };
 
-window.onInput = function() {
-  const txt = document.getElementById('mainEditor').innerText || '';
-  const w = txt.trim() ? txt.trim().split(/\s+/).length : 0;
-  updateWC(w);
-  triggerSave();
-}
+window.onInput = () => {
+  const txt=document.getElementById('mainEditor').innerText||'';
+  const w=txt.trim()?txt.trim().split(/\s+/).length:0;
+  updateWC(w); triggerSave();
+};
 
 function updateWC(w) {
-  const ses = Math.max(0, w - sesionStartWords);
-  document.getElementById('sbWords').innerHTML = `Palabras: <strong>${w}</strong>`;
-  document.getElementById('sbSesion').innerHTML = `Sesión: <strong>+${ses}</strong>`;
-  document.getElementById('wc2').textContent = w;
-  const goal = parseInt(document.getElementById('wcGoal').textContent) || 400;
-  const pct = Math.min(100, Math.round(w / goal * 100));
-  document.getElementById('progFill').style.width = pct + '%';
-  document.getElementById('pctLabel').textContent = pct + '%';
-  const bb = document.getElementById('bb-' + currentChapterId);
-  if (bb) bb.textContent = w;
-  if (chapters[currentChapterId]) chapters[currentChapterId].words = w;
-  updateTotalWC();
-  updateObj(); updateSes(ses);
+  const ses=Math.max(0,w-sesionStartWords);
+  document.getElementById('sbWords').innerHTML=`Palabras: <strong>${w}</strong>`;
+  document.getElementById('sbSesion').innerHTML=`Sesión: <strong>+${ses}</strong>`;
+  document.getElementById('wc2').textContent=w;
+  const goal=parseInt(document.getElementById('wcGoal').textContent)||400;
+  const pct=Math.min(100,Math.round(w/goal*100));
+  document.getElementById('progFill').style.width=pct+'%';
+  document.getElementById('pctLabel').textContent=pct+'%';
+  const bb=document.getElementById('bb-'+currentChapterId); if(bb) bb.textContent=w;
+  if(chapters[currentChapterId]) chapters[currentChapterId].words=w;
+  updateTotalWC(); updateObj(); updateSes(ses);
 }
 
 function updateTotalWC() {
-  const total = Object.values(chapters).reduce((a, c) => a + (c.words || 0), 0);
-  document.getElementById('totalWC').textContent = total;
+  const total=Object.values(chapters).reduce((a,c)=>a+(c.words||0),0);
+  document.getElementById('totalWC').textContent=total;
+}
+
+function countImagesInEditor() {
+  const imgs=document.getElementById('mainEditor').querySelectorAll('.img-block').length;
+  document.getElementById('imgCount').textContent=imgs;
 }
 
 function triggerSave() {
-  document.getElementById('savedOk').innerHTML = 'Guardando… <i class="ti ti-loader" style="font-size:12px"></i>';
-  document.getElementById('modePill').className = 'mode-pill pill-sync';
+  document.getElementById('savedOk').innerHTML='Guardando… <i class="ti ti-loader" style="font-size:12px"></i>';
+  document.getElementById('modePill').className='mode-pill pill-sync';
   clearTimeout(saveTimer);
-  saveTimer = setTimeout(async () => {
-    if (!currentChapterId || !currentProjectId) return;
+  saveTimer=setTimeout(async()=>{
+    if(!currentChapterId||!currentProjectId) return;
     saveCurrentChapter();
-    const ch = chapters[currentChapterId];
+    const ch=chapters[currentChapterId];
     try {
-      await updateDoc(doc(db, 'projects', currentProjectId, 'chapters', currentChapterId), {
-        content: ch.content, words: ch.words
-      });
-      await updateDoc(doc(db, 'projects', currentProjectId), { updatedAt: serverTimestamp() });
-      document.getElementById('savedOk').innerHTML = 'Guardado <i class="ti ti-check" style="font-size:12px;color:var(--ok)"></i>';
-      document.getElementById('modePill').textContent = 'Escritura';
-      document.getElementById('modePill').className = 'mode-pill pill-write';
-    } catch(e) {
-      document.getElementById('savedOk').innerHTML = '<span style="color:#c0392b">Error al guardar</span>';
-    }
-  }, 1500);
+      await updateDoc(doc(db,'projects',currentProjectId,'chapters',currentChapterId),{content:ch.content,words:ch.words});
+      await updateDoc(doc(db,'projects',currentProjectId),{updatedAt:serverTimestamp()});
+      document.getElementById('savedOk').innerHTML='Guardado <i class="ti ti-check" style="font-size:12px;color:var(--ok)"></i>';
+      document.getElementById('modePill').textContent='Escritura';
+      document.getElementById('modePill').className='mode-pill pill-write';
+    } catch(e){ document.getElementById('savedOk').innerHTML='<span style="color:#c0392b">Error al guardar</span>'; }
+  },1500);
 }
 
-/* ════════════════════════════════════════
-   OBJETIVO
-════════════════════════════════════════ */
-window.updateObj = function() {
-  const target = parseInt(document.getElementById('objTarget').value) || 5000;
-  const total = Object.values(chapters).reduce((a, c) => a + (c.words || 0), 0);
-  const p = Math.min(100, Math.round(total / target * 100));
-  document.getElementById('objFill').style.width = p + '%';
-  document.getElementById('objPct').textContent = p + '%';
-}
-window.updateSes = function(sw) {
-  const target = parseInt(document.getElementById('sesTarget').value) || 500;
-  const s = sw !== undefined ? sw : 0;
-  const p = Math.min(100, Math.round(s / target * 100));
-  document.getElementById('sesFill').style.width = p + '%';
-  document.getElementById('sesPct').textContent = p + '%';
-}
+/* ── IMÁGENES CON CLOUDINARY ── */
+window.triggerImg = () => document.getElementById('imgInput').click();
 
-/* ════════════════════════════════════════
-   META DEL PROYECTO
-════════════════════════════════════════ */
-window.saveProjectMeta = async function() {
-  if (!currentProjectId) return;
+window.handleImgUpload = async (e) => {
+  const file=e.target.files[0]; if(!file) return;
+  e.target.value='';
+  // Mostrar placeholder de carga
+  const ph=document.getElementById('imgPh');
+  const loadEl=document.createElement('div'); loadEl.className='img-uploading'; loadEl.id='img-loading';
+  loadEl.innerHTML='<i class="ti ti-loader" style="font-size:20px;display:block;margin-bottom:6px"></i>Subiendo imagen a Cloudinary…';
+  ph.parentNode.insertBefore(loadEl,ph);
   try {
-    await updateDoc(doc(db, 'projects', currentProjectId), {
-      name: document.getElementById('binderProjectName').value,
-      updatedAt: serverTimestamp()
-    });
-  } catch(e) {}
+    const formData=new FormData();
+    formData.append('file',file);
+    formData.append('upload_preset',CLOUDINARY_PRESET);
+    const res=await fetch(`https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD}/image/upload`,{method:'POST',body:formData});
+    const data=await res.json();
+    if(data.error) throw new Error(data.error.message);
+    loadEl.remove();
+    insertImageBlock(data.secure_url);
+    toast('Imagen subida correctamente');
+  } catch(err) {
+    loadEl.remove();
+    toast('Error al subir imagen: '+err.message);
+  }
+};
+
+function insertImageBlock(url) {
+  const ph=document.getElementById('imgPh');
+  const uid='img-'+Date.now();
+  const wrapper=document.createElement('div');
+  wrapper.className='img-block'; wrapper.id=uid;
+  wrapper.innerHTML=`
+    <div class="img-toolbar">
+      <button class="img-tbtn" onclick="toggleBgMode('${uid}')"><i class="ti ti-layout-board"></i> Fondo</button>
+      <button class="img-tbtn" onclick="toggleDarkBg('${uid}')"><i class="ti ti-contrast"></i> Oscuro</button>
+      <button class="img-tbtn" onclick="alignImg('${uid}','full')"><i class="ti ti-arrows-horizontal"></i> Completo</button>
+      <button class="img-tbtn" onclick="alignImg('${uid}','left')"><i class="ti ti-layout-align-left"></i> Izq.</button>
+      <button class="img-tbtn" onclick="alignImg('${uid}','right')"><i class="ti ti-layout-align-right"></i> Der.</button>
+      <button class="img-tbtn" onclick="removeImgBlock('${uid}')"><i class="ti ti-trash"></i></button>
+    </div>
+    <img src="${url}" alt="Ilustración"/>
+    <div class="img-size-controls">
+      <span class="img-size-label">Tamaño:</span>
+      <input type="range" class="img-size-slider" min="20" max="100" value="100" oninput="resizeImg('${uid}',this.value)"/>
+      <span class="img-size-label" id="size-lbl-${uid}">100%</span>
+    </div>
+    <input class="img-cap-input" type="text" placeholder="Pie de imagen…"/>`;
+  ph.parentNode.insertBefore(wrapper,ph);
+  countImagesInEditor();
+  triggerSave();
 }
 
-/* ════════════════════════════════════════
-   IMÁGENES
-════════════════════════════════════════ */
-window.triggerImg = function() { document.getElementById('imgInput').click(); }
-window.handleImg = function(e) {
-  const file = e.target.files[0]; if (!file) return;
-  const reader = new FileReader();
-  reader.onload = ev => {
-    const uid = 'img_' + Date.now();
-    const ph = document.getElementById('imgPh');
-    const w = document.createElement('div'); w.className = 'img-wrap'; w.id = uid;
-    w.innerHTML = `<img src="${ev.target.result}" alt="Ilustración"/><div class="img-acts"><button class="img-act-btn" onclick="removeImg('${uid}')"><i class="ti ti-trash" style="font-size:12px"></i></button></div><input class="img-cap" type="text" placeholder="Pie de imagen…"/>`;
-    ph.parentNode.insertBefore(w, ph);
-    imgCount++; document.getElementById('imgCount').textContent = imgCount;
-    toast('Imagen insertada');
-  };
-  reader.readAsDataURL(file); e.target.value = '';
-}
-window.removeImg = function(id) {
-  const el = document.getElementById(id);
-  if (el) { el.remove(); imgCount = Math.max(0, imgCount-1); document.getElementById('imgCount').textContent = imgCount; }
-}
+window.toggleBgMode = (id) => {
+  const block=document.getElementById(id); if(!block) return;
+  const isBg=block.classList.contains('bg-mode');
+  if(isBg) {
+    block.classList.remove('bg-mode');
+    const overlay=block.querySelector('.img-text-overlay');
+    if(overlay) overlay.remove();
+  } else {
+    block.classList.add('bg-mode');
+    if(!block.querySelector('.img-text-overlay')) {
+      const overlay=document.createElement('div');
+      overlay.className='img-text-overlay'; overlay.contentEditable='true';
+      overlay.setAttribute('spellcheck','true');
+      overlay.setAttribute('placeholder','Escribe aquí sobre la imagen…');
+      block.appendChild(overlay);
+    }
+  }
+  triggerSave();
+};
 
-/* ════════════════════════════════════════
-   SPLIT
-════════════════════════════════════════ */
-window.toggleSplit = function() {
-  isSplit = !isSplit;
-  document.getElementById('scrollB').style.display = isSplit ? 'block' : 'none';
-  document.getElementById('splitDiv').style.display = isSplit ? 'block' : 'none';
-  document.getElementById('splitBtn').classList.toggle('on', isSplit);
-  toast(isSplit ? 'Doble pantalla activada' : 'Doble pantalla desactivada');
-}
+window.toggleDarkBg = (id) => {
+  const block=document.getElementById(id); if(!block) return;
+  block.classList.toggle('dark-bg');
+  triggerSave();
+};
 
-/* ════════════════════════════════════════
-   SNAPSHOT
-════════════════════════════════════════ */
-window.saveSnap = function() {
+window.alignImg = (id,align) => {
+  const block=document.getElementById(id); if(!block) return;
+  block.style.float='none'; block.style.width='100%'; block.style.margin='20px 0';
+  if(align==='left'){ block.style.float='left'; block.style.width='45%'; block.style.margin='8px 20px 8px 0'; }
+  else if(align==='right'){ block.style.float='right'; block.style.width='45%'; block.style.margin='8px 0 8px 20px'; }
+  triggerSave();
+};
+
+window.resizeImg = (id,val) => {
+  const block=document.getElementById(id); if(!block) return;
+  block.style.width=val+'%';
+  const lbl=document.getElementById('size-lbl-'+id); if(lbl) lbl.textContent=val+'%';
+};
+
+window.removeImgBlock = (id) => {
+  const el=document.getElementById(id); if(el){ el.remove(); countImagesInEditor(); triggerSave(); }
+};
+
+/* ── OBJETIVO Y FECHA LÍMITE ── */
+window.updateObj = () => {
+  const target=parseInt(document.getElementById('objTarget').value)||5000;
+  const total=Object.values(chapters).reduce((a,c)=>a+(c.words||0),0);
+  const p=Math.min(100,Math.round(total/target*100));
+  document.getElementById('objFill').style.width=p+'%';
+  document.getElementById('objPct').textContent=p+'%';
+};
+
+window.updateSes = (sw) => {
+  const target=parseInt(document.getElementById('sesTarget').value)||500;
+  const s=sw!==undefined?sw:0;
+  const p=Math.min(100,Math.round(s/target*100));
+  document.getElementById('sesFill').style.width=p+'%';
+  document.getElementById('sesPct').textContent=p+'%';
+};
+
+window.updateDeadline = () => {
+  const deadline=document.getElementById('projDeadline').value;
+  const info=document.getElementById('deadlineInfo');
+  if(!deadline){ info.style.display='none'; return; }
+  const today=new Date(); const dl=new Date(deadline);
+  const days=Math.ceil((dl-today)/(1000*60*60*24));
+  const target=parseInt(document.getElementById('objTarget').value)||5000;
+  const total=Object.values(chapters).reduce((a,c)=>a+(c.words||0),0);
+  const remaining=Math.max(0,target-total);
+  const perDay=days>0?Math.ceil(remaining/days):remaining;
+  info.style.display='block';
+  info.innerHTML=`<strong>${days>0?days+' días restantes':'¡Fecha pasada!'}</strong><br>${perDay} palabras/día para llegar a la meta`;
+  saveProjectMeta();
+};
+
+/* ── META DEL PROYECTO ── */
+window.saveProjectMeta = async () => {
+  if(!currentProjectId) return;
+  try { await updateDoc(doc(db,'projects',currentProjectId),{name:document.getElementById('binderProjectName').value,updatedAt:serverTimestamp()}); } catch(e){}
+};
+
+/* ── SPLIT ── */
+window.toggleSplit = () => {
+  isSplit=!isSplit;
+  document.getElementById('scrollB').style.display=isSplit?'block':'none';
+  document.getElementById('splitDiv').style.display=isSplit?'block':'none';
+  document.getElementById('splitBtn').classList.toggle('on',isSplit);
+  if(isSplit) {
+    const otros=chapterOrder.filter(id=>id!==currentChapterId);
+    if(otros.length>0) document.getElementById('splitContent').innerHTML=chapters[otros[0]]?.content||'';
+  }
+  toast(isSplit?'Doble pantalla activada':'Desactivada');
+};
+
+/* ── SNAPSHOT ── */
+window.saveSnap = () => {
   snapCount++;
-  const now = new Date();
-  const container = document.getElementById('snapsContainer');
-  const item = document.createElement('div'); item.className = 'snap-item';
-  item.innerHTML = `<div class="snap-date">${now.toLocaleTimeString('es-ES',{hour:'2-digit',minute:'2-digit'})}</div><div class="snap-lbl">v${snapCount} — ${chapters[currentChapterId]?.title || ''}</div>`;
-  container.insertBefore(item, container.firstChild);
-  switchNote('snaps', document.querySelectorAll('.ntab')[3]);
+  const now=new Date();
+  const container=document.getElementById('snapsContainer');
+  const item=document.createElement('div'); item.className='snap-item';
+  item.innerHTML=`<div class="snap-date">${now.toLocaleTimeString('es-ES',{hour:'2-digit',minute:'2-digit'})}</div><div class="snap-lbl">v${snapCount} — ${chapters[currentChapterId]?.title||''}</div>`;
+  container.insertBefore(item,container.firstChild);
+  switchNote('snaps',document.querySelectorAll('.ntab')[3]);
   toast('Snapshot guardado');
-}
+};
 
-/* ════════════════════════════════════════
-   PANEL CENTRAL
-════════════════════════════════════════ */
-window.switchMid = function(mode, tabEl) {
-  document.querySelectorAll('.ptab').forEach(t => t.classList.remove('active'));
+/* ── PANEL CENTRAL ── */
+window.switchMid = (mode,tabEl) => {
+  document.querySelectorAll('.ptab').forEach(t=>t.classList.remove('active'));
   tabEl.classList.add('active');
-  document.getElementById('cork').style.display = mode === 'cork' ? 'flex' : 'none';
-  document.getElementById('outline').style.display = mode === 'outline' ? 'block' : 'none';
-  document.getElementById('scriv').style.display = mode === 'scriv' ? 'block' : 'none';
-  if (mode === 'scriv') { saveCurrentChapter(); renderScriv(); }
-}
+  document.getElementById('cork').style.display=mode==='cork'?'flex':'none';
+  document.getElementById('outline').style.display=mode==='outline'?'block':'none';
+  document.getElementById('scriv').style.display=mode==='scriv'?'block':'none';
+  if(mode==='scriv') renderScriv();
+};
 
-/* ════════════════════════════════════════
-   INSPECTOR TABS
-════════════════════════════════════════ */
-window.switchNote = function(tab, el) {
-  document.querySelectorAll('.ntab').forEach(t => t.classList.remove('active'));
+/* ── INSPECTOR TABS ── */
+window.switchNote = (tab,el) => {
+  document.querySelectorAll('.ntab').forEach(t=>t.classList.remove('active'));
   el.classList.add('active');
-  ['meta','sinopsis','notas','snaps','obj'].forEach(id => {
-    const el = document.getElementById('tab-' + id);
-    if (el) el.style.display = id === tab ? 'block' : 'none';
+  ['meta','sinopsis','notas','snaps','obj'].forEach(id=>{
+    const el=document.getElementById('tab-'+id); if(el) el.style.display=id===tab?'block':'none';
   });
-}
+};
 
-/* ════════════════════════════════════════
-   LIBRETA
-════════════════════════════════════════ */
-window.saveNotepad = async function() {
-  if (!currentProjectId) return;
-  clearTimeout(window.notepadTimer);
-  window.notepadTimer = setTimeout(async () => {
-    try {
-      await updateDoc(doc(db, 'projects', currentProjectId), {
-        notepad: document.getElementById('notepadArea').value
-      });
-    } catch(e) {}
-  }, 1500);
-}
-window.toggleNotepad = function() { document.getElementById('notepad').classList.toggle('open'); }
+/* ── LIBRETA ── */
+window.saveNotepad = () => {
+  if(!currentProjectId) return;
+  clearTimeout(notepadTimer);
+  notepadTimer=setTimeout(async()=>{ try{ await updateDoc(doc(db,'projects',currentProjectId),{notepad:document.getElementById('notepadArea').value}); }catch(e){} },1500);
+};
+window.toggleNotepad = () => document.getElementById('notepad').classList.toggle('open');
 
-/* ════════════════════════════════════════
-   MODO COMPOSICIÓN
-════════════════════════════════════════ */
-window.openCompose = function() {
-  document.getElementById('composeEd').innerHTML = document.getElementById('mainEditor').innerHTML;
+/* ── COMPOSE ── */
+window.openCompose = () => {
+  document.getElementById('composeEd').innerHTML=document.getElementById('mainEditor').innerHTML;
   document.getElementById('compose').classList.add('open');
   document.getElementById('composeEd').focus();
-}
-window.closeCompose = function() {
-  document.getElementById('mainEditor').innerHTML = document.getElementById('composeEd').innerHTML;
+};
+window.closeCompose = () => {
+  document.getElementById('mainEditor').innerHTML=document.getElementById('composeEd').innerHTML;
   document.getElementById('compose').classList.remove('open');
   onInput();
-}
-window.onComposeInput = function() {
-  const txt = document.getElementById('composeEd').innerText || '';
-  document.getElementById('composeWC').textContent = txt.trim() ? txt.trim().split(/\s+/).length : 0;
-}
+};
+window.onComposeInput = () => {
+  const txt=document.getElementById('composeEd').innerText||'';
+  document.getElementById('composeWC').textContent=txt.trim()?txt.trim().split(/\s+/).length:0;
+};
 
-/* ════════════════════════════════════════
-   MODAL COMPILAR
-════════════════════════════════════════ */
-window.openModal = function() { document.getElementById('modal').classList.add('open'); }
-window.closeModal = function() { document.getElementById('modal').classList.remove('open'); }
-document.getElementById('modal').addEventListener('click', e => { if (e.target === document.getElementById('modal')) closeModal(); });
+/* ── MODAL ── */
+window.openModal = () => document.getElementById('modal').classList.add('open');
+window.closeModal = () => document.getElementById('modal').classList.remove('open');
+document.getElementById('modal').addEventListener('click',e=>{ if(e.target===document.getElementById('modal')) closeModal(); });
 
-window.compilar = function(fmt) {
+/* ── COMPILAR ── */
+window.compilar = (fmt) => {
   saveCurrentChapter();
-  const title = document.getElementById('binderProjectName').value || 'Mi proyecto';
-  let blob, filename;
-  if (fmt === 'txt') {
-    let txt = title + '\n' + '═'.repeat(40);
-    Object.values(chapters).forEach(ch => { const d = document.createElement('div'); d.innerHTML = ch.content; txt += '\n\n' + ch.title + '\n' + '─'.repeat(ch.title.length) + '\n\n' + d.innerText; });
-    blob = new Blob([txt], {type:'text/plain'}); filename = title + '.txt';
-  } else if (fmt === 'md') {
-    let md = '# ' + title + '\n';
-    Object.values(chapters).forEach(ch => { const d = document.createElement('div'); d.innerHTML = ch.content; md += '\n## ' + ch.title + '\n\n' + d.innerText + '\n'; });
-    blob = new Blob([md], {type:'text/markdown'}); filename = title + '.md';
-  } else if (fmt === 'html') {
-    let html = `<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8"><title>${title}</title><style>body{font-family:Georgia,serif;max-width:680px;margin:60px auto;line-height:1.85;color:#1a1208}h1{font-size:28px}h2{font-size:20px;margin:2em 0 .5em}img{max-width:100%;border-radius:6px;margin:20px 0}</style></head><body><h1>${title}</h1>`;
-    Object.values(chapters).forEach(ch => { html += `<h2>${ch.title}</h2><div>${ch.content}</div>`; });
-    html += '</body></html>';
-    blob = new Blob([html], {type:'text/html'}); filename = title + '.html';
+  const title=document.getElementById('binderProjectName').value||'Mi proyecto';
+  let blob,filename;
+  if(fmt==='txt'){
+    let txt=title+'\n'+'═'.repeat(40);
+    Object.values(chapters).forEach(ch=>{ const d=document.createElement('div');d.innerHTML=ch.content;txt+='\n\n'+ch.title+'\n'+'─'.repeat(ch.title.length)+'\n\n'+d.innerText; });
+    blob=new Blob([txt],{type:'text/plain'}); filename=title+'.txt';
+  } else if(fmt==='md'){
+    let md='# '+title+'\n';
+    Object.values(chapters).forEach(ch=>{ const d=document.createElement('div');d.innerHTML=ch.content;md+='\n## '+ch.title+'\n\n'+d.innerText+'\n'; });
+    blob=new Blob([md],{type:'text/markdown'}); filename=title+'.md';
+  } else if(fmt==='html'){
+    let html=`<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8"><title>${title}</title><style>body{font-family:Georgia,serif;max-width:680px;margin:60px auto;line-height:1.85;color:#1a1208}h1{font-size:28px}h2{font-size:20px;margin:2em 0 .5em}img{max-width:100%;border-radius:6px;margin:20px 0}</style></head><body><h1>${title}</h1>`;
+    Object.values(chapters).forEach(ch=>{ html+=`<h2>${ch.title}</h2><div>${ch.content}</div>`; });
+    html+='</body></html>';
+    blob=new Blob([html],{type:'text/html'}); filename=title+'.html';
   } else {
-    blob = new Blob([JSON.stringify({proyecto: title, capitulos: chapters, personajes: characters, fecha: new Date().toISOString()}, null, 2)], {type:'application/json'});
-    filename = title + '.json';
+    blob=new Blob([JSON.stringify({proyecto:title,capitulos:chapters,personajes:characters,fecha:new Date().toISOString()},null,2)],{type:'application/json'});
+    filename=title+'.json';
   }
-  const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = filename.replace(/[^\w\s.-]/g,''); a.click();
-  closeModal(); toast('Compilado como ' + fmt.toUpperCase());
-}
+  const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=filename.replace(/[^\w\s.-]/g,''); a.click();
+  closeModal(); toast('Compilado como '+fmt.toUpperCase());
+};
 
-/* ════════════════════════════════════════
-   TECLADO
-════════════════════════════════════════ */
-document.addEventListener('keydown', e => {
-  if (e.key === 'Escape' && document.getElementById('compose').classList.contains('open')) closeCompose();
-  if ((e.ctrlKey || e.metaKey) && e.key === 's') { e.preventDefault(); saveSnap(); }
+/* ── TECLADO ── */
+document.addEventListener('keydown',e=>{
+  if(e.key==='Escape'&&document.getElementById('compose').classList.contains('open')) closeCompose();
+  if((e.ctrlKey||e.metaKey)&&e.key==='s'){ e.preventDefault(); saveSnap(); }
 });
 
-/* ════════════════════════════════════════
-   INIT
-════════════════════════════════════════ */
+/* ── INIT ── */
 showProjectsScreen();
-
 </script>
 </body>
 </html>
