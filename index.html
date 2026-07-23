@@ -521,7 +521,7 @@ input[type="file"]{display:none}
       <div class="editor-body">
         <div class="editor-scroll" id="scrollA">
           <div class="editor-content" id="editorContent">
-            <div id="mainEditor" contenteditable="true" class="texted" oninput="onInput()" spellcheck="true"></div>
+            <div id="mainEditor" contenteditable="true" class="texted" oninput="onInput()" spellcheck="true" lang="es"></div>
             <div class="img-ph" id="imgPh" onclick="triggerImg()">
               <i class="ti ti-photo-plus"></i><span>Insertar ilustración aquí</span>
             </div>
@@ -692,7 +692,7 @@ input[type="file"]{display:none}
 <div class="compose" id="compose">
   <div class="compose-inner">
     <input type="text" class="compose-title" id="composeTitle" value=""/>
-    <div id="composeEd" contenteditable="true" class="compose-ed" oninput="onComposeInput()" spellcheck="true"></div>
+    <div id="composeEd" contenteditable="true" class="compose-ed" oninput="onComposeInput()" spellcheck="true" lang="es"></div>
   </div>
   <div class="compose-bar">
     <span class="compose-wc">Palabras: <strong id="composeWC">0</strong></span>
@@ -820,6 +820,41 @@ input[type="file"]{display:none}
           <button class="snap-act-btn" id="snapMgrDeleteBtn" onclick="snapMgrDelete()" style="display:none;color:#c0392b;border-color:#c0392b">Eliminar</button>
         </div>
       </div>
+    </div>
+  </div>
+</div>
+
+<!-- Indicador de grabación -->
+<div class="mic-indicator" id="micIndicator">
+  <div class="mic-dot"></div>
+  <span>Escuchando… <span class="mic-interim" id="micInterim"></span></span>
+  <button onclick="stopDictation()" style="background:rgba(255,255,255,.2);border:none;border-radius:4px;padding:2px 8px;color:#fff;cursor:pointer;font-size:11px;font-family:'Inter',sans-serif">Parar</button>
+</div>
+
+<!-- Popup de sugerencia LanguageTool -->
+<div class="lt-popup" id="ltPopup">
+  <div class="lt-popup-type" id="ltPopupType">Ortografía</div>
+  <div class="lt-popup-msg" id="ltPopupMsg"></div>
+  <div class="lt-popup-replacements" id="ltPopupReplacements"></div>
+  <span class="lt-popup-close" onclick="closeLtPopup()">✕ Ignorar</span>
+</div>
+
+<!-- Modal Matching Text Finder -->
+<div class="modal-overlay" id="modal-mtf">
+  <div class="mtf-modal">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-shrink:0">
+      <div>
+        <div style="font-family:'Playfair Display',serif;font-size:18px;font-weight:600;color:var(--tx)">Detector de texto duplicado</div>
+        <div style="font-size:12px;color:var(--txm);margin-top:2px">Detecta fragmentos repetidos entre capítulos</div>
+      </div>
+      <button class="mbtn-cancel" onclick="closeModal('mtf')">Cerrar</button>
+    </div>
+    <div style="display:flex;gap:8px;margin-bottom:14px;flex-shrink:0">
+      <input id="mtfInput" class="search-input" placeholder="Texto a buscar (mínimo 10 caracteres)…" style="flex:1" onkeydown="if(event.key==='Enter')runMatchingTextFinder()"/>
+      <button class="modal-btn-ok" onclick="runMatchingTextFinder()">Buscar</button>
+    </div>
+    <div style="flex:1;overflow-y:auto" id="mtfResults">
+      <div style="font-size:12px;color:var(--txm);text-align:center;padding:20px">Introduce un fragmento de texto para buscar duplicados en todos los capítulos</div>
     </div>
   </div>
 </div>
@@ -1953,6 +1988,55 @@ window.compilar=(fmt)=>{
 .bm-insp-title { font-size:12px; color:var(--tx); flex:1; }
 .bm-insp-del { background:none; border:none; cursor:pointer; color:var(--txm); font-size:12px; padding:0; }
 .bm-insp-del:hover { color:#c0392b; }
+
+/* ── DICTADO POR MICRÓFONO ── */
+.mic-btn { position:relative; }
+.mic-btn.recording { animation:mic-pulse 1s ease-in-out infinite; }
+.mic-btn.recording i { color:#c0392b !important; }
+@keyframes mic-pulse { 0%,100%{opacity:1} 50%{opacity:.5} }
+.mic-indicator { position:fixed; bottom:60px; left:50%; transform:translateX(-50%); background:rgba(192,57,43,.92); color:#fff; padding:8px 18px; border-radius:20px; font-size:13px; font-family:'Inter',sans-serif; display:none; align-items:center; gap:8px; z-index:500; box-shadow:0 4px 16px rgba(192,57,43,.35); white-space:nowrap; }
+.mic-indicator.visible { display:flex; }
+.mic-dot { width:8px; height:8px; border-radius:50%; background:#fff; animation:mic-pulse .8s ease-in-out infinite; }
+.mic-interim { color:rgba(255,255,255,.7); font-style:italic; }
+
+/* ── LANGUAGETOOL (corrección gramatical) ── */
+.lt-error { border-bottom:2px solid #e74c3c; cursor:pointer; position:relative; }
+.lt-error.lt-style { border-bottom-color:#e67e22; }
+.lt-error.lt-grammar { border-bottom-color:#8e44ad; }
+.lt-popup { position:fixed; background:#fff; border:1px solid var(--bd2); border-radius:8px; box-shadow:0 4px 20px rgba(0,0,0,.15); padding:12px 14px; z-index:600; max-width:320px; font-family:'Inter',sans-serif; display:none; }
+.lt-popup.visible { display:block; }
+.lt-popup-type { font-size:10px; font-weight:600; text-transform:uppercase; letter-spacing:.06em; margin-bottom:4px; }
+.lt-popup-type.ortografia { color:#c0392b; }
+.lt-popup-type.gramatica { color:#8e44ad; }
+.lt-popup-type.estilo { color:#e67e22; }
+.lt-popup-msg { font-size:12px; color:var(--tx); margin-bottom:8px; line-height:1.5; }
+.lt-popup-replacements { display:flex; gap:5px; flex-wrap:wrap; margin-bottom:8px; }
+.lt-replacement { padding:3px 9px; background:var(--green-light); border:1px solid var(--gr); border-radius:var(--r); font-size:12px; color:var(--green); cursor:pointer; font-weight:500; transition:background .1s; }
+.lt-replacement:hover { background:var(--gr); color:#fff; }
+.lt-popup-close { font-size:11px; color:var(--txm); cursor:pointer; }
+.lt-popup-close:hover { color:var(--tx); }
+.lt-status { font-size:10px; color:var(--txm); display:flex; align-items:center; gap:4px; }
+.lt-status.checking { color:var(--ac); }
+.lt-status.ok { color:var(--ok); }
+.lt-status.error { color:#c0392b; }
+.lt-panel { background:var(--s1); border-radius:var(--r); border:1px solid var(--bd); margin-top:8px; overflow:hidden; }
+.lt-panel-head { padding:7px 10px; background:var(--s2); border-bottom:1px solid var(--bd); font-size:11px; font-weight:600; color:var(--tx); display:flex; align-items:center; justify-content:space-between; }
+.lt-error-item { padding:8px 10px; border-bottom:1px solid var(--bd); font-size:12px; cursor:pointer; transition:background .1s; }
+.lt-error-item:hover { background:var(--s2); }
+.lt-error-item:last-child { border:none; }
+.lt-error-item .lt-ei-msg { color:var(--tx); margin-bottom:3px; }
+.lt-error-item .lt-ei-ctx { font-size:11px; color:var(--txm); font-style:italic; }
+
+/* ── SNAPSHOTS AUTOMÁTICOS ── */
+.auto-snap-indicator { font-size:10px; color:var(--txm); display:flex; align-items:center; gap:3px; }
+
+/* ── MATCHING TEXT FINDER ── */
+.mtf-modal { background:var(--s0); border-radius:10px; padding:24px; width:580px; max-width:95vw; border:1px solid var(--bd); max-height:80vh; display:flex; flex-direction:column; overflow:hidden; }
+.mtf-result { padding:10px 12px; background:var(--s1); border-radius:var(--r); border:1px solid var(--bd); margin-bottom:8px; cursor:pointer; transition:border-color .12s; }
+.mtf-result:hover { border-color:var(--ac-bd); }
+.mtf-result-title { font-size:12px; font-weight:600; color:var(--tx); margin-bottom:4px; }
+.mtf-result-excerpt { font-size:11px; color:var(--txm); line-height:1.5; }
+.mtf-result-excerpt mark { background:rgba(255,230,0,.5); border-radius:2px; padding:0 1px; }
 </style></head><body><h1>${title}</h1>`;
     Object.values(chapters).filter(c=>c.include!==false).forEach(ch=>{html+=`<h2>${ch.title}</h2><div>${ch.content}</div>`;});
     html+='</body></html>';
@@ -1964,6 +2048,467 @@ window.compilar=(fmt)=>{
   const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=filename.replace(/[^\w\s.-]/g,'');a.click();
   closeModal('compile');toast('Compilado como '+fmt.toUpperCase());
 };
+
+
+/* ════════════════════════════════════════
+   DICTADO POR MICRÓFONO (Web Speech API)
+   Español de España — texto directo al cursor
+════════════════════════════════════════ */
+let recognition = null;
+let isRecording = false;
+let dictationTarget = 'mainEditor'; // o 'composeEd'
+
+window.toggleDictation = () => {
+  if (isRecording) { stopDictation(); return; }
+  startDictation();
+};
+
+function startDictation() {
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SpeechRecognition) {
+    toast('Tu navegador no soporta dictado por voz');
+    return;
+  }
+  recognition = new SpeechRecognition();
+  recognition.lang = 'es-ES';
+  recognition.continuous = true;
+  recognition.interimResults = true;
+  recognition.maxAlternatives = 1;
+
+  recognition.onstart = () => {
+    isRecording = true;
+    document.getElementById('micBtn').classList.add('recording');
+    document.getElementById('micIndicator').classList.add('visible');
+    // Asegurarse de que el editor tiene foco
+    const ed = document.getElementById('mainEditor');
+    if (document.getElementById('compose').classList.contains('open')) {
+      dictationTarget = 'composeEd';
+      document.getElementById('composeEd').focus();
+    } else {
+      dictationTarget = 'mainEditor';
+      ed.focus();
+    }
+    toast('Dictado activado — habla en español');
+  };
+
+  recognition.onresult = (event) => {
+    let interim = '';
+    let finalText = '';
+    for (let i = event.resultIndex; i < event.results.length; i++) {
+      const transcript = event.results[i][0].transcript;
+      if (event.results[i].isFinal) {
+        finalText += transcript;
+      } else {
+        interim += transcript;
+      }
+    }
+    // Mostrar texto provisional
+    document.getElementById('micInterim').textContent = interim;
+    // Insertar texto final en el cursor
+    if (finalText) {
+      const ed = document.getElementById(dictationTarget);
+      ed.focus();
+      // Insertar en la posición del cursor
+      const sel = window.getSelection();
+      if (sel && sel.rangeCount > 0) {
+        const range = sel.getRangeAt(0);
+        range.deleteContents();
+        // Añadir espacio si el texto anterior no termina en espacio
+        const textNode = document.createTextNode(finalText + ' ');
+        range.insertNode(textNode);
+        range.setStartAfter(textNode);
+        range.setEndAfter(textNode);
+        sel.removeAllRanges();
+        sel.addRange(range);
+      } else {
+        document.execCommand('insertText', false, finalText + ' ');
+      }
+      if (dictationTarget === 'mainEditor') onInput();
+      else onComposeInput();
+      document.getElementById('micInterim').textContent = '';
+    }
+  };
+
+  recognition.onerror = (event) => {
+    if (event.error === 'no-speech') return; // normal, ignorar
+    if (event.error === 'not-allowed') {
+      toast('Permiso de micrófono denegado — actívalo en el navegador');
+      stopDictation();
+      return;
+    }
+    console.warn('Speech error:', event.error);
+  };
+
+  recognition.onend = () => {
+    // Si sigue activo, reiniciar (para dictado continuo)
+    if (isRecording) {
+      try { recognition.start(); } catch(e) {}
+    }
+  };
+
+  try {
+    recognition.start();
+  } catch(e) {
+    toast('Error al iniciar dictado: ' + e.message);
+  }
+}
+
+window.stopDictation = () => {
+  isRecording = false;
+  if (recognition) { recognition.stop(); recognition = null; }
+  document.getElementById('micBtn').classList.remove('recording');
+  document.getElementById('micIndicator').classList.remove('visible');
+  document.getElementById('micInterim').textContent = '';
+  toast('Dictado detenido');
+};
+
+/* ════════════════════════════════════════
+   CORRECCIÓN GRAMATICAL — LANGUAGETOOL
+   API pública gratuita, español de España
+════════════════════════════════════════ */
+let ltErrors = [];
+let ltPopupVisible = false;
+let ltCheckTimer = null;
+const LT_API = 'https://api.languagetool.org/v2/check';
+const LT_MIN_CHARS = 40; // mínimo de caracteres para revisar
+
+window.runLanguageTool = async () => {
+  if (!currentChapterId) { toast('Abre un capítulo primero'); return; }
+  const ed = document.getElementById('mainEditor');
+  const text = ed.innerText || '';
+  if (text.trim().length < LT_MIN_CHARS) { toast('Escribe más texto para revisar'); return; }
+
+  const ltBtn = document.getElementById('ltBtn');
+  ltBtn.classList.add('on');
+  ltBtn.querySelector('span').textContent = 'Revisando…';
+
+  try {
+    const params = new URLSearchParams({
+      text: text,
+      language: 'es-ES',
+      enabledOnly: 'false',
+    });
+    const res = await fetch(LT_API, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: params
+    });
+    const data = await res.json();
+    ltErrors = data.matches || [];
+    highlightLtErrors(ed, text, ltErrors);
+    ltBtn.querySelector('span').textContent = `${ltErrors.length} error${ltErrors.length!==1?'es':''}`;
+    if (ltErrors.length === 0) {
+      toast('✓ Sin errores detectados');
+      ltBtn.classList.remove('on');
+      ltBtn.querySelector('span').textContent = 'Revisar';
+    } else {
+      toast(`${ltErrors.length} sugerencia${ltErrors.length!==1?'s':''} encontrada${ltErrors.length!==1?'s':''}`);
+    }
+  } catch(e) {
+    toast('Error al conectar con LanguageTool — comprueba tu conexión');
+    ltBtn.classList.remove('on');
+    ltBtn.querySelector('span').textContent = 'Revisar';
+  }
+};
+
+function highlightLtErrors(ed, text, errors) {
+  // Limpiar marcas anteriores
+  clearLtHighlights(ed);
+  if (!errors.length) return;
+
+  // Reconstruir el HTML del editor con marcas de error
+  // Trabajamos sobre el texto plano y reemplazamos por posición
+  let html = ed.innerHTML;
+  // Para cada error, encontrar el fragmento en el texto y añadir marca
+  // Usamos un enfoque de offset sobre innerText
+  errors.forEach((err, idx) => {
+    const offset = err.offset;
+    const len = err.length;
+    const errText = text.substring(offset, offset + len);
+    const category = err.rule?.category?.id || '';
+    const cls = category.includes('STYLE') || category.includes('REDUNDANCY') ? 'lt-style' :
+                 category.includes('GRAMMAR') ? 'lt-grammar' : 'lt-error';
+    // Solo marcar en el DOM si el texto existe tal cual
+    if (errText && errText.length > 0) {
+      try {
+        const escaped = errText.replace(/[.*+?^${}()|[\]\]/g, '\$&');
+        // Solo reemplazar la primera ocurrencia para evitar desfases de offset
+        html = html.replace(new RegExp(escaped), `<span class="lt-error ${cls}" data-lt-idx="${idx}" onclick="showLtPopup(event,${idx})">${errText}</span>`);
+      } catch(e) {}
+    }
+  });
+  ed.innerHTML = html;
+}
+
+function clearLtHighlights(ed) {
+  ed.querySelectorAll('.lt-error').forEach(span => {
+    const text = document.createTextNode(span.textContent);
+    span.replaceWith(text);
+  });
+  // Normalizar nodos de texto
+  ed.normalize();
+}
+
+window.showLtPopup = (event, idx) => {
+  event.stopPropagation();
+  const err = ltErrors[idx];
+  if (!err) return;
+  const popup = document.getElementById('ltPopup');
+  const typeEl = document.getElementById('ltPopupType');
+  const msgEl = document.getElementById('ltPopupMsg');
+  const replEl = document.getElementById('ltPopupReplacements');
+
+  const category = err.rule?.category?.id || '';
+  const typeLabel = category.includes('STYLE') || category.includes('REDUNDANCY') ? 'Estilo' :
+                    category.includes('GRAMMAR') ? 'Gramática' : 'Ortografía';
+  const typeCls = typeLabel.toLowerCase().replace('á','a').replace('é','e');
+
+  typeEl.textContent = typeLabel;
+  typeEl.className = `lt-popup-type ${typeCls}`;
+  msgEl.textContent = err.message;
+  replEl.innerHTML = '';
+  (err.replacements || []).slice(0, 5).forEach(r => {
+    const btn = document.createElement('button');
+    btn.className = 'lt-replacement';
+    btn.textContent = r.value;
+    btn.onclick = () => applyLtReplacement(idx, r.value);
+    replEl.appendChild(btn);
+  });
+
+  // Posicionar el popup cerca del error
+  const rect = event.target.getBoundingClientRect();
+  popup.style.top = (rect.bottom + 6) + 'px';
+  popup.style.left = Math.min(rect.left, window.innerWidth - 340) + 'px';
+  popup.classList.add('visible');
+  ltPopupVisible = true;
+};
+
+window.closeLtPopup = () => {
+  document.getElementById('ltPopup').classList.remove('visible');
+  ltPopupVisible = false;
+};
+
+function applyLtReplacement(idx, replacement) {
+  const ed = document.getElementById('mainEditor');
+  const span = ed.querySelector(`[data-lt-idx="${idx}"]`);
+  if (span) {
+    span.replaceWith(document.createTextNode(replacement));
+    ed.normalize();
+  }
+  closeLtPopup();
+  onInput();
+  toast('Corrección aplicada');
+}
+
+// Cerrar popup al hacer clic fuera
+document.addEventListener('click', (e) => {
+  if (ltPopupVisible && !e.target.closest('.lt-popup') && !e.target.closest('.lt-error')) {
+    closeLtPopup();
+  }
+});
+
+// Auto-revisión cada 30 segundos si hay texto suficiente (opcional, suave)
+function scheduleAutoLt() {
+  clearTimeout(ltCheckTimer);
+  ltCheckTimer = setTimeout(() => {
+    const ed = document.getElementById('mainEditor');
+    const text = ed?.innerText || '';
+    if (text.trim().length >= 200 && document.getElementById('ltBtn').classList.contains('on')) {
+      runLanguageTool();
+    }
+  }, 30000);
+}
+
+/* ════════════════════════════════════════
+   SNAPSHOTS AUTOMÁTICOS
+   Se guarda uno silencioso cada vez que
+   se usa Cmd+S, etiquetado con hora
+════════════════════════════════════════ */
+function saveAutoSnapshot() {
+  if (!currentChapterId || !chapters[currentChapterId]) return;
+  const now = new Date();
+  const label = `Auto · ${now.toLocaleTimeString('es-ES', {hour:'2-digit', minute:'2-digit'})}`;
+  const snaps = [...(chapters[currentChapterId].snapshots || [])];
+  const content = document.getElementById('mainEditor').innerHTML;
+  snaps.push({ title: label, content, date: now.toISOString(), auto: true });
+  // Mantener máximo 20 auto-snapshots por capítulo
+  const autoOnly = snaps.filter(s => s.auto);
+  if (autoOnly.length > 20) {
+    const firstAutoIdx = snaps.findIndex(s => s.auto);
+    if (firstAutoIdx !== -1) snaps.splice(firstAutoIdx, 1);
+  }
+  chapters[currentChapterId].snapshots = snaps;
+  updateDoc(doc(db, 'projects', currentProjectId, 'chapters', currentChapterId), { snapshots: snaps }).catch(() => {});
+  renderSnaps(snaps);
+}
+
+/* ════════════════════════════════════════
+   MATCHING TEXT FINDER
+   Detecta fragmentos de texto repetidos
+   entre capítulos del proyecto
+════════════════════════════════════════ */
+window.runMatchingTextFinder = () => {
+  const input = document.getElementById('mtfInput');
+  // Si se llama sin input (desde el botón toolbar), usar selección actual
+  if (!input.value.trim()) {
+    const sel = window.getSelection();
+    if (sel && sel.toString().trim().length >= 5) {
+      input.value = sel.toString().trim();
+    }
+  }
+  const query = input.value.trim();
+  const results = document.getElementById('mtfResults');
+  if (query.length < 5) {
+    results.innerHTML = '<div style="font-size:12px;color:var(--txm);text-align:center;padding:20px">Mínimo 5 caracteres para buscar</div>';
+    return;
+  }
+  const qLow = query.toLowerCase();
+  const hits = [];
+  Object.values(chapters).forEach(ch => {
+    const tmp = document.createElement('div'); tmp.innerHTML = ch.content;
+    const text = tmp.innerText || '';
+    const textLow = text.toLowerCase();
+    let pos = 0;
+    let count = 0;
+    const excerpts = [];
+    while ((pos = textLow.indexOf(qLow, pos)) !== -1 && count < 5) {
+      const start = Math.max(0, pos - 40);
+      const end = Math.min(text.length, pos + query.length + 40);
+      const excerpt = text.substring(start, end).replace(
+        new RegExp(query.replace(/[.*+?^${}()|[\]\]/g, '\$&'), 'gi'),
+        m => `<mark>${m}</mark>`
+      );
+      excerpts.push(excerpt);
+      pos += query.length;
+      count++;
+    }
+    if (count > 0) {
+      hits.push({ ch, count, excerpts });
+    }
+  });
+
+  results.innerHTML = '';
+  if (hits.length === 0) {
+    results.innerHTML = '<div style="font-size:12px;color:var(--txm);text-align:center;padding:20px">No se encontraron duplicados</div>';
+    return;
+  }
+  hits.sort((a, b) => b.count - a.count);
+  hits.forEach(hit => {
+    const div = document.createElement('div'); div.className = 'mtf-result';
+    div.innerHTML = `
+      <div class="mtf-result-title">
+        ${hit.ch.title}
+        <span style="font-size:10px;font-weight:400;color:var(--txm);margin-left:6px">${hit.count} ocurrencia${hit.count !== 1 ? 's' : ''}</span>
+      </div>
+      ${hit.excerpts.map(e => `<div class="mtf-result-excerpt">…${e}…</div>`).join('')}
+    `;
+    div.onclick = () => {
+      nav(document.getElementById('b-' + hit.ch.id), hit.ch.id);
+      closeModal('mtf');
+    };
+    results.appendChild(div);
+  });
+  toast(`${hits.length} capítulo${hits.length !== 1 ? 's' : ''} con ese texto`);
+};
+
+/* ════════════════════════════════════════
+   SECTION TYPES EN EL COMPILADOR
+   El tipo de sección genera separadores distintos
+════════════════════════════════════════ */
+const SECTION_SEPARATORS = {
+  'Capítulo':   (ch) => `<h2 class="chapter-heading">${ch.title}</h2>`,
+  'Escena':     (ch) => `<div class="scene-separator"><span>✦</span></div><h3 class="scene-heading">${ch.title}</h3>`,
+  'Prólogo':    (ch) => `<h2 class="prologue-heading" style="font-style:italic">${ch.title}</h2>`,
+  'Epílogo':    (ch) => `<h2 class="epilogue-heading" style="font-style:italic">${ch.title}</h2>`,
+  'Intermedio': (ch) => `<div class="interlude-separator">— ${ch.title} —</div>`,
+  'Apéndice':   (ch) => `<h2 class="appendix-heading">${ch.title}</h2>`,
+};
+
+const HTML_COMPILE_STYLES = `
+  body { font-family: Georgia, serif; max-width: 680px; margin: 60px auto; line-height: 1.85; color: #1a1208; padding: 0 24px; }
+  h1.project-title { font-size: 32px; text-align: center; margin-bottom: 8px; }
+  .project-subtitle { text-align: center; color: #888; font-style: italic; margin-bottom: 60px; font-size: 14px; }
+  h2.chapter-heading { font-size: 24px; margin: 3em 0 1em; page-break-before: always; }
+  h3.scene-heading { font-size: 18px; margin: 1.5em 0 .8em; }
+  .scene-separator { text-align: center; color: #b8882a; font-size: 20px; margin: 2em 0 .5em; }
+  .prologue-heading, .epilogue-heading { font-size: 22px; text-align: center; margin: 3em 0 1.5em; }
+  .interlude-separator { text-align: center; font-variant: small-caps; letter-spacing: .15em; color: #888; margin: 3em 0 1.5em; font-size: 14px; }
+  .appendix-heading { font-size: 20px; border-top: 1px solid #ddd; padding-top: 1em; margin-top: 3em; }
+  img { max-width: 100%; border-radius: 6px; margin: 24px 0; }
+  blockquote { border-left: 3px solid #b8882a; padding-left: 16px; color: #5a4a38; font-style: italic; margin: 1em 0; }
+  .inline-annotation { display: none; }
+  @media print { h2.chapter-heading { page-break-before: always; } }
+`;
+
+/* ════════════════════════════════════════
+   REEMPLAZAR compilar() con versión mejorada
+   que usa Section Types
+════════════════════════════════════════ */
+window.compilar = (fmt) => {
+  saveCurrentChapter();
+  const title = document.getElementById('binderProjectName').value || 'Mi proyecto';
+  const chaptersToCompile = chapterOrder
+    .map(id => chapters[id])
+    .filter(ch => ch && ch.include !== false);
+
+  let blob, filename;
+
+  if (fmt === 'txt') {
+    let txt = title + '\n' + '═'.repeat(50) + '\n';
+    chaptersToCompile.forEach(ch => {
+      const stype = ch.sectionType || 'Capítulo';
+      const sep = stype === 'Escena' ? '\n* * *\n\n' : '\n\n';
+      const tmp = document.createElement('div'); tmp.innerHTML = ch.content;
+      txt += sep + ch.title + '\n' + '─'.repeat(ch.title.length) + '\n\n' + tmp.innerText;
+    });
+    blob = new Blob([txt], {type:'text/plain'}); filename = title + '.txt';
+
+  } else if (fmt === 'md') {
+    let md = '# ' + title + '\n\n';
+    chaptersToCompile.forEach(ch => {
+      const stype = ch.sectionType || 'Capítulo';
+      const hLevel = stype === 'Escena' ? '###' : stype === 'Intermedio' ? '---\n\n##' : '##';
+      const tmp = document.createElement('div'); tmp.innerHTML = ch.content;
+      md += `\n${hLevel} ${ch.title}\n\n${tmp.innerText}\n`;
+    });
+    blob = new Blob([md], {type:'text/markdown'}); filename = title + '.md';
+
+  } else if (fmt === 'html') {
+    let html = `<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8"><title>${title}</title><style>${HTML_COMPILE_STYLES}</style></head><body>`;
+    html += `<h1 class="project-title">${title}</h1>`;
+    html += `<div class="project-subtitle">Compilado el ${new Date().toLocaleDateString('es-ES', {day:'numeric',month:'long',year:'numeric'})}</div>`;
+    chaptersToCompile.forEach(ch => {
+      const stype = ch.sectionType || 'Capítulo';
+      const separator = SECTION_SEPARATORS[stype] ? SECTION_SEPARATORS[stype](ch) : `<h2>${ch.title}</h2>`;
+      // Quitar anotaciones inline del contenido
+      const tmp = document.createElement('div'); tmp.innerHTML = ch.content;
+      tmp.querySelectorAll('.inline-annotation').forEach(a => a.remove());
+      html += separator + '<div class="chapter-content">' + tmp.innerHTML + '</div>';
+    });
+    html += '</body></html>';
+    blob = new Blob([html], {type:'text/html'}); filename = title + '.html';
+
+  } else {
+    blob = new Blob([JSON.stringify({
+      proyecto: title, capitulos: chapters, personajes: characters,
+      bookmarks: projectBookmarks, cmetaSchema: projectCMetaSchema,
+      fecha: new Date().toISOString()
+    }, null, 2)], {type:'application/json'});
+    filename = title + '.json';
+  }
+
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = filename.replace(/[^\w\s.-]/g, '');
+  a.click();
+  closeModal('compile');
+  toast('Compilado como ' + fmt.toUpperCase());
+};
+
+/* ════════════════════════════════════════
+   ACTUALIZAR TECLADO: Cmd+S guarda snapshot
+   automático ADEMÁS de abrir el modal
+════════════════════════════════════════ */
 
 /* ── TECLADO ── */
 document.addEventListener('keydown',e=>{
