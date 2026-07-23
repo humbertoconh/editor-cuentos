@@ -965,6 +965,8 @@ function renderBinder(){
     item.onclick=()=>nav(document.getElementById('b-personajes'),'personajes');
     pc.appendChild(item);
   });
+  // Sincronizar iconos de bookmark
+  if(typeof syncBmIconsInBinder === 'function') syncBmIconsInBinder();
 }
 
 /* ── RENDER CORCHO ── */
@@ -2504,11 +2506,7 @@ function syncBmIconsInBinder() {
 }
 
 // Hook al renderBinder para añadir iconos de bookmark
-const _origRenderBinder = renderBinder;
-function renderBinder() {
-  _origRenderBinder();
-  syncBmIconsInBinder();
-}
+// syncBmIconsInBinder se llama al final de renderBinder
 
 // Añadir atajo de teclado: Cmd+D para marcar capítulo actual
 document._kmBmAdded = true;
