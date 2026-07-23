@@ -457,6 +457,14 @@ input[type="file"]{display:none}
     <div class="coll-tab-bar" id="collTabBar"></div>
     <div id="collContent"></div>
   </div>
+  <!-- BOOKMARKS PANEL -->
+  <div class="bm-panel" id="bmPanel" style="display:none;flex-direction:column">
+    <button class="bm-add-current" onclick="bookmarkCurrentDoc()">
+      <i class="ti ti-bookmark-plus" style="font-size:13px"></i> Marcar capítulo actual
+    </button>
+    <div class="bm-section">Marcadores del proyecto</div>
+    <div id="bmList"></div>
+  </div>
 </div>
 
 <!-- MAIN -->
@@ -1746,9 +1754,14 @@ window.switchMid=(mode,tabEl)=>{
   if(mode==='outline')renderOutline();
   if(mode==='bookmarks')renderBmPanel();
 };
-document.getElementById('collectionsView').style.display='none';
-document.getElementById('outlineWrap').style.display='none';
-document.getElementById('bmPanel').style.display='none';
+// Inicializar visibilidad de paneles de forma segura
+function initPanelVisibility() {
+  ['collectionsView','outlineWrap','bmPanel'].forEach(id => {
+    const el = document.getElementById(id);
+    if(el) el.style.display = 'none';
+  });
+}
+initPanelVisibility();
 
 /* ── INSPECTOR TABS ── */
 window.switchNote=(tab,el)=>{
