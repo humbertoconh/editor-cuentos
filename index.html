@@ -2211,29 +2211,26 @@ window.runLanguageTool = async () => {
   }
 };
 
+function escapeRegex(str) {
+  return str.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
+}
+
 function highlightLtErrors(ed, text, errors) {
-  // Limpiar marcas anteriores
   clearLtHighlights(ed);
   if (!errors.length) return;
-
-  // Reconstruir el HTML del editor con marcas de error
-  // Trabajamos sobre el texto plano y reemplazamos por posición
   let html = ed.innerHTML;
-  // Para cada error, encontrar el fragmento en el texto y añadir marca
-  // Usamos un enfoque de offset sobre innerText
   errors.forEach((err, idx) => {
-    const offset = err.offset;
-    const len = err.length;
-    const errText = text.substring(offset, offset + len);
+    const errText = text.substring(err.offset, err.offset + err.length);
     const category = err.rule?.category?.id || '';
     const cls = category.includes('STYLE') || category.includes('REDUNDANCY') ? 'lt-style' :
                  category.includes('GRAMMAR') ? 'lt-grammar' : 'lt-error';
-    // Solo marcar en el DOM si el texto existe tal cual
     if (errText && errText.length > 0) {
       try {
-        const escaped = errText.replace(/[.*+?^${}()|[\]\]/g, '\$&');
-        // Solo reemplazar la primera ocurrencia para evitar desfases de offset
-        html = html.replace(new RegExp(escaped), `<span class="lt-error ${cls}" data-lt-idx="${idx}" onclick="showLtPopup(event,${idx})">${errText}</span>`);
+        const escaped = escapeRegex(errText);
+        const re = new RegExp(escaped);
+        html = html.replace(re,
+          '<span class="lt-error ' + cls + '" data-lt-idx="' + idx + '" onclick="showLtPopup(event,' + idx + ')">' + errText + '</span>'
+        );
       } catch(e) {}
     }
   });
@@ -2375,7 +2372,7 @@ window.runMatchingTextFinder = () => {
       const start = Math.max(0, pos - 40);
       const end = Math.min(text.length, pos + query.length + 40);
       const excerpt = text.substring(start, end).replace(
-        new RegExp(query.replace(/[.*+?^${}()|[\]\]/g, '\$&'), 'gi'),
+        new RegExp(escapeRegex(query), 'gi'),
         m => `<mark>${m}</mark>`
       );
       excerpts.push(excerpt);
