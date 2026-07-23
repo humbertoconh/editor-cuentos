@@ -561,6 +561,7 @@ input[type="file"]{display:none}
     <div class="ntab" onclick="switchNote('kw',this)">Keywords</div>
     <div class="ntab" onclick="switchNote('snaps',this)">Snaps</div>
     <div class="ntab" onclick="switchNote('obj',this)">Objetivo</div>
+    <div class="ntab" onclick="switchNote('cmeta',this)">Metadata</div>
   </div>
   <div class="insp-scroll">
     <!-- INFO -->
@@ -638,6 +639,15 @@ input[type="file"]{display:none}
       <div class="deadline-info" id="deadlineInfo" style="display:none"></div>
     </div>
   </div>
+      <!-- CUSTOM METADATA TAB -->
+    <div id="tab-cmeta" style="display:none">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
+        <div class="slabel" style="margin:0">Metadata personalizada</div>
+        <button onclick="openModal('cmeta')" style="background:none;border:none;cursor:pointer;font-size:11px;color:var(--ac);font-family:'Inter',sans-serif">Gestionar</button>
+      </div>
+      <div id="cmetaInspector"></div>
+    </div>
+
   <div class="insp-footer">
     <span class="insp-footer-label">Total proyecto</span>
     <span class="insp-footer-val"><span id="totalWC">0</span> palabras</span>
@@ -694,6 +704,91 @@ input[type="file"]{display:none}
     <button class="notepad-close" onclick="toggleNotepad()"><i class="ti ti-x"></i></button>
   </div>
   <textarea class="notepad-area" id="notepadArea" placeholder="Ideas, notas sueltas del proyecto…" oninput="saveNotepad()"></textarea>
+</div>
+
+
+<!-- ══ PANEL DE ESTILOS ══ -->
+<div class="styles-panel" id="stylesPanel">
+  <div class="styles-panel-head">
+    <span class="styles-panel-title">Estilos de párrafo</span>
+    <button class="styles-close" onclick="toggleStylesPanel()"><i class="ti ti-x"></i></button>
+  </div>
+  <div class="styles-list" id="stylesList"></div>
+  <div class="styles-footer">
+    <button class="styles-footer-btn" onclick="createStyle()"><i class="ti ti-plus" style="font-size:12px"></i> Nuevo estilo</button>
+    <button class="styles-footer-btn" onclick="removeStyle()"><i class="ti ti-trash" style="font-size:12px"></i> Eliminar</button>
+  </div>
+</div>
+
+<!-- ══ MODAL WRITING HISTORY ══ -->
+<div class="modal-overlay" id="modal-writinghistory">
+  <div class="wh-modal">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+      <div style="font-family:'Playfair Display',serif;font-size:18px;font-weight:600;color:var(--tx)">Historial de escritura</div>
+      <button class="mbtn-cancel" onclick="closeModal('writinghistory')">Cerrar</button>
+    </div>
+    <div class="wh-month-nav">
+      <button class="wh-nav-btn" onclick="whPrevMonth()"><i class="ti ti-chevron-left"></i></button>
+      <span class="wh-month-title" id="whMonthTitle"></span>
+      <button class="wh-nav-btn" onclick="whNextMonth()"><i class="ti ti-chevron-right"></i></button>
+    </div>
+    <div class="wh-weekdays">
+      <div class="wh-weekday">L</div><div class="wh-weekday">M</div><div class="wh-weekday">X</div>
+      <div class="wh-weekday">J</div><div class="wh-weekday">V</div><div class="wh-weekday">S</div>
+      <div class="wh-weekday">D</div>
+    </div>
+    <div class="wh-calendar" id="whCalendar"></div>
+    <div class="wh-stats-row" id="whStats"></div>
+  </div>
+</div>
+
+<!-- ══ MODAL CUSTOM METADATA ══ -->
+<div class="modal-overlay" id="modal-cmeta">
+  <div class="cmeta-manage-modal">
+    <div style="font-family:'Playfair Display',serif;font-size:18px;font-weight:600;color:var(--tx);margin-bottom:4px">Metadata personalizada</div>
+    <div style="font-size:12px;color:var(--txm);margin-bottom:16px">Campos personalizados para este proyecto</div>
+    <div id="cmetaFieldsEditor"></div>
+    <div class="cmeta-add-row">
+      <input class="cmeta-add-input" id="cmetaNewName" placeholder="Nombre del campo…" onkeydown="if(event.key==='Enter')addCMetaField()"/>
+      <select class="cmeta-type-sel" id="cmetaNewType">
+        <option value="text">Texto</option>
+        <option value="number">Número</option>
+        <option value="date">Fecha</option>
+        <option value="check">Casilla</option>
+        <option value="select">Lista</option>
+      </select>
+      <button class="obj-btn" onclick="addCMetaField()">+</button>
+    </div>
+    <div class="modal-foot"><button class="mbtn-cancel" onclick="closeModal('cmeta')">Cerrar</button></div>
+  </div>
+</div>
+
+<!-- ══ MODAL SNAPSHOT MANAGER ══ -->
+<div class="modal-overlay" id="modal-snapmanager">
+  <div class="snap-mgr-modal">
+    <div class="snap-mgr-head">
+      <span class="snap-mgr-title">Gestor de snapshots</span>
+      <button class="mbtn-cancel" onclick="closeModal('snapmanager')">Cerrar</button>
+    </div>
+    <div class="snap-mgr-body">
+      <div style="display:flex;flex-direction:column;width:240px;flex-shrink:0;border-right:1px solid var(--bd)">
+        <div class="snap-mgr-search">
+          <input type="text" placeholder="Buscar snapshots…" oninput="filterSnapManager(this.value)"/>
+        </div>
+        <div class="snap-mgr-list" id="snapMgrList"></div>
+      </div>
+      <div class="snap-mgr-content">
+        <div class="snap-mgr-preview" id="snapMgrPreview">
+          <div style="color:var(--txm);font-style:italic;text-align:center;margin-top:40px">Selecciona un snapshot para previsualizar</div>
+        </div>
+        <div class="snap-mgr-actions">
+          <button class="snap-act-btn" id="snapMgrRestoreBtn" onclick="snapMgrRestore()" style="display:none">Restaurar</button>
+          <button class="snap-act-btn" id="snapMgrExportBtn" onclick="snapMgrExport()" style="display:none">Exportar .txt</button>
+          <button class="snap-act-btn" id="snapMgrDeleteBtn" onclick="snapMgrDelete()" style="display:none;color:#c0392b;border-color:#c0392b">Eliminar</button>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
 
 <div class="toast" id="toast"></div>
@@ -814,6 +909,14 @@ async function loadAllData(){
     renderBinder(); renderCork(); renderOutline(); renderCollections();
     if(chapterOrder.length>0){showEditor();loadChapter(chapterOrder[0]);}
     updateTotalWC();
+    // Cargar extras v3
+    if(projDoc.exists()){
+      projectCMetaSchema = projDoc.data().cmetaSchema||[];
+      chapterCMeta = projDoc.data().chapterCMeta||{};
+      writingHistory = projDoc.data().writingHistory||{};
+    }
+    renderCMetaInspector();
+    whLastWords=Object.values(chapters).reduce((a,c)=>a+(c.words||0),0);
   }catch(e){toast('Error al cargar: '+e.message);}
 }
 
@@ -1174,6 +1277,7 @@ window.onInput=()=>{
 };
 
 function updateWC(w,chars){
+  trackWritingHistory(w);
   const ses=Math.max(0,w-sesionStartWords);
   document.getElementById('sbWords').innerHTML=`Palabras: <strong>${w}</strong>`;
   document.getElementById('sbSesion').innerHTML=`Sesión: <strong>+${ses}</strong>`;
@@ -1534,9 +1638,10 @@ document.getElementById('collectionsView').style.display='none';
 window.switchNote=(tab,el)=>{
   document.querySelectorAll('.ntab').forEach(t=>t.classList.remove('active'));
   el.classList.add('active');
-  ['meta','sinopsis','notas','kw','snaps','obj'].forEach(id=>{
+  ['meta','sinopsis','notas','kw','snaps','obj','cmeta'].forEach(id=>{
     const el=document.getElementById('tab-'+id);if(el)el.style.display=id===tab?'block':'none';
   });
+  if(tab==='cmeta') renderCMetaInspector();
 };
 
 /* ── META PROYECTO ── */
@@ -1577,7 +1682,95 @@ window.compilar=(fmt)=>{
     Object.values(chapters).forEach(ch=>{const d=document.createElement('div');d.innerHTML=ch.content;md+='\n## '+ch.title+'\n\n'+d.innerText+'\n';});
     blob=new Blob([md],{type:'text/markdown'});filename=title+'.md';
   }else if(fmt==='html'){
-    let html=`<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8"><title>${title}</title><style>body{font-family:Georgia,serif;max-width:680px;margin:60px auto;line-height:1.85;color:#1a1208}h1{font-size:28px}h2{font-size:20px;margin:2em 0 .5em}img{max-width:100%;border-radius:6px;margin:20px 0}.inline-annotation{display:none}</style></head><body><h1>${title}</h1>`;
+    let html=`<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8"><title>${title}</title><style>body{font-family:Georgia,serif;max-width:680px;margin:60px auto;line-height:1.85;color:#1a1208}h1{font-size:28px}h2{font-size:20px;margin:2em 0 .5em}img{max-width:100%;border-radius:6px;margin:20px 0}.inline-annotation{display:none}
+/* ── FOCUS MODE ── */
+.texted.focus-line p { color: rgba(26,18,8,0.15); transition: color .2s; }
+.texted.focus-line p.focused { color: var(--tx); }
+.texted.focus-sentence span.focus-unit { color: rgba(26,18,8,0.15); transition: color .2s; }
+.texted.focus-sentence span.focus-unit.focused { color: var(--tx); }
+.texted.focus-paragraph p { color: rgba(26,18,8,0.15); transition: color .2s; }
+.texted.focus-paragraph p.focused-para { color: var(--tx); }
+.focus-btn-group { display:flex; gap:2px; }
+.focus-pill { padding:3px 7px; font-size:10px; border:1px solid var(--bd2); border-radius:10px; cursor:pointer; color:var(--txm); background:transparent; font-family:'Inter',sans-serif; transition:all .12s; }
+.focus-pill.on { background:var(--gr-bg); color:var(--gr); border-color:var(--gr); }
+
+/* ── WRITING HISTORY ── */
+.wh-modal { background:var(--s0); border-radius:10px; padding:24px; width:620px; max-width:95vw; border:1px solid var(--bd); max-height:85vh; overflow-y:auto; }
+.wh-calendar { display:grid; grid-template-columns:repeat(7,1fr); gap:4px; margin-top:12px; }
+.wh-day { aspect-ratio:1; border-radius:4px; display:flex; flex-direction:column; align-items:center; justify-content:center; font-size:9px; cursor:default; position:relative; border:1px solid var(--bd); }
+.wh-day .wh-num { font-size:9px; color:var(--txm); }
+.wh-day .wh-words { font-size:8px; font-weight:600; }
+.wh-day.wh-empty { background:var(--s1); }
+.wh-day.wh-wrote { background:var(--ok-bg); }
+.wh-day.wh-wrote .wh-num { color:var(--ok); }
+.wh-day.wh-wrote .wh-words { color:var(--ok); }
+.wh-day.wh-great { background:var(--gr-bg); }
+.wh-day.wh-great .wh-num { color:var(--gr); }
+.wh-day.wh-great .wh-words { color:var(--gr); }
+.wh-day.wh-today { border-color:var(--ac); }
+.wh-month-nav { display:flex; align-items:center; justify-content:space-between; margin-bottom:8px; }
+.wh-month-title { font-size:14px; font-weight:500; color:var(--tx); }
+.wh-nav-btn { background:none; border:1px solid var(--bd2); border-radius:4px; cursor:pointer; padding:4px 8px; font-size:13px; color:var(--txm); }
+.wh-nav-btn:hover { background:var(--s2); }
+.wh-weekdays { display:grid; grid-template-columns:repeat(7,1fr); gap:4px; margin-bottom:4px; }
+.wh-weekday { font-size:10px; color:var(--txm); text-align:center; }
+.wh-stats-row { display:flex; gap:12px; margin-top:16px; flex-wrap:wrap; }
+.wh-stat { flex:1; min-width:100px; background:var(--s1); border-radius:var(--r); padding:10px; border:1px solid var(--bd); }
+.wh-stat-label { font-size:10px; color:var(--txm); margin-bottom:4px; }
+.wh-stat-val { font-size:20px; font-weight:600; color:var(--tx); }
+.wh-stat-sub { font-size:10px; color:var(--txm); }
+
+/* ── CUSTOM METADATA ── */
+.cmeta-field { margin-bottom:8px; }
+.cmeta-label { font-size:10px; color:var(--txm); text-transform:uppercase; letter-spacing:.05em; margin-bottom:3px; display:flex; align-items:center; justify-content:space-between; }
+.cmeta-del-btn { background:none; border:none; cursor:pointer; color:var(--txm); font-size:12px; padding:0; line-height:1; }
+.cmeta-del-btn:hover { color:#c0392b; }
+.cmeta-input { width:100%; border:1px solid var(--bd2); border-radius:4px; padding:5px 7px; font-size:12px; font-family:'Inter',sans-serif; color:var(--tx); background:var(--s0); outline:none; }
+.cmeta-input:focus { border-color:var(--ac-bd); }
+.cmeta-checkbox { display:flex; align-items:center; gap:6px; font-size:12px; color:var(--tx); cursor:pointer; }
+.cmeta-add-row { display:flex; gap:4px; margin-top:8px; }
+.cmeta-add-input { flex:1; padding:4px 7px; border:1px solid var(--bd2); border-radius:4px; font-size:11px; font-family:'Inter',sans-serif; outline:none; background:var(--s0); }
+.cmeta-type-sel { padding:4px 6px; border:1px solid var(--bd2); border-radius:4px; font-size:11px; font-family:'Inter',sans-serif; background:var(--s0); cursor:pointer; }
+.cmeta-manage-modal { background:var(--s0); border-radius:10px; padding:24px; width:420px; max-width:90vw; border:1px solid var(--bd); }
+
+/* ── STYLES (Estilos de párrafo) ── */
+.styles-panel { position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); width:340px; background:var(--s0); border:1px solid var(--bd2); border-radius:10px; box-shadow:0 8px 32px rgba(0,0,0,.15); z-index:400; display:none; flex-direction:column; overflow:hidden; }
+.styles-panel.open { display:flex; }
+.styles-panel-head { padding:10px 14px; background:var(--s2); border-bottom:1px solid var(--bd); display:flex; align-items:center; justify-content:space-between; }
+.styles-panel-title { font-size:13px; font-weight:500; color:var(--tx); }
+.styles-close { background:none; border:none; cursor:pointer; color:var(--txm); font-size:15px; padding:0; }
+.styles-list { padding:8px; overflow-y:auto; max-height:300px; }
+.style-item { padding:7px 10px; border-radius:var(--r); cursor:pointer; font-size:13px; display:flex; align-items:center; gap:8px; transition:background .1s; }
+.style-item:hover { background:var(--s2); }
+.style-item.active { background:var(--ac-bg); color:var(--ac); }
+.style-item .style-preview { flex:1; }
+.style-separator { height:1px; background:var(--bd); margin:4px 0; }
+.styles-footer { padding:8px 10px; border-top:1px solid var(--bd); display:flex; gap:6px; }
+.styles-footer-btn { flex:1; padding:6px; border:1px solid var(--bd2); border-radius:var(--r); background:transparent; cursor:pointer; font-size:11px; font-family:'Inter',sans-serif; color:var(--txm); transition:all .1s; }
+.styles-footer-btn:hover { background:var(--s2); color:var(--tx); }
+
+/* ── SNAPSHOT MANAGER ── */
+.snap-mgr-modal { background:var(--s0); border-radius:10px; padding:0; width:680px; max-width:95vw; border:1px solid var(--bd); max-height:85vh; display:flex; flex-direction:column; overflow:hidden; }
+.snap-mgr-head { padding:16px 20px; border-bottom:1px solid var(--bd); display:flex; align-items:center; justify-content:space-between; flex-shrink:0; }
+.snap-mgr-title { font-family:'Playfair Display',serif; font-size:18px; font-weight:600; color:var(--tx); }
+.snap-mgr-body { display:flex; flex:1; overflow:hidden; min-height:0; }
+.snap-mgr-list { width:240px; border-right:1px solid var(--bd); overflow-y:auto; flex-shrink:0; }
+.snap-mgr-list::-webkit-scrollbar { width:3px; }
+.snap-mgr-list::-webkit-scrollbar-thumb { background:var(--bd2); border-radius:2px; }
+.snap-mgr-item { padding:10px 12px; border-bottom:1px solid var(--bd); cursor:pointer; transition:background .1s; }
+.snap-mgr-item:hover { background:var(--s2); }
+.snap-mgr-item.active { background:var(--ac-bg); }
+.snap-mgr-ch { font-size:11px; color:var(--txm); margin-bottom:2px; }
+.snap-mgr-name { font-size:12px; font-weight:500; color:var(--tx); }
+.snap-mgr-date { font-size:10px; color:var(--txm); margin-top:2px; }
+.snap-mgr-content { flex:1; display:flex; flex-direction:column; overflow:hidden; }
+.snap-mgr-preview { flex:1; overflow-y:auto; padding:16px; font-family:'Lora',serif; font-size:14px; line-height:1.8; color:var(--tx); }
+.snap-mgr-actions { padding:10px 16px; border-top:1px solid var(--bd); display:flex; gap:8px; flex-shrink:0; }
+.snap-mgr-search { padding:8px 12px; border-bottom:1px solid var(--bd); flex-shrink:0; }
+.snap-mgr-search input { width:100%; padding:5px 9px; border:1px solid var(--bd2); border-radius:var(--r); font-size:12px; font-family:'Inter',sans-serif; outline:none; }
+.snap-mgr-search input:focus { border-color:var(--ac-bd); }
+.snap-mgr-empty { flex:1; display:flex; align-items:center; justify-content:center; color:var(--txm); font-size:13px; }
+</style></head><body><h1>${title}</h1>`;
     Object.values(chapters).filter(c=>c.include!==false).forEach(ch=>{html+=`<h2>${ch.title}</h2><div>${ch.content}</div>`;});
     html+='</body></html>';
     blob=new Blob([html],{type:'text/html'});filename=title+'.html';
@@ -1599,7 +1792,418 @@ document.addEventListener('keydown',e=>{
   if((e.ctrlKey||e.metaKey)&&e.key==='f'){e.preventDefault();toggleSearch();}
 });
 
+
+/* ════════════════════════════════════════
+   FOCUS MODE (v3)
+   Desenfoca todo excepto línea/frase/párrafo actual
+════════════════════════════════════════ */
+let focusMode = 'none';
+
+window.setFocusMode = (mode) => {
+  const ed = document.getElementById('mainEditor');
+  // Toggle: si ya está activo el mismo, desactivar
+  if (focusMode === mode) {
+    focusMode = 'none';
+    ed.classList.remove('focus-line','focus-sentence','focus-paragraph');
+    clearFocusHighlights();
+    document.querySelectorAll('.focus-pill').forEach(p => p.classList.remove('on'));
+    toast('Modo foco desactivado');
+    return;
+  }
+  focusMode = mode;
+  ed.classList.remove('focus-line','focus-sentence','focus-paragraph');
+  clearFocusHighlights();
+  document.querySelectorAll('.focus-pill').forEach(p => p.classList.remove('on'));
+  if (mode !== 'none') {
+    ed.classList.add('focus-' + mode);
+    document.getElementById('focus' + mode.charAt(0).toUpperCase() + mode.slice(1))?.classList.add('on');
+    applyFocus();
+    toast('Foco: ' + {line:'línea',sentence:'frase',paragraph:'párrafo'}[mode]);
+  }
+};
+
+function clearFocusHighlights() {
+  const ed = document.getElementById('mainEditor');
+  ed.querySelectorAll('p').forEach(p => p.classList.remove('focused','focused-para'));
+  ed.querySelectorAll('span.focus-unit').forEach(s => {
+    s.outerHTML = s.innerHTML;
+  });
+}
+
+function applyFocus() {
+  if (focusMode === 'none') return;
+  const ed = document.getElementById('mainEditor');
+  const sel = window.getSelection();
+  if (!sel || sel.rangeCount === 0) return;
+  const node = sel.anchorNode;
+  if (!node) return;
+
+  if (focusMode === 'line' || focusMode === 'paragraph') {
+    // Encontrar el párrafo padre
+    let para = node.nodeType === 3 ? node.parentElement : node;
+    while (para && para.tagName !== 'P' && para !== ed) para = para.parentElement;
+    ed.querySelectorAll('p').forEach(p => {
+      p.classList.remove('focused','focused-para');
+      if (focusMode === 'line') p.classList[p === para ? 'add' : 'remove']('focused');
+      else p.classList[p === para ? 'add' : 'remove']('focused-para');
+    });
+  }
+}
+
+document.addEventListener('selectionchange', () => {
+  if (focusMode !== 'none' && document.activeElement === document.getElementById('mainEditor')) {
+    applyFocus();
+  }
+});
+
+/* ════════════════════════════════════════
+   WRITING HISTORY (v3)
+   Registra palabras escritas por día en Firebase
+════════════════════════════════════════ */
+let whCurrentDate = new Date();
+let writingHistory = {}; // { 'YYYY-MM-DD': wordCount }
+
+async function loadWritingHistory() {
+  // Cargado dentro de loadAllData - esta función es no-op
+}
+
+function saveWritingHistoryToday(wordsDelta) {
+  if (!currentProjectId || wordsDelta <= 0) return;
+  const today = new Date().toISOString().split('T')[0];
+  writingHistory[today] = (writingHistory[today] || 0) + wordsDelta;
+  // Guardar en Firebase (debounced)
+  clearTimeout(window.whSaveTimer);
+  window.whSaveTimer = setTimeout(async () => {
+    try {
+      await updateDoc(doc(db,'projects',currentProjectId), { writingHistory });
+    } catch(e) {}
+  }, 3000);
+}
+
+window.renderWritingHistory = async () => {
+  await loadWritingHistory();
+  renderWHCalendar();
+};
+
+function renderWHCalendar() {
+  const year = whCurrentDate.getFullYear();
+  const month = whCurrentDate.getMonth();
+  const monthNames = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+  document.getElementById('whMonthTitle').textContent = monthNames[month] + ' ' + year;
+
+  const cal = document.getElementById('whCalendar');
+  cal.innerHTML = '';
+  const today = new Date().toISOString().split('T')[0];
+  const firstDay = new Date(year, month, 1);
+  const lastDay = new Date(year, month + 1, 0);
+  // Día de la semana del 1 (0=Dom, ajustar a Lun=0)
+  let startDow = (firstDay.getDay() + 6) % 7;
+  // Espacios vacíos al inicio
+  for (let i = 0; i < startDow; i++) {
+    const empty = document.createElement('div'); empty.className = 'wh-day wh-empty'; cal.appendChild(empty);
+  }
+  // Días del mes
+  let totalWords = 0, daysWrote = 0, bestDay = 0;
+  for (let d = 1; d <= lastDay.getDate(); d++) {
+    const dateKey = `${year}-${String(month+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    const words = writingHistory[dateKey] || 0;
+    totalWords += words;
+    if (words > 0) daysWrote++;
+    if (words > bestDay) bestDay = words;
+    const div = document.createElement('div');
+    div.className = 'wh-day' + (words === 0 ? ' wh-empty' : words >= 500 ? ' wh-great' : ' wh-wrote') + (dateKey === today ? ' wh-today' : '');
+    div.innerHTML = `<span class="wh-num">${d}</span>${words > 0 ? `<span class="wh-words">${words}</span>` : ''}`;
+    div.title = dateKey + ': ' + words + ' palabras';
+    cal.appendChild(div);
+  }
+  // Stats
+  const stats = document.getElementById('whStats');
+  const avg = daysWrote > 0 ? Math.round(totalWords / daysWrote) : 0;
+  stats.innerHTML = `
+    <div class="wh-stat"><div class="wh-stat-label">Total del mes</div><div class="wh-stat-val">${totalWords.toLocaleString()}</div><div class="wh-stat-sub">palabras</div></div>
+    <div class="wh-stat"><div class="wh-stat-label">Días activos</div><div class="wh-stat-val">${daysWrote}</div><div class="wh-stat-sub">de ${lastDay.getDate()} días</div></div>
+    <div class="wh-stat"><div class="wh-stat-label">Media diaria</div><div class="wh-stat-val">${avg.toLocaleString()}</div><div class="wh-stat-sub">palabras/día activo</div></div>
+    <div class="wh-stat"><div class="wh-stat-label">Mejor día</div><div class="wh-stat-val">${bestDay.toLocaleString()}</div><div class="wh-stat-sub">palabras</div></div>
+  `;
+}
+
+window.whPrevMonth = () => { whCurrentDate = new Date(whCurrentDate.getFullYear(), whCurrentDate.getMonth()-1, 1); renderWHCalendar(); };
+window.whNextMonth = () => { whCurrentDate = new Date(whCurrentDate.getFullYear(), whCurrentDate.getMonth()+1, 1); renderWHCalendar(); };
+
+// Integrar con onInput para registrar escritura
+let whLastWords = 0;
+function trackWritingHistory(currentWords) {
+  if (currentWords > whLastWords) {
+    saveWritingHistoryToday(currentWords - whLastWords);
+  }
+  whLastWords = currentWords;
+}
+
+/* ════════════════════════════════════════
+   CUSTOM METADATA (v3)
+   Campos personalizados por proyecto
+════════════════════════════════════════ */
+let projectCMetaSchema = []; // [{ name, type, options? }]
+let chapterCMeta = {}; // { chapterId: { fieldName: value } }
+
+async function loadCMetaSchema() {
+  // Cargado dentro de loadAllData - esta función es no-op
+}
+
+window.addCMetaField = async () => {
+  const name = document.getElementById('cmetaNewName').value.trim();
+  if (!name) return;
+  const type = document.getElementById('cmetaNewType').value;
+  if (projectCMetaSchema.find(f => f.name === name)) { toast('Ya existe un campo con ese nombre'); return; }
+  projectCMetaSchema.push({ name, type });
+  document.getElementById('cmetaNewName').value = '';
+  await saveCMetaSchema();
+  renderCMetaEditor();
+  renderCMetaInspector();
+  toast('Campo añadido: ' + name);
+};
+
+window.removeCMetaField = async (name) => {
+  if (!confirm('¿Eliminar el campo "' + name + '"?')) return;
+  projectCMetaSchema = projectCMetaSchema.filter(f => f.name !== name);
+  await saveCMetaSchema();
+  renderCMetaEditor();
+  renderCMetaInspector();
+  toast('Campo eliminado');
+};
+
+async function saveCMetaSchema() {
+  try {
+    await updateDoc(doc(db,'projects',currentProjectId), { cmetaSchema: projectCMetaSchema, chapterCMeta });
+  } catch(e) {}
+}
+
+window.saveCMetaValue = async (fieldName, value) => {
+  if (!currentChapterId) return;
+  if (!chapterCMeta[currentChapterId]) chapterCMeta[currentChapterId] = {};
+  chapterCMeta[currentChapterId][fieldName] = value;
+  try {
+    await updateDoc(doc(db,'projects',currentProjectId), { chapterCMeta });
+  } catch(e) {}
+};
+
+function renderCMetaEditor() {
+  const cont = document.getElementById('cmetaFieldsEditor');
+  cont.innerHTML = '';
+  if (projectCMetaSchema.length === 0) {
+    cont.innerHTML = '<div style="font-size:12px;color:var(--txm);text-align:center;padding:12px">Sin campos personalizados aún</div>';
+    return;
+  }
+  projectCMetaSchema.forEach(field => {
+    const row = document.createElement('div'); row.className = 'cmeta-field';
+    row.innerHTML = `<div class="cmeta-label"><span>${field.name} <span style="color:var(--txm);font-size:9px">(${field.type})</span></span><button class="cmeta-del-btn" onclick="removeCMetaField('${field.name}')"><i class="ti ti-trash" style="font-size:12px"></i></button></div>`;
+    cont.appendChild(row);
+  });
+}
+
+function renderCMetaInspector() {
+  const cont = document.getElementById('cmetaInspector');
+  if (!cont) return;
+  cont.innerHTML = '';
+  if (projectCMetaSchema.length === 0) {
+    cont.innerHTML = '<div style="font-size:11px;color:var(--txm)">Sin campos personalizados. Haz clic en "Gestionar" para añadir.</div>';
+    return;
+  }
+  const chData = currentChapterId ? (chapterCMeta[currentChapterId] || {}) : {};
+  projectCMetaSchema.forEach(field => {
+    const div = document.createElement('div'); div.className = 'cmeta-field';
+    let inputHtml = '';
+    const val = chData[field.name] || '';
+    if (field.type === 'text') {
+      inputHtml = `<input class="cmeta-input" type="text" value="${val.replace(/"/g,'&quot;')}" placeholder="${field.name}…" onchange="saveCMetaValue('${field.name}',this.value)"/>`;
+    } else if (field.type === 'number') {
+      inputHtml = `<input class="cmeta-input" type="number" value="${val}" onchange="saveCMetaValue('${field.name}',this.value)"/>`;
+    } else if (field.type === 'date') {
+      inputHtml = `<input class="cmeta-input" type="date" value="${val}" onchange="saveCMetaValue('${field.name}',this.value)"/>`;
+    } else if (field.type === 'check') {
+      inputHtml = `<label class="cmeta-checkbox"><input type="checkbox" ${val==='true'?'checked':''} onchange="saveCMetaValue('${field.name}',this.checked.toString())"/> ${field.name}</label>`;
+    } else if (field.type === 'select') {
+      const opts = (field.options || ['Opción 1','Opción 2']).map(o => `<option${o===val?' selected':''}>${o}</option>`).join('');
+      inputHtml = `<select class="cmeta-input" onchange="saveCMetaValue('${field.name}',this.value)">${opts}</select>`;
+    }
+    div.innerHTML = `<div class="cmeta-label">${field.name}</div>${inputHtml}`;
+    cont.appendChild(div);
+  });
+}
+
+/* ════════════════════════════════════════
+   ESTILOS DE PÁRRAFO (v3 Styles)
+════════════════════════════════════════ */
+const DEFAULT_STYLES = [
+  { name:'Sin estilo', cmd:null, preview:'Texto normal' },
+  { name:'Encabezado 1', cmd:'h2', preview:'Encabezado 1', fontSize:'21px', fontWeight:'600', fontFamily:"'Playfair Display',serif" },
+  { name:'Encabezado 2', cmd:'h3', preview:'Encabezado 2', fontSize:'17px', fontWeight:'600', fontFamily:"'Playfair Display',serif" },
+  { name:'Cita en bloque', cmd:'quote', preview:'Cita en bloque', italic:true, borderLeft:'3px solid var(--gold)', paddingLeft:'16px' },
+  { name:'Lista sin orden', cmd:'ul', preview:'• Lista sin orden' },
+];
+let projectStyles = [...DEFAULT_STYLES];
+let activeStyleName = 'Sin estilo';
+
+window.toggleStylesPanel = () => document.getElementById('stylesPanel').classList.toggle('open');
+
+function renderStylesList() {
+  const list = document.getElementById('stylesList');
+  list.innerHTML = '';
+  projectStyles.forEach(style => {
+    const item = document.createElement('div'); item.className = 'style-item' + (style.name === activeStyleName ? ' active' : '');
+    const previewStyle = [
+      style.fontSize ? `font-size:${style.fontSize}` : '',
+      style.fontWeight ? `font-weight:${style.fontWeight}` : '',
+      style.fontFamily ? `font-family:${style.fontFamily}` : "font-family:'Lora',serif",
+      style.italic ? 'font-style:italic' : '',
+      style.borderLeft ? `border-left:${style.borderLeft};padding-left:${style.paddingLeft}` : '',
+    ].filter(Boolean).join(';');
+    item.innerHTML = `<span class="style-preview" style="${previewStyle}">${style.preview}</span>`;
+    item.onclick = () => applyStyle(style);
+    list.appendChild(item);
+  });
+}
+renderStylesList();
+
+function applyStyle(style) {
+  const ed = document.getElementById('mainEditor'); ed.focus();
+  activeStyleName = style.name;
+  if (style.cmd === 'h2') document.execCommand('formatBlock',false,'h2');
+  else if (style.cmd === 'h3') document.execCommand('formatBlock',false,'h3');
+  else if (style.cmd === 'quote') document.execCommand('formatBlock',false,'blockquote');
+  else if (style.cmd === 'ul') document.execCommand('insertUnorderedList');
+  else if (!style.cmd) document.execCommand('formatBlock',false,'p');
+  renderStylesList();
+  toast('Estilo aplicado: ' + style.name);
+}
+
+window.createStyle = () => {
+  const name = prompt('Nombre del nuevo estilo:');
+  if (!name || projectStyles.find(s => s.name === name)) return;
+  projectStyles.push({ name, cmd:null, preview:name });
+  renderStylesList();
+  toast('Estilo creado: ' + name);
+};
+
+window.removeStyle = () => {
+  if (activeStyleName === 'Sin estilo') { toast('No puedes eliminar el estilo base'); return; }
+  if (!confirm('¿Eliminar el estilo "' + activeStyleName + '"?')) return;
+  projectStyles = projectStyles.filter(s => s.name !== activeStyleName);
+  activeStyleName = 'Sin estilo';
+  renderStylesList();
+  toast('Estilo eliminado');
+};
+
+/* ════════════════════════════════════════
+   SNAPSHOT MANAGER (v3)
+   Gestor global de snapshots de todos los capítulos
+════════════════════════════════════════ */
+let snapMgrSelected = null; // { chapterId, snapIndex }
+
+window.renderSnapManager = () => {
+  const list = document.getElementById('snapMgrList');
+  list.innerHTML = '';
+  let hasAny = false;
+  Object.values(chapters).forEach(ch => {
+    (ch.snapshots || []).forEach((snap, i) => {
+      hasAny = true;
+      const item = document.createElement('div'); item.className = 'snap-mgr-item';
+      const date = new Date(snap.date);
+      item.innerHTML = `<div class="snap-mgr-ch">${ch.title}</div><div class="snap-mgr-name">${snap.title || 'Sin título'}</div><div class="snap-mgr-date">${date.toLocaleString('es-ES',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'})}</div>`;
+      item.onclick = () => selectSnapMgrItem(ch.id, i, item);
+      list.appendChild(item);
+    });
+  });
+  if (!hasAny) list.innerHTML = '<div style="padding:16px;font-size:12px;color:var(--txm);text-align:center">No hay snapshots en este proyecto</div>';
+  snapMgrSelected = null;
+  document.getElementById('snapMgrPreview').innerHTML = '<div style="color:var(--txm);font-style:italic;text-align:center;margin-top:40px">Selecciona un snapshot para previsualizar</div>';
+  ['snapMgrRestoreBtn','snapMgrExportBtn','snapMgrDeleteBtn'].forEach(id => document.getElementById(id).style.display='none');
+};
+
+function selectSnapMgrItem(chId, snapIdx, itemEl) {
+  document.querySelectorAll('.snap-mgr-item').forEach(i => i.classList.remove('active'));
+  itemEl.classList.add('active');
+  snapMgrSelected = { chapterId: chId, snapIndex: snapIdx };
+  const snap = chapters[chId]?.snapshots?.[snapIdx];
+  if (!snap) return;
+  const tmp = document.createElement('div'); tmp.innerHTML = snap.content;
+  document.getElementById('snapMgrPreview').innerText = tmp.innerText;
+  ['snapMgrRestoreBtn','snapMgrExportBtn','snapMgrDeleteBtn'].forEach(id => document.getElementById(id).style.display='inline-block');
+}
+
+window.snapMgrRestore = () => {
+  if (!snapMgrSelected) return;
+  const { chapterId, snapIndex } = snapMgrSelected;
+  const snap = chapters[chapterId]?.snapshots?.[snapIndex];
+  if (!snap) return;
+  if (!confirm('¿Restaurar este snapshot? El contenido actual del capítulo se perderá.')) return;
+  // Cargar el capítulo si no está cargado
+  if (currentChapterId !== chapterId) {
+    nav(document.getElementById('b-'+chapterId), chapterId);
+  }
+  setTimeout(() => {
+    document.getElementById('mainEditor').innerHTML = snap.content;
+    onInput();
+    closeModal('snapmanager');
+    toast('Snapshot restaurado');
+  }, 300);
+};
+
+window.snapMgrExport = () => {
+  if (!snapMgrSelected) return;
+  const { chapterId, snapIndex } = snapMgrSelected;
+  const snap = chapters[chapterId]?.snapshots?.[snapIndex];
+  if (!snap) return;
+  const tmp = document.createElement('div'); tmp.innerHTML = snap.content;
+  const blob = new Blob([`${chapters[chapterId]?.title || ''}
+${snap.title || ''}
+
+${tmp.innerText}`], {type:'text/plain'});
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = (snap.title || 'snapshot') + '.txt'; a.click();
+  toast('Snapshot exportado');
+};
+
+window.snapMgrDelete = async () => {
+  if (!snapMgrSelected) return;
+  const { chapterId, snapIndex } = snapMgrSelected;
+  if (!confirm('¿Eliminar este snapshot? Esta acción no se puede deshacer.')) return;
+  const snaps = [...(chapters[chapterId].snapshots || [])];
+  snaps.splice(snapIndex, 1);
+  chapters[chapterId].snapshots = snaps;
+  try {
+    await updateDoc(doc(db,'projects',currentProjectId,'chapters',chapterId), { snapshots: snaps });
+  } catch(e) {}
+  // Si el capítulo activo tiene snaps actualizados, refrescar inspector
+  if (currentChapterId === chapterId) renderSnaps(snaps);
+  renderSnapManager();
+  toast('Snapshot eliminado');
+};
+
+window.filterSnapManager = (q) => {
+  const items = document.querySelectorAll('.snap-mgr-item');
+  const ql = q.toLowerCase();
+  items.forEach(item => {
+    const text = item.textContent.toLowerCase();
+    item.style.display = text.includes(ql) ? 'block' : 'none';
+  });
+};
+
+/* ════════════════════════════════════════
+   INTEGRACIÓN: tracking de historial en onInput
+════════════════════════════════════════ */
+// trackWritingHistory se llama desde updateWC
+
+/* ════════════════════════════════════════
+   AÑADIR a loadChapter: cargar cmeta del capítulo
+════════════════════════════════════════ */
+
+
+// extras v3: cargados inline
+
+
 /* ── INIT ── */
+// v3 extras cargados dentro de loadAllData
+
 showProjectsScreen();
 </script>
 </body>
