@@ -334,16 +334,33 @@ input[type="file"]{display:none}
 .insp-footer-val{font-size:12px;color:var(--tx);font-weight:500}
 
 /* COMPOSE */
-.compose{position:fixed;inset:0;background:#1a1a18;z-index:200;display:none;flex-direction:column;align-items:center;overflow-y:auto}
+.compose{position:fixed;inset:0;background:#f9f6f0;z-index:200;display:none;flex-direction:column;align-items:center;overflow-y:auto}
 .compose.open{display:flex}
-.compose-inner{width:100%;max-width:680px;padding:60px 40px 100px;flex:1}
-.compose-title{font-family:'Playfair Display',serif;font-size:28px;font-weight:600;color:#e8e0d0;border:none;background:transparent;outline:none;width:100%;margin-bottom:24px;padding-bottom:12px;border-bottom:1px solid rgba(255,255,255,.1)}
-.compose-ed{font-family:'Lora',serif;font-size:18px;line-height:2;color:#d0c8b8;min-height:400px;outline:none;width:100%}
+/* Modo oscuro opcional */
+.compose.dark-mode{background:#1a1a18}
+.compose-inner{width:100%;max-width:680px;padding:48px 32px 120px;flex:1}
+.compose-title{font-family:'Playfair Display',serif;font-size:28px;font-weight:600;color:#1a1208;border:none;background:transparent;outline:none;width:100%;margin-bottom:20px;padding-bottom:12px;border-bottom:2px solid #d8cdb8}
+.compose.dark-mode .compose-title{color:#e8e0d0;border-bottom-color:rgba(255,255,255,.1)}
+.compose-ed{font-family:'Lora',serif;font-size:18px;line-height:2;color:#1a1208;min-height:60vh;outline:none;width:100%}
 .compose-ed p{margin-bottom:.3em}
-.compose-bar{position:fixed;bottom:0;left:0;right:0;padding:10px 24px;background:rgba(26,26,24,.92);display:flex;align-items:center;gap:16px;font-size:12px;color:rgba(200,190,170,.5);border-top:1px solid rgba(255,255,255,.07)}
-.compose-wc{color:rgba(200,190,170,.7)}
-.compose-exit{margin-left:auto;padding:5px 12px;border:1px solid rgba(255,255,255,.15);border-radius:var(--r);background:transparent;color:rgba(200,190,170,.6);cursor:pointer;font-size:12px;font-family:'Inter',sans-serif}
-.compose-exit:hover{color:#e8e0d0}
+.compose.dark-mode .compose-ed{color:#d0c8b8}
+/* BARRA INFERIOR — grande y táctil */
+.compose-bar{position:fixed;bottom:0;left:0;right:0;padding:10px 16px;background:rgba(249,246,240,.96);backdrop-filter:blur(8px);display:flex;align-items:center;gap:8px;border-top:1px solid #d8cdb8;flex-wrap:wrap}
+.compose.dark-mode .compose-bar{background:rgba(26,26,24,.95);border-top-color:rgba(255,255,255,.07)}
+.compose-wc{font-size:12px;color:#9a8a78;font-family:'Inter',sans-serif;min-width:90px}
+.compose-dark-mode .compose-wc{color:rgba(200,190,170,.7)}
+/* Botones táctiles grandes */
+.compose-btn{padding:10px 16px;border-radius:8px;font-size:13px;font-family:'Inter',sans-serif;cursor:pointer;font-weight:500;display:flex;align-items:center;gap:6px;border:none;transition:all .12s;white-space:nowrap;min-height:44px}
+.compose-btn-snap{background:#b8882a;color:#fff}
+.compose-btn-snap:hover{background:#9a7020}
+.compose-btn-mic{background:#e8f4e8;color:#2e5c4f;border:1px solid #c0dbc0}
+.compose-btn-mic.recording{background:#fde8e8;color:#a0392b;border-color:#f0c0c0;animation:mic-pulse 1s ease-in-out infinite}
+.compose-btn-dark{background:transparent;color:#9a8a78;border:1px solid #d8cdb8}
+.compose-btn-dark:hover{background:#f0ebe0}
+.compose-exit{margin-left:auto;padding:10px 18px;border:1.5px solid #d8cdb8;border-radius:8px;background:transparent;cursor:pointer;font-size:13px;font-family:'Inter',sans-serif;color:#5a4a38;font-weight:500;min-height:44px;display:flex;align-items:center;gap:6px}
+.compose-exit:hover{background:#f0ebe0}
+.compose.dark-mode .compose-exit{border-color:rgba(255,255,255,.2);color:rgba(200,190,170,.7)}
+.compose.dark-mode .compose-exit:hover{background:rgba(255,255,255,.05)}
 
 /* MODAL */
 .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.45);display:none;align-items:center;justify-content:center;z-index:300}
@@ -479,10 +496,38 @@ input[type="file"]{display:none}
 
   <div class="toolbar">
     <div class="tg">
+      <button class="tbtn" onclick="document.getElementById('mainEditor').focus();document.execCommand('undo')" title="Deshacer (⌘Z)"><i class="ti ti-arrow-back-up"></i></button>
+      <button class="tbtn" onclick="document.getElementById('mainEditor').focus();document.execCommand('redo')" title="Rehacer (⌘Y)"><i class="ti ti-arrow-forward-up"></i></button>
+    </div>
+    <div class="tg">
       <button class="tbtn" onclick="fmt('bold')" title="Negrita"><i class="ti ti-bold"></i></button>
       <button class="tbtn" onclick="fmt('italic')" title="Cursiva"><i class="ti ti-italic"></i></button>
       <button class="tbtn" onclick="fmt('underline')" title="Subrayado"><i class="ti ti-underline"></i></button>
       <button class="tbtn" onclick="fmt('strikeThrough')" title="Tachado"><i class="ti ti-strikethrough"></i></button>
+    </div>
+    <div class="tg">
+      <select class="font-selector" id="fontSelector" onchange="applyFont(this.value)" title="Tipo de letra">
+        <option value="Lora">Lora (por defecto)</option>
+        <option value="Georgia">Georgia</option>
+        <option value="'Times New Roman',serif">Times New Roman</option>
+        <option value="Garamond,serif">Garamond</option>
+        <option value="'Palatino Linotype',serif">Palatino</option>
+        <option value="'Book Antiqua',serif">Book Antiqua</option>
+        <option value="Arial,sans-serif">Arial</option>
+        <option value="'Helvetica Neue',sans-serif">Helvetica</option>
+        <option value="Verdana,sans-serif">Verdana</option>
+        <option value="'Courier New',monospace">Courier New</option>
+      </select>
+      <select class="font-size-selector" id="fontSizeSelector" onchange="applyFontSize(this.value)" title="Tamaño">
+        <option value="14">14px</option>
+        <option value="15">15px</option>
+        <option value="16">16px</option>
+        <option value="17" selected>17px</option>
+        <option value="18">18px</option>
+        <option value="20">20px</option>
+        <option value="22">22px</option>
+        <option value="24">24px</option>
+      </select>
     </div>
     <div class="tg">
       <button class="tbtn" onclick="fmt('h2')" title="Título"><i class="ti ti-h-1"></i></button>
@@ -521,11 +566,9 @@ input[type="file"]{display:none}
       <div class="editor-body">
         <div class="editor-scroll" id="scrollA">
           <div class="editor-content" id="editorContent">
-            <div id="mainEditor" contenteditable="true" class="texted" oninput="onInput()" spellcheck="true" lang="es"></div>
-            <div class="img-ph" id="imgPh" onclick="triggerImg()">
-              <i class="ti ti-photo-plus"></i><span>Insertar ilustración aquí</span>
+            <div id="mainEditor" contenteditable="true" class="texted" oninput="onInput()" spellcheck="true" lang="es">
             </div>
-            <input type="file" id="imgInput" accept="image/*" onchange="handleImgUpload(event)"/>
+            <input type="file" id="imgInput" accept="image/*" onchange="handleImgUpload(event)" style="display:none"/>
           </div>
         </div>
         <div class="split-div" id="splitDiv" style="display:none"></div>
@@ -695,9 +738,22 @@ input[type="file"]{display:none}
     <div id="composeEd" contenteditable="true" class="compose-ed" oninput="onComposeInput()" spellcheck="true" lang="es"></div>
   </div>
   <div class="compose-bar">
-    <span class="compose-wc">Palabras: <strong id="composeWC">0</strong></span>
-    <span style="color:rgba(200,190,170,.4)">Esc para salir · Cmd+S para snapshot</span>
-    <button class="compose-exit" onclick="closeCompose()"><i class="ti ti-arrows-minimize" style="font-size:13px"></i> Salir del foco</button>
+    <span class="compose-wc">✦ <strong id="composeWC">0</strong> palabras</span>
+    <!-- Botón snapshot táctil -->
+    <button class="compose-btn compose-btn-snap" onclick="saveComposeSnap()" title="Guardar snapshot">
+      <i class="ti ti-camera" style="font-size:16px"></i> Snapshot
+    </button>
+    <!-- Botón dictado en modo foco -->
+    <button class="compose-btn compose-btn-mic" id="composeMicBtn" onclick="toggleComposeDictation()" title="Dictado por voz">
+      <i class="ti ti-microphone" style="font-size:16px"></i> Dictar
+    </button>
+    <!-- Toggle modo oscuro/claro -->
+    <button class="compose-btn compose-btn-dark" onclick="toggleComposeDarkMode()" title="Modo oscuro/claro">
+      <i class="ti ti-moon" style="font-size:16px" id="composeDarkIcon"></i>
+    </button>
+    <button class="compose-exit" onclick="closeCompose()">
+      <i class="ti ti-arrows-minimize" style="font-size:15px"></i> Salir
+    </button>
   </div>
 </div>
 
@@ -997,7 +1053,7 @@ function renderBinder(){
     const ch=chapters[id]; if(!ch)return;
     const item=document.createElement('div'); item.className='bitem sub'; item.id='b-'+id;
     const lblColor=ch.label&&ch.label!=='none'?`var(--lbl-${ch.label})`:'transparent';
-    item.innerHTML=`<div class="blbl" style="background:${lblColor}"></div><i class="ti ti-file-text" style="font-size:12px"></i><span class="bl">${ch.title}</span><span class="bb" id="bb-${id}">${ch.words||0}</span>`;
+    item.innerHTML=`<div class="blbl" style="background:${lblColor}"></div><i class="ti ti-file-text" style="font-size:12px"></i><span class="bl">${ch.title}</span><span class="bb" id="bb-${id}">${ch.words||0}</span><button onclick="deleteChapter('${id}',event)" title="Eliminar capítulo" style="background:none;border:none;cursor:pointer;color:rgba(201,169,110,0);padding:0 2px;font-size:13px;flex-shrink:0;transition:color .12s" onmouseover="this.style.color='#c0392b'" onmouseout="this.style.color='rgba(201,169,110,0)'"><i class="ti ti-trash"></i></button>`;
     item.onclick=()=>nav(item,id);
     cc.appendChild(item);
   });
@@ -1229,7 +1285,10 @@ function showAlt(viewId,section){
 function loadChapter(id){
   currentChapterId=id;
   const ch=chapters[id]; if(!ch)return;
-  document.getElementById('mainEditor').innerHTML=ch.content||'';
+  const ed = document.getElementById('mainEditor');
+  ed.innerHTML = ch.content || '';
+  // Limpiar cualquier placeholder residual dentro del editor
+  ed.querySelectorAll('.img-ph-dynamic').forEach(el => el.remove());
   document.getElementById('chapterTitle').value=ch.title||'';
   document.getElementById('composeTitle').value=ch.title||'';
   document.getElementById('chStatus').value=ch.status||'Borrador';
@@ -1239,6 +1298,22 @@ function loadChapter(id){
   document.getElementById('chNotas').value=ch.notas||'';
   document.getElementById('chTodos').value=ch.todos||'';
   document.getElementById('chInclude').checked=ch.include!==false;
+  // Aplicar fuente guardada
+  const ed2 = document.getElementById('mainEditor');
+  if(ch.fontFamily) {
+    ed2.style.fontFamily = ch.fontFamily;
+    document.getElementById('fontSelector').value = ch.fontFamily;
+  } else {
+    ed2.style.fontFamily = 'Lora';
+    document.getElementById('fontSelector').value = 'Lora';
+  }
+  if(ch.fontSize) {
+    ed2.style.fontSize = ch.fontSize + 'px';
+    document.getElementById('fontSizeSelector').value = ch.fontSize;
+  } else {
+    ed2.style.fontSize = '17px';
+    document.getElementById('fontSizeSelector').value = '17';
+  }
   sesionStartWords=ch.words||0;
   // Etiqueta
   document.querySelectorAll('.lbl-dot').forEach(d=>d.classList.remove('selected'));
@@ -1264,7 +1339,10 @@ function saveCurrentChapter(){
   if(!currentChapterId||!chapters[currentChapterId])return;
   clearTimeout(saveTimer);
   const ch=chapters[currentChapterId];
-  ch.content=document.getElementById('mainEditor').innerHTML;
+  // Clonar para limpiar antes de guardar
+  const edClone = document.getElementById('mainEditor').cloneNode(true);
+  edClone.querySelectorAll('.img-ph-dynamic').forEach(el => el.remove());
+  ch.content = edClone.innerHTML;
   const txt=document.getElementById('mainEditor').innerText||'';
   ch.words=txt.trim()?txt.trim().split(/\s+/).length:0;
   ch.title=document.getElementById('chapterTitle').value;
@@ -1389,6 +1467,27 @@ window.compareSnap=(i)=>{
 };
 
 /* ── EDITOR ── */
+window.applyFont = (fontFamily) => {
+  const ed = document.getElementById('mainEditor');
+  ed.style.fontFamily = fontFamily;
+  // Guardar preferencia de fuente con el capítulo
+  if(currentChapterId && chapters[currentChapterId]) {
+    chapters[currentChapterId].fontFamily = fontFamily;
+    updateDoc(doc(db,'projects',currentProjectId,'chapters',currentChapterId),{fontFamily}).catch(()=>{});
+  }
+  toast('Fuente: ' + document.getElementById('fontSelector').options[document.getElementById('fontSelector').selectedIndex].text);
+};
+
+window.applyFontSize = (size) => {
+  const ed = document.getElementById('mainEditor');
+  ed.style.fontSize = size + 'px';
+  // Guardar tamaño con el capítulo
+  if(currentChapterId && chapters[currentChapterId]) {
+    chapters[currentChapterId].fontSize = size;
+    updateDoc(doc(db,'projects',currentProjectId,'chapters',currentChapterId),{fontSize:size}).catch(()=>{});
+  }
+};
+
 window.fmt=(cmd)=>{
   const ed=document.getElementById('mainEditor');ed.focus();
   if(cmd==='h2')document.execCommand('formatBlock',false,'h2');
@@ -1598,6 +1697,31 @@ window.updateDeadline=()=>{
 };
 
 /* ── AÑADIR CAPÍTULO ── */
+window.deleteChapter=async(id, event)=>{
+  event.stopPropagation();
+  const ch = chapters[id];
+  if(!ch) return;
+  if(!confirm(`¿Eliminar "${ch.title}"? Esta acción no se puede deshacer.`)) return;
+  if(chapterOrder.length <= 1) { toast('No puedes eliminar el único capítulo'); return; }
+  try {
+    await deleteDoc(doc(db,'projects',currentProjectId,'chapters',id));
+    delete chapters[id];
+    chapterOrder = chapterOrder.filter(cid => cid !== id);
+    // Si era el capítulo activo, abrir el primero disponible
+    if(currentChapterId === id) {
+      currentChapterId = null;
+      if(chapterOrder.length > 0) {
+        showEditor();
+        loadChapter(chapterOrder[0]);
+        document.getElementById('b-'+chapterOrder[0])?.classList.add('active');
+      }
+    }
+    renderBinder(); renderCork(); renderOutline();
+    updateTotalWC();
+    toast('Capítulo eliminado');
+  } catch(e) { toast('Error: '+e.message); }
+};
+
 window.addChapter=async()=>{
   if(!currentProjectId)return;
   const n=chapterOrder.length+1;
@@ -1721,7 +1845,10 @@ window.saveStormField=async(id,field,value)=>{
 };
 
 /* ── IMÁGENES CLOUDINARY ── */
-window.triggerImg=()=>document.getElementById('imgInput').click();
+window.triggerImg=()=>{
+  document.getElementById('mainEditor').focus();
+  document.getElementById('imgInput').click();
+};
 window.handleImgUpload=async(e)=>{
   const file=e.target.files[0];if(!file)return;e.target.value='';
   const ph=document.getElementById('imgPh');
@@ -1737,10 +1864,13 @@ window.handleImgUpload=async(e)=>{
   }catch(err){loadEl.remove();toast('Error al subir imagen: '+err.message);}
 };
 function insertImageBlock(url){
-  const ph=document.getElementById('imgPh');
-  const uid='img-'+Date.now();
-  const wrapper=document.createElement('div');wrapper.className='img-block';wrapper.id=uid;
-  wrapper.innerHTML=`
+  const ed = document.getElementById('mainEditor');
+  const uid = 'img-' + Date.now();
+  const wrapper = document.createElement('div');
+  wrapper.className = 'img-block';
+  wrapper.contentEditable = 'false'; // no editable como texto
+  wrapper.id = uid;
+  wrapper.innerHTML = `
     <div class="img-toolbar">
       <button class="img-tbtn" onclick="toggleBgMode('${uid}')"><i class="ti ti-layout-board"></i> Fondo</button>
       <button class="img-tbtn" onclick="toggleDarkBg('${uid}')"><i class="ti ti-contrast"></i> Oscuro</button>
@@ -1755,9 +1885,23 @@ function insertImageBlock(url){
       <input type="range" min="20" max="100" value="100" style="flex:1;cursor:pointer" oninput="resizeImg('${uid}',this.value)"/>
       <span style="font-size:11px;color:var(--txm)" id="size-lbl-${uid}">100%</span>
     </div>
-    <input class="img-cap-input" type="text" placeholder="Pie de imagen…"/>`;
-  ph.parentNode.insertBefore(wrapper,ph);
-  countImagesInEditor();triggerSave();
+    <input class="img-cap-input" type="text" placeholder="Pie de imagen…" contenteditable="false"/>`;
+  // Insertar en la posición del cursor o al final del editor
+  const sel = window.getSelection();
+  if (sel && sel.rangeCount > 0 && ed.contains(sel.anchorNode)) {
+    const range = sel.getRangeAt(0);
+    range.collapse(false);
+    range.insertNode(wrapper);
+    // Mover cursor después del bloque
+    range.setStartAfter(wrapper);
+    range.setEndAfter(wrapper);
+    sel.removeAllRanges();
+    sel.addRange(range);
+  } else {
+    ed.appendChild(wrapper);
+  }
+  countImagesInEditor();
+  triggerSave();
 }
 window.toggleBgMode=(id)=>{const b=document.getElementById(id);if(!b)return;const isBg=b.classList.contains('bg-mode');if(isBg){b.classList.remove('bg-mode');const ov=b.querySelector('.img-text-overlay');if(ov)ov.remove();}else{b.classList.add('bg-mode');if(!b.querySelector('.img-text-overlay')){const ov=document.createElement('div');ov.className='img-text-overlay';ov.contentEditable='true';ov.setAttribute('spellcheck','true');b.appendChild(ov);}}triggerSave();};
 window.toggleDarkBg=(id)=>{const b=document.getElementById(id);if(b){b.classList.toggle('dark-bg');triggerSave();}};
@@ -1824,8 +1968,45 @@ window.saveNotepad=()=>{
 window.toggleNotepad=()=>document.getElementById('notepad').classList.toggle('open');
 
 /* ── COMPOSE ── */
+window.toggleComposeDarkMode = () => {
+  const compose = document.getElementById('compose');
+  compose.classList.toggle('dark-mode');
+  const icon = document.getElementById('composeDarkIcon');
+  icon.className = compose.classList.contains('dark-mode')
+    ? 'ti ti-sun' : 'ti ti-moon';
+  icon.style.fontSize = '16px';
+};
+
+window.saveComposeSnap = () => {
+  // Sincronizar contenido del compose al editor principal primero
+  document.getElementById('mainEditor').innerHTML = document.getElementById('composeEd').innerHTML;
+  openModal('snap');
+};
+
+window.toggleComposeDictation = () => {
+  dictationTarget = 'composeEd';
+  const btn = document.getElementById('composeMicBtn');
+  if (isRecording) {
+    stopDictation();
+    btn.classList.remove('recording');
+    btn.innerHTML = '<i class="ti ti-microphone" style="font-size:16px"></i> Dictar';
+  } else {
+    startDictation();
+    btn.classList.add('recording');
+    btn.innerHTML = '<i class="ti ti-microphone" style="font-size:16px"></i> Escuchando…';
+  }
+};
+
 window.openCompose=()=>{document.getElementById('composeEd').innerHTML=document.getElementById('mainEditor').innerHTML;document.getElementById('compose').classList.add('open');document.getElementById('composeEd').focus();};
-window.closeCompose=()=>{document.getElementById('mainEditor').innerHTML=document.getElementById('composeEd').innerHTML;document.getElementById('compose').classList.remove('open');onInput();};
+window.closeCompose=()=>{
+  document.getElementById('mainEditor').innerHTML=document.getElementById('composeEd').innerHTML;
+  document.getElementById('compose').classList.remove('open');
+  // Resetear botón mic si estaba activo
+  if(isRecording && dictationTarget==='composeEd') stopDictation();
+  const btn=document.getElementById('composeMicBtn');
+  if(btn){btn.classList.remove('recording');btn.innerHTML='<i class="ti ti-microphone" style="font-size:16px"></i> Dictar';}
+  onInput();
+};
 window.onComposeInput=()=>{const txt=document.getElementById('composeEd').innerText||'';document.getElementById('composeWC').textContent=txt.trim()?txt.trim().split(/\s+/).length:0;};
 
 /* ── MODALES ── */
@@ -2471,7 +2652,12 @@ window.compilar = (fmt) => {
     blob = new Blob([md], {type:'text/markdown'}); filename = title + '.md';
 
   } else if (fmt === 'html') {
-    let html = `<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8"><title>${title}</title><style>${HTML_COMPILE_STYLES}</style></head><body>`;
+    let html = `<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8"><title>${title}</title><style>${HTML_COMPILE_STYLES}
+/* ── SELECTOR DE FUENTE ── */
+.font-selector { padding:4px 6px; border:1px solid var(--bd2); border-radius:4px; font-size:11px; font-family:'Inter',sans-serif; background:var(--s0); color:var(--tx); cursor:pointer; max-width:130px; }
+.font-selector:focus { outline:none; border-color:var(--ac-bd); }
+.font-size-selector { padding:4px 4px; border:1px solid var(--bd2); border-radius:4px; font-size:11px; font-family:'Inter',sans-serif; background:var(--s0); color:var(--tx); cursor:pointer; width:52px; }
+</style></head><body>`;
     html += `<h1 class="project-title">${title}</h1>`;
     html += `<div class="project-subtitle">Compilado el ${new Date().toLocaleDateString('es-ES', {day:'numeric',month:'long',year:'numeric'})}</div>`;
     chaptersToCompile.forEach(ch => {
